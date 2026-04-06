@@ -1072,6 +1072,16 @@ function makeCard(v) {
 }
 
 // ============ RENDER ============
+const FOLDER_LINKS = {
+  methods: 'https://drive.google.com/drive/folders/1Nm6rRHAujyX6WPR6AGBauSka3WhXYnoz',
+  supervisor: 'https://drive.google.com/drive/folders/1PFh6tKlrgPhT-pDgc-qiRpT1HfsjU51J',
+  new: 'https://drive.google.com/drive/folders/1R5yThi9LqqkyPeiqsdc8M1BSKizdGWKu',
+  nutrition: 'https://drive.google.com/drive/folders/1lMXEvqNHyit_j705YaVpomyIXZwPPKVL',
+  management: 'https://drive.google.com/drive/folders/1SkapNCFodYidBJhrS21k4cfTRzJf-jjR',
+  hom: 'https://drive.google.com/drive/folders/1UyoIKoTj_47wew9uT5QlLBGuOFHXcba3',
+  wt: 'https://drive.google.com/drive/folders/126u29QGFunfCBz_KnnIMyawhB0BP9Z7N'
+};
+
 function renderAll() {
   let videos = VIDEOS;
   if (searchQuery) {
@@ -1098,9 +1108,10 @@ function renderAll() {
     const items = videos.filter(sec.filter);
     if (!items.length) continue;
     const done = items.filter(v => v.progress >= 100).length;
+    const folderLink = FOLDER_LINKS[sec.id] ? '<a href="'+FOLDER_LINKS[sec.id]+'" target="_blank" style="margin-left:12px;font-size:13px;color:#54b9c5;text-decoration:none;font-weight:600;">📁 תיקיה</a>' : '';
     html += '<div class="section" data-section="'+sec.id+'">' +
       '<div class="section-header">' +
-        '<div class="section-title">'+sec.title+'</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;"><div class="section-title">'+sec.title+'</div>'+folderLink+'</div>' +
         '<span class="section-count">'+done+'/'+items.length+' \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5</span>' +
       '</div>' +
       '<div class="row-wrapper">' +
