@@ -1,0 +1,38 @@
+{
+  "session_start": "2026-04-06T11:09:11Z",
+  "budget_total": 280000,
+  "budget_overhead": 30000,
+  "budget_per_priority": 60000,
+  "priorities": [
+    {
+      "id": "P1",
+      "title": "Fix Cloudflare Pages deployment (unblock P2)",
+      "status": "completed",
+      "pdr_approved": true,
+      "phase": "DO",
+      "checkpoint_commit": "d38a3e3"
+    },
+    {
+      "id": "P2",
+      "title": "Verify Google Drive API integration is live",
+      "status": "completed",
+      "pdr_approved": false,
+      "phase": "PLAN",
+      "checkpoint_commit": "b525cbf"
+    },
+    {
+      "id": "P3",
+      "title": "Implement TAB member authentication and display",
+      "status": "completed",
+      "pdr_approved": true,
+      "phase": "DO",
+      "checkpoint_commit": "cf74ed3"
+    }
+  ],
+  "totals": {
+    "turns": 0,
+    "estimated_tokens": 0,
+    "budget_remaining": 255000,
+    "budget_status": "GREEN"
+  }
+}

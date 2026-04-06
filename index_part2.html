@@ -1,0 +1,559 @@
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-links">
+    <a href="#">תנאי שימוש</a>
+    <a href="#">פרטיות</a>
+    <a href="#">עזרה</a>
+    <a href="#">צור קשר</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Super Team Academy. Herbalife Training Platform.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const VIDEOS = [
+  { id:1, category:'new', title:'\u05D0\u05DB\u05D9\u05DC\u05D4 \u05E8\u05D2\u05E9\u05D9\u05EA', desc:'\u05D4\u05D1\u05E0\u05EA \u05D0\u05DB\u05D9\u05DC\u05D4 \u05E8\u05D2\u05E9\u05D9\u05EA \u05D5\u05D0\u05D9\u05DA \u05DC\u05D4\u05EA\u05D7\u05D9\u05DC \u05DC\u05DC\u05DE\u05D3 \u05DC\u05DC\u05E7\u05D5\u05D7\u05D5\u05EA', duration:'35 \u05D3\u05E7', progress:0, fav:false, driveId:'1kD5wXyALd-3G4EhaMpWohm1PRjLYpi8T', emoji:'\u{1F957}' },
+  { id:2, category:'new', title:'\u05D4\u05E4\u05E0\u05D9\u05D5\u05EA \u05D5\u05D0\u05DE\u05D1\u05E1\u05D3\u05D5\u05E8', desc:'\u05D1\u05E0\u05D9\u05D9\u05EA \u05DE\u05E2\u05E8\u05DB\u05EA \u05D4\u05E4\u05E0\u05D9\u05D5\u05EA, \u05E9\u05D9\u05D5\u05D5\u05E7 \u05EA\u05D5\u05DB\u05DF \u05D5\u05EA\u05D5\u05DB\u05E0\u05D9\u05EA \u05D0\u05DE\u05D1\u05E1\u05D3\u05D5\u05E8', duration:'30 \u05D3\u05E7', progress:0, fav:false, driveId:'1PgxSAvw_32unldpHHD4fHjyd_DNCzDfV', emoji:'\u{1F91D}' },
+  { id:3, category:'new', title:'\u05E8\u05E9\u05EA\u05D5\u05EA \u05D7\u05D1\u05E8\u05EA\u05D9\u05D5\u05EA', desc:'\u05E9\u05D9\u05D5\u05D5\u05E7 \u05D5\u05D1\u05E0\u05D9\u05D9\u05EA \u05E0\u05D5\u05DB\u05D7\u05D5\u05EA \u05D1\u05E8\u05E9\u05EA\u05D5\u05EA \u05D4\u05D7\u05D1\u05E8\u05EA\u05D9\u05D5\u05EA', duration:'45 \u05D3\u05E7', progress:0, fav:false, driveId:'1-V88J2q0E70VwUq4o2Z86CHoROUJvTFM', emoji:'\u{1F4F1}' },
+  { id:4, category:'new', title:'\u05E0\u05D9\u05D4\u05D5\u05DC \u05DE\u05DC\u05D0\u05D9', desc:'\u05D0\u05D9\u05DA \u05DC\u05E0\u05D4\u05DC \u05D0\u05EA \u05D4\u05DE\u05DC\u05D0\u05D9 \u05D1\u05E6\u05D5\u05E8\u05D4 \u05D7\u05DB\u05DE\u05D4, \u05DC\u05D7\u05E1\u05D5\u05DA \u05D5\u05DC\u05D9\u05D9\u05E2\u05DC', duration:'20 \u05D3\u05E7', progress:0, fav:true, driveId:'1NS8zGgBCywtqCc94R7I7ifhBQI7P2SVG', emoji:'\u{1F4E6}' },
+  { id:5, category:'new', title:'\u05E1\u05D9\u05DE\u05D5\u05DC\u05E6\u05D9\u05D9\u05EA \u05E4\u05D2\u05D9\u05E9\u05D4 \u2013 \u05E4\u05E8\u05D5\u05D2\u05E0\u05DC\u05D9', desc:'\u05D4\u05D3\u05D2\u05DE\u05EA \u05E4\u05D2\u05D9\u05E9\u05D4 \u05DE\u05DC\u05D0\u05D4 \u05D1\u05D1\u05D5\u05E8\u05D3 \u05E2\u05DD \u05DC\u05E7\u05D5\u05D7 \u05E4\u05E8\u05D5\u05D2\u05E0\u05DC\u05D9', duration:'30 \u05D3\u05E7', progress:0, fav:false, driveId:'19N9kq62Z8UYUBE3VML0vHpKqFroo75G8', emoji:'\u{1F3AD}' },
+  { id:6, category:'new', title:'\u05E1\u05D9\u05DE\u05D5\u05DC\u05E6\u05D9\u05D9\u05EA \u05E4\u05D2\u05D9\u05E9\u05D4 \u2013 \u05D8\u05DC\u05E4\u05D5\u05DF', desc:'\u05D4\u05D3\u05D2\u05DE\u05EA \u05E4\u05D2\u05D9\u05E9\u05D4 \u05DE\u05DC\u05D0\u05D4 \u05D1\u05D8\u05DC\u05E4\u05D5\u05DF \u05E2\u05DD \u05DC\u05E7\u05D5\u05D7 \u05D7\u05D3\u05E9', duration:'25 \u05D3\u05E7', progress:0, fav:false, driveId:'1xBY0RvHAANOaxSBiJJyH8vBQGMtsCo_6', emoji:'\u{1F4DE}' },
+  { id:7, category:'new', title:'\u05D1\u05D5\u05E8\u05D3', desc:'\u05D4\u05D3\u05E8\u05DB\u05D4 \u05DE\u05E7\u05D9\u05E4\u05D4 \u05E2\u05DC \u05E9\u05D9\u05DE\u05D5\u05E9 \u05D1\u05D1\u05D5\u05E8\u05D3 \u2013 \u05DE\u05D4\u05E6\u05E2\u05D3 \u05D4\u05E8\u05D0\u05E9\u05D5\u05DF', duration:'35 \u05D3\u05E7', progress:0, fav:false, driveId:'1DhfjZKnjGXcPo0K-8zQpEmezUJRxq_7g', emoji:'\u{1F5A5}\uFE0F' },
+  { id:8, category:'new', title:'\u05D4\u05D3\u05E8\u05DB\u05EA \u05EA\u05D5\u05DB\u05E0\u05D9\u05EA \u05D4\u05E9\u05D9\u05D5\u05D5\u05E7', desc:'\u05D4\u05E1\u05D1\u05E8 \u05DE\u05DC\u05D0 \u05E2\u05DC \u05EA\u05D5\u05DB\u05E0\u05D9\u05EA \u05D4\u05E9\u05D9\u05D5\u05D5\u05E7 \u05E9\u05DC \u05D4\u05E8\u05D1\u05DC\u05D9\u05D9\u05E3', duration:'40 \u05D3\u05E7', progress:0, fav:false, driveId:'1hvBKmgz9AlBS6mBxSRgOpNbcLkGE9HNJ', emoji:'\u{1F4CA}' },
+  { id:9, category:'new', title:'\u05D4\u05E6\u05D2\u05EA \u05DE\u05D5\u05E6\u05E8\u05D9\u05DD \u05D5\u05E9\u05EA\u05D9\u05D9\u05D4', desc:'\u05D4\u05E6\u05D2\u05EA \u05DE\u05D5\u05E6\u05E8\u05D9 \u05D4\u05E8\u05D1\u05DC\u05D9\u05D9\u05E3 \u05D1\u05E6\u05D5\u05E8\u05D4 \u05DE\u05E7\u05E6\u05D5\u05E2\u05D9\u05EA', duration:'30 \u05D3\u05E7', progress:0, fav:false, driveId:'1uhGBS2h0v6u-uYg2YXjktD03uKak9lcG', emoji:'\u{1F964}' },
+  { id:10, category:'new', title:'\u05E9\u05D2\u05E8\u05EA \u05E2\u05D1\u05D5\u05D3\u05D4', desc:'\u05D1\u05E0\u05D9\u05D9\u05EA \u05D4\u05DE\u05D9\u05E0\u05D3\u05E1\u05D8 \u05D4\u05E0\u05DB\u05D5\u05DF \u05DC\u05D4\u05E6\u05DC\u05D7\u05D4 \u05D1\u05D4\u05E8\u05D1\u05DC\u05D9\u05D9\u05E3', duration:'25 \u05D3\u05E7', progress:0, fav:false, driveId:'1rnX4kMtkpQq6t_hFhfYcRTBT8SJukhJn', emoji:'\u{1F9E0}' },
+  { id:11, category:'new', title:'\u05E4\u05DC\u05D0\u05D5 \u05DC\u05E7\u05D5\u05D7 \u05D0\u05D5\u05E0\u05DC\u05D9\u05D9\u05DF', desc:'\u05E9\u05D9\u05D8\u05EA \u05DE\u05E2\u05E7\u05D1 \u05D5\u05E4\u05DC\u05D0\u05D5 \u05DC\u05E7\u05D5\u05D7\u05D5\u05EA \u05D0\u05D5\u05E0\u05DC\u05D9\u05D9\u05DF \u05DC\u05E9\u05D9\u05DE\u05D5\u05E8 \u05D5\u05D2\u05D3\u05D9\u05DC\u05D4', duration:'20 \u05D3\u05E7', progress:0, fav:false, driveId:'164rW5A-QYQyOzktzMBaw7zANer4tKEcy', emoji:'\u{1F4BB}' },
+  { id:12, category:'supervisor', title:'\u05D7\u05D9\u05E9\u05D5\u05D1 \u05E2\u05E8\u05DB\u05D9\u05DD \u05D4\u05E8\u05D1\u05DC\u05D9\u05D9\u05E3', desc:'\u05D4\u05D3\u05E8\u05DB\u05D4 \u05DE\u05DC\u05D0\u05D4 \u05DC\u05D7\u05D9\u05E9\u05D5\u05D1 VP, \u05E8\u05D5\u05D9\u05D0\u05DC\u05D8\u05D9 \u05D5\u05D1\u05D5\u05E0\u05D5\u05E1\u05D9\u05DD', duration:'40 \u05D3\u05E7', progress:0, fav:false, driveId:'1rNYh5KKi7HBuMDDJwsq_PjzSCwJgaQgO', emoji:'\u{1F522}' },
+  { id:13, category:'supervisor', title:'\u05E2\u05D1\u05D5\u05D3\u05D4 \u05E2\u05DD AI', desc:'\u05E9\u05D9\u05DE\u05D5\u05E9 \u05D1\u05DB\u05DC\u05D9 \u05D1\u05D9\u05E0\u05D4 \u05DE\u05DC\u05D0\u05DB\u05D5\u05EA\u05D9\u05EA \u05DC\u05E9\u05D9\u05E4\u05D5\u05E8 \u05D1\u05D9\u05E6\u05D5\u05E2\u05D9\u05DD', duration:'45 \u05D3\u05E7', progress:0, fav:false, driveId:'1d48U5i39VWpn3RGL295Cs1DlIR0-V3XY', emoji:'\u{1F916}' },
+  { id:14, category:'supervisor', title:'\u05E2\u05D1\u05D5\u05D3\u05D4 \u05E2\u05DD \u05DC\u05E7\u05D5\u05D7\u05D5\u05EA \u05D1\u05D0\u05E8\u05D4"\u05D1', desc:'\u05D4\u05E8\u05D7\u05D1\u05D4 \u05DC\u05E9\u05D5\u05E7 \u05D4\u05D0\u05DE\u05E8\u05D9\u05E7\u05D0\u05D9 \u2013 \u05E9\u05E4\u05D4, \u05EA\u05E8\u05D1\u05D5\u05EA \u05D5\u05E9\u05D9\u05D8\u05D5\u05EA', duration:'35 \u05D3\u05E7', progress:0, fav:false, driveId:'1hgfYckGLwFCK7PdvC03Gp88PFZwqVvB3', emoji:'\u{1F1FA}\u{1F1F8}' },
+  { id:15, category:'supervisor', title:'\u05E9\u05D9\u05E0\u05D5\u05D9 \u05D4\u05E8\u05D2\u05DC\u05D9\u05DD', desc:'\u05DC\u05E4\u05E8\u05D5\u05E5 \u05DE\u05E2\u05D1\u05E8 \u05D5\u05DC\u05E9\u05E0\u05D5\u05EA \u05D4\u05E8\u05D2\u05DC\u05D9\u05DD \u05DC\u05E6\u05DE\u05D9\u05D7\u05D4', duration:'30 \u05D3\u05E7', progress:0, fav:false, driveId:'1yAhOHupJZdBI8ODvL6bnptW-goXwMnYN', emoji:'\u{1F504}' },
+  { id:16, category:'supervisor', title:'FOMO', desc:'\u05D9\u05E6\u05D9\u05E8\u05EA \u05D3\u05D7\u05D9\u05E4\u05D5\u05EA \u05D5\u05D0\u05D8\u05E8\u05E7\u05D8\u05D9\u05D1\u05D9\u05D5\u05EA \u05D1\u05E2\u05E1\u05E7', duration:'40 \u05D3\u05E7', progress:0, fav:false, driveId:'1RNMAzQAjf94r320-hEv4OsUx3SepfOBn', emoji:'\u{1F525}' },
+  { id:17, category:'supervisor', title:'\u05D1\u05E0\u05D9\u05D9\u05EA \u05DE\u05D5\u05D3\u05DC \u05D0\u05D8\u05E8\u05E7\u05D8\u05D9\u05D1\u05D9 \u05D5\u05E9\u05DB\u05E4\u05D5\u05DC', desc:'\u05D1\u05E0\u05D9\u05D9\u05EA \u05DE\u05D5\u05D3\u05DC \u05DE\u05E0\u05D4\u05D9\u05D2\u05D5\u05EA \u05E9\u05E0\u05E9\u05DB\u05E4\u05DC \u05D5\u05D9\u05D2\u05D3\u05DC', duration:'50 \u05D3\u05E7', progress:0, fav:false, driveId:'1D0V-zgLHr4Hn02LNWZf3vRM-UZ088fhZ', emoji:'\u265F\uFE0F' },
+  { id:18, category:'supervisor', title:'\u05E6\u05E2\u05D3\u05D9\u05DD \u05E8\u05D0\u05E9\u05D5\u05E0\u05D9\u05DD \u05D2\u05D9\u05D4\u05D5\u05DC\u05D9\u05D9\u05DD', desc:'\u05D4\u05E6\u05E2\u05D3\u05D9\u05DD \u05D4\u05E8\u05D0\u05E9\u05D5\u05E0\u05D9\u05DD \u05DC\u05D1\u05E0\u05D5\u05EA \u05DE\u05E0\u05D4\u05D9\u05D2', duration:'35 \u05D3\u05E7', progress:0, fav:false, driveId:'1G-SBoE90x9E_XNuSfJzt89UAtB60xUQN', emoji:'\u{1F463}' },
+  { id:19, category:'supervisor', title:'\u05E4\u05DC\u05D5\u05D0\u05D5 \u05DE\u05E4\u05D9\u05E5', desc:'\u05E9\u05D9\u05D8\u05EA \u05DE\u05E2\u05E7\u05D1 \u05D0\u05D7\u05E8 \u05DE\u05E0\u05E6\u05D9\u05D2\u05D9\u05DD \u05D1\u05E6\u05D5\u05D5\u05EA', duration:'30 \u05D3\u05E7', progress:0, fav:false, driveId:'1T8ecGKUl1hPFKgTYTydw-T0y1nESIBQ0', emoji:'\u{1F4CB}' },
+  { id:20, category:'supervisor', title:'\u05E4\u05DC\u05D5\u05D0\u05D5 \u05DE\u05E4\u05D9\u05E5 \u05E9\u05D9\u05E9 \u05DC\u05D5 \u05DC\u05E7\u05D5\u05D7', desc:'\u05E9\u05D9\u05D8\u05D5\u05EA \u05E4\u05DC\u05D0\u05D5 \u05DE\u05E4\u05E7\u05D7 \u05DC\u05DE\u05E0\u05E6\u05D9\u05D2 \u05E2\u05DD \u05DC\u05E7\u05D5\u05D7\u05D5\u05EA', duration:'35 \u05D3\u05E7', progress:0, fav:false, driveId:'1klq97w3K0IczxddsDdyz7WU54Lcaz9wO', emoji:'\u{1F3AF}' },
+  { id:21, category:'wt', title:'\u05E9\u05D9\u05E0\u05D5\u05D9 \u05D4\u05E8\u05D2\u05DC\u05D9\u05DD', desc:'\u05DE\u05D9\u05E0\u05D3\u05E1\u05D8 \u05DE\u05E0\u05D4\u05D9\u05D2\u05D5\u05EA \u05DC\u05E8\u05DE\u05EA WT \u05D5\u05DE\u05E2\u05DC\u05D4', duration:'45 \u05D3\u05E7', progress:0, fav:false, driveId:'1FrxV7OdX8BbYQcdaOWdp-Lwgh0RYkIZI', emoji:'\u{1F48E}' },
+  { id:22, category:'wt', title:'\u05E2\u05D1\u05D5\u05D3\u05D4 \u05E2\u05DD \u05D4\u05D1\u05D9\u05D6\u05D5\u05D5\u05E8\u05E7', desc:'\u05D0\u05D9\u05DA \u05DC\u05D4\u05DB\u05D9\u05DF \u05D5\u05DC\u05E0\u05D4\u05DC \u05D0\u05D9\u05E8\u05D5\u05E2\u05D9 \u05E6\u05D5\u05D5\u05EA', duration:'40 \u05D3\u05E7', progress:0, fav:false, driveId:'1-K2yuoAKUdPOXACyGi-vWtywDEWnaUMm', emoji:'\u{1F3AA}' },
+  { id:23, category:'wt', title:'\u05E0\u05D9\u05D4\u05D5\u05DC \u05DE\u05DC\u05D0\u05D9', desc:'\u05D0\u05E1\u05D8\u05E8\u05D8\u05D2\u05D9\u05D5\u05EA \u05DE\u05EA\u05E7\u05D3\u05DE\u05D5\u05EA \u05DC\u05D1\u05E0\u05D9\u05D9\u05EA \u05D0\u05E8\u05D2\u05D5\u05DF', duration:'55 \u05D3\u05E7', progress:0, fav:false, driveId:'1YaUw1YjDOfBNTiSFRErPqFYvtpdcGvDm', emoji:'\u{1F3D7}\uFE0F' },
+  { id:24, category:'wt', title:'\u05D1\u05E0\u05D9\u05D9\u05EA \u05DE\u05D5\u05D3\u05DC \u05D0\u05D8\u05E8\u05E7\u05D8\u05D9\u05D1\u05D9 \u05D5\u05E9\u05DB\u05E4\u05D5\u05DC', desc:'\u05E0\u05D9\u05D4\u05D5\u05DC \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9 \u05DE\u05EA\u05E7\u05D3\u05DD \u05D5\u05EA\u05DB\u05E0\u05D5\u05DF \u05DC\u05D8\u05D5\u05D5\u05D7 \u05D0\u05E8\u05D5\u05DA', duration:'50 \u05D3\u05E7', progress:0, fav:false, driveId:'1ILedxHiJwNU5ari07prybxFwE5i5QVlo', emoji:'\u{1F4B0}' },
+  { id:25, category:'general', title:'20.12 \u05D6\u05D5\u05DD \u05D1\u05D9\u05D5\u05E1', desc:'\u05D4\u05E7\u05DC\u05D8\u05EA \u05D6\u05D5\u05DD \u05D1\u05D9\u05D5\u05E1 \u05DE\u05D9\u05D5\u05D7\u05D3 \u05E2\u05DD \u05DB\u05DC \u05D4\u05E6\u05D5\u05D5\u05EA', duration:'60 \u05D3\u05E7', progress:0, fav:false, driveId:'1zzP7Qf4k-hFDGSotaHJjZT2A7uknASbV', emoji:'\u{1F4F9}' },
+  { id:26, category:'general', title:'\u05D0\u05EA\u05D2\u05E8 21 \u05D9\u05DE\u05D9\u05DD', desc:'\u05E4\u05D9\u05EA\u05D5\u05D7 \u05DE\u05D9\u05E0\u05D3\u05E1\u05D8 \u05E0\u05DB\u05D5\u05DF \u05DC\u05D4\u05E6\u05DC\u05D7\u05D4', duration:'45 \u05D3\u05E7', progress:0, fav:false, driveId:'1ty0NPyOxGXNKWUa65fT5FXveVbIa1hcs', emoji:'\u{1F3C6}' },
+  { id:27, category:'general', title:'\u05E1\u05D9\u05DE\u05D5\u05DC\u05E6\u05D9\u05D9\u05EA \u05E4\u05D2\u05D9\u05E9\u05D4 \u05DC\u05DC\u05E7\u05D5\u05D7 \u05D7\u05D3\u05E9', desc:'\u05E4\u05D9\u05EA\u05D5\u05D7 \u05DE\u05D9\u05E0\u05D3\u05E1\u05D8 \u2013 \u05D7\u05DC\u05E7 \u05E9\u05E0\u05D9', duration:'40 \u05D3\u05E7', progress:0, fav:false, driveId:'1Rfq48QOcyU3R9LX8PYaPg5UPMUh7gziQ', emoji:'\u{1F3C6}' },
+  { id:28, category:'general', title:'\u05D6\u05D5\u05DD \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05EA\u05E0\u05D2\u05D3\u05D5\u05D9\u05D5\u05EA', desc:'\u05E1\u05E8\u05D8\u05D5\u05DF \u05DE\u05D1\u05E6\u05E2 \u05DE\u05D9\u05D5\u05D7\u05D3 \u2013 REMIND \u05DC\u05DB\u05DC \u05D4\u05E6\u05D5\u05D5\u05EA', duration:'15 \u05D3\u05E7', progress:0, fav:false, driveId:'1kNB247nxMP7Ya6sMCypU1dpdEU2co9f6', emoji:'\u{1F514}' },
+  { id:29, category:'general', title:'\u05D6\u05D5\u05DD \u05E4\u05DC\u05E7\u05E1 \u05DE\u05E0\u05D4\u05D9\u05D2\u05D5\u05EA', desc:'\u05E1\u05E8\u05D8\u05D5\u05DF \u05DE\u05D9\u05D5\u05D7\u05D3 \u05E9\u05DC \u05D4\u05E6\u05D5\u05D5\u05EA', duration:'20 \u05D3\u05E7', progress:0, fav:false, driveId:'1n7j_YE85OLtgoOYUMB1Kd5JZFPMy2do1', emoji:'\u{1F3A5}' },
+  { id:30, category:'general', title:'\u05E4\u05DC\u05D5\u05D0\u05D5 \u05D7\u05D5\u05D2\u05D9 \u05D1\u05D9\u05EA \u05D5\u05D1\u05D9\u05E7\u05D5\u05E8 \u05D1\u05D9\u05EA', desc:'\u05D4\u05D3\u05E8\u05DB\u05D4 \u05E2\u05DC \u05E0\u05D9\u05D4\u05D5\u05DC \u05D7\u05D5\u05D2\u05D9\u05DD \u05D5\u05D9\u05D9\u05E6\u05D5\u05E8 \u05DE\u05D5\u05E6\u05D9\u05D0\u05D9\u05DD', duration:'35 \u05D3\u05E7', progress:0, fav:false, driveId:'1l_gJgeqSsQm-y5qTvpfQL0mygjQF_F6H', emoji:'\u{1F331}' },
+  { id:31, category:'docs', title:'Quick Start', desc:'\u05DE\u05D3\u05E8\u05D9\u05DA \u05D4\u05EA\u05D7\u05DC\u05D4 \u05DE\u05D4\u05D9\u05E8\u05D4 \u2013 PDF \u05DC\u05DB\u05DC \u05DE\u05E0\u05E6\u05D9\u05D2 \u05D7\u05D3\u05E9', duration:'PDF', progress:0, fav:false, driveId:'1rJt1sXz7PvDuW13Eqg_-Ee9JwQjbq4v_', emoji:'\u{1F4C4}' },
+  { id:32, category:'docs', title:'\u05D8\u05D5\u05E4\u05E1 \u05D4\u05DB\u05E8\u05EA \u05DC\u05E7\u05D5\u05D7', desc:'\u05D8\u05D5\u05E4\u05E1 \u05D4\u05DB\u05E8\u05EA \u05DC\u05E7\u05D5\u05D7 \u05D5\u05D0\u05D9\u05E1\u05D5\u05E3 \u05DE\u05D9\u05D3\u05E2 \u05DC\u05E4\u05D2\u05D9\u05E9\u05D4 \u05E8\u05D0\u05E9\u05D5\u05E0\u05D4', duration:'PDF', progress:0, fav:false, driveId:'1PjvKFChOq2CfdGnMBROeXnQyfYsq-9Ry', emoji:'\u{1F4DD}' },
+  { id:33, category:'docs', title:'\u05D4\u05D6\u05D3\u05DE\u05E0\u05D5\u05EA \u05E2\u05E1\u05E7\u05D9\u05EA', desc:'\u05DE\u05E6\u05D2\u05EA \u05D4\u05D6\u05D3\u05DE\u05E0\u05D5\u05EA \u05E2\u05E1\u05E7\u05D9\u05EA \u05DC\u05D4\u05E6\u05D2\u05D4 \u05DC\u05E4\u05D5\u05D8\u05E0\u05E6\u05D9\u05D0\u05DC\u05D9\u05DD', duration:'PDF', progress:0, fav:false, driveId:'19NmBlpJudBr50zAiqhVwYH3GDcmwG8h9', emoji:'\u{1F4BC}' },
+  { id:34, category:'docs', title:'Flow \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9', desc:'\u05EA\u05E8\u05E9\u05D9\u05DD flow \u05E9\u05DC \u05D4\u05DE\u05D1\u05E0\u05D4 \u05D4\u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 \u05E9\u05DC \u05D4\u05E6\u05D5\u05D5\u05EA', duration:'Excel', progress:0, fav:false, driveId:'1nSIfJKxrcHw1OmhFEMDt4e8aQHwvEozm', emoji:'\u{1F4CA}' },
+];
+
+const SECTIONS = [
+  { id:'new', title:'\u05E6\u05D5\u05E2\u05D3\u05D9\u05DD \u05D7\u05D3\u05E9\u05D9\u05DD', filter: v => v.category==='new' },
+  { id:'supervisor', title:'\u05D1\u05E0\u05D5\u05E9\u05D4 \u05DE\u05E4\u05E7\u05D7\u05D9\u05DD', filter: v => v.category==='supervisor' },
+  { id:'nutrition', title:'\u05D7\u05D6\u05D5\u05D4 \u05D5\u05DE\u05D5\u05E6\u05E8\u05D9\u05DD', filter: v => v.category==='nutrition' },
+  { id:'methods', title:'\u05E9\u05D9\u05D8\u05D5\u05EA \u05E2\u05D1\u05D5\u05D3\u05D4', filter: v => v.category==='methods' },
+  { id:'management', title:'\u05E0\u05D9\u05D4\u05D5\u05DC \u05D5\u05D0\u05E8\u05D2\u05D5\u05DF', filter: v => v.category==='management' },
+  { id:'hom', title:'HOM \u05D4\u05D3\u05E8\u05DB\u05D4', filter: v => v.category==='hom' },
+  { id:'wt', title:'WT \u05D5\u05DE\u05E2\u05DC\u05D4', filter: v => v.category==='wt' },
+  { id:'general', title:'\u05DB\u05DC\u05DC\u05D9\u05D9\u05DD', filter: v => v.category==='general' },
+];
+
+// ===== TEAM MEMBERS LIST =====
+const MEMBERS = [
+  { name: 'שחף ויצמן', email: 'shahafwai@gmail.com' },
+  { name: 'הודיה אוחיון', email: 'hodaya1507ohayon@gmail.com' },
+  { name: 'רינת ישראל', email: 'Rinati0010@gmail.com' },
+  { name: 'יעל רותם', email: 'ylasko76@gmail.com' },
+  { name: 'עדן טיבי תדמור', email: 'Edentibi5@gmail.com' },
+  { name: 'ליז מאירוביץ', email: 'Lizmeirovich1@gmail.com' },
+  { name: 'רבקה דהן', email: 'Rivkanati@gmail.com' },
+  { name: 'פולי מאירוביץ ויצמן', email: 'Polly70meirovich@gmail.com' },
+  { name: 'נוגה אזרד', email: 'nogazrad122@gmail.com' },
+  { name: 'מישל אסא', email: 'Michellelesdman@gmail.com' },
+  { name: 'מלי עטר', email: 'maliat1405@gmail.com' },
+  { name: 'דנה צפניה', email: 'zfaniadana@gmail.com' },
+  { name: 'גיא אסא', email: 'guyassa6@gmail.com' },
+  { name: 'עדי שור', email: 'Adishor2025@gmail.com' }
+];
+
+function isMember(email) {
+  return MEMBERS.some(m => m.email.toLowerCase() === email.toLowerCase());
+}
+
+function getMemberByEmail(email) {
+  return MEMBERS.find(m => m.email.toLowerCase() === email.toLowerCase());
+}
+
+const BADGE_MAP = {
+  new: ['badge-new', '\u05E6\u05D5\u05E2\u05D3 \u05D7\u05D3\u05E9'],
+  supervisor: ['badge-supervisor', '\u05DE\u05E4\u05E7\u05D7'],
+  nutrition: ['badge-nutrition', '\u05D7\u05D6\u05D5\u05D4'],
+  methods: ['badge-methods', '\u05E9\u05D9\u05D8\u05D5\u05EA'],
+  management: ['badge-management', '\u05E0\u05D9\u05D4\u05D5\u05DC'],
+  hom: ['badge-hom', 'HOM'],
+  wt: ['badge-wt', 'WT+'],
+  general: ['badge-general', '\u05DB\u05DC\u05DC\u05D9'],
+};
+
+let currentFilter = 'all';
+let searchQuery = '';
+
+// ============ PER-USER PROGRESS ============
+function getUserKey() {
+  const u = JSON.parse(localStorage.getItem('st_user') || 'null');
+  if (!u) return null;
+  return 'st_progress_' + u.phone;
+}
+function loadUserProgress() {
+  const key = getUserKey();
+  if (!key) return {};
+  return JSON.parse(localStorage.getItem(key) || '{}');
+}
+function saveUserProgress(prog) {
+  const key = getUserKey();
+  if (key) localStorage.setItem(key, JSON.stringify(prog));
+}
+function markWatched(videoId) {
+  const prog = loadUserProgress();
+  prog[videoId] = 100;
+  saveUserProgress(prog);
+  applyProgress();
+  renderAll();
+  syncProgressToFirebase();
+  showToast('\u2713 \u05E1\u05D5\u05DE\u05DF \u05DB\u05E0\u05E6\u05E4\u05D4!');
+}
+function applyProgress() {
+  const prog = loadUserProgress();
+  VIDEOS.forEach(v => { v.progress = prog[v.id] || 0; });
+}
+
+// ============ LOGIN ============
+async function doLogin() {
+  const name = document.getElementById('loginName').value.trim();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const phone = document.getElementById('loginPhone').value.trim();
+  const tab = document.getElementById('loginTab').value;
+  if (!name || !email || !phone || !tab) { showToast('נא למלא את כל השדות'); return; }
+
+  document.querySelector('.login-btn').textContent = 'בודק...';
+  const status = await registerUser(name, email, phone, tab);
+
+  if (status === 'pending') {
+    showPendingScreen(name);
+    localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab }));
+    return;
+  }
+  if (status === 'denied') {
+    showToast('הגישה נדחתה. פנה למנהל הצוות.');
+    document.querySelector('.login-btn').textContent = 'כניסה לאקדמיה';
+    return;
+  }
+  if (status === 'not_allowed') {
+    showToast('האימייל לא מופיע ברשימה המאושרת.');
+    document.querySelector('.login-btn').textContent = 'כניסה לאקדמיה';
+    return;
+  }
+
+  // approved
+  localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab }));
+  document.getElementById('loginOverlay').classList.add('hidden');
+  hidePendingScreen();
+  showUser({ name, phone });
+  applyProgress();
+  renderAll();
+  showToast('\u05D1\u05E8\u05D5\u05DA \u05D4\u05D1\u05D0, ' + name + '!');
+}
+
+function showPendingScreen(name) {
+  let el = document.getElementById('pendingScreen');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'pendingScreen';
+    el.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.97);display:flex;align-items:center;justify-content:center;text-align:center;font-family:Heebo,sans-serif;';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = '<div style="max-width:400px;padding:40px">' +
+    '<div style="font-size:60px;margin-bottom:20px">\u23F3</div>' +
+    '<h2 style="color:#fff;font-size:24px;margin-bottom:10px">\u05E9\u05DC\u05D5\u05DD ' + name + '!</h2>' +
+    '<p style="color:#999;font-size:16px;line-height:1.6;margin-bottom:24px">\u05D4\u05D1\u05E7\u05E9\u05D4 \u05E9\u05DC\u05DA \u05E0\u05E9\u05DC\u05D7\u05D4 \u05DC\u05DE\u05E0\u05D4\u05DC \u05D4\u05E6\u05D5\u05D5\u05EA.<br>\u05EA\u05E7\u05D1\u05DC \u05D0\u05D9\u05E9\u05D5\u05E8 \u05D1\u05E7\u05E8\u05D5\u05D1.</p>' +
+    '<button onclick="recheckStatus()" style="padding:12px 28px;background:#e50914;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">\u05D1\u05D3\u05D5\u05E7 \u05E9\u05D5\u05D1</button>' +
+    '<p style="color:#666;font-size:12px;margin-top:16px">\u05D4\u05D3\u05E3 \u05D1\u05D5\u05D3\u05E7 \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA \u05DB\u05DC 15 \u05E9\u05E0\u05D9\u05D5\u05EA</p>' +
+  '</div>';
+  el.style.display = 'flex';
+  startStatusPolling();
+}
+
+function hidePendingScreen() {
+  const el = document.getElementById('pendingScreen');
+  if (el) el.style.display = 'none';
+  stopStatusPolling();
+}
+
+let pollInterval = null;
+function startStatusPolling() {
+  stopStatusPolling();
+  pollInterval = setInterval(recheckStatus, 15000);
+}
+function stopStatusPolling() {
+  if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+}
+
+async function recheckStatus() {
+  const u = JSON.parse(localStorage.getItem('st_user') || 'null');
+  if (!u) return;
+  const status = await checkUserStatus(u.email || u.phone);
+  if (status === 'approved') {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    hidePendingScreen();
+    showUser(u);
+    applyProgress();
+    renderAll();
+    showToast('אושרת! ברוך הבא, ' + u.name + '!');
+  } else if (status === 'denied') {
+    hidePendingScreen();
+    localStorage.removeItem('st_user');
+    showToast('\u05D4\u05D2\u05D9\u05E9\u05D4 \u05E0\u05D3\u05D7\u05EA\u05D4.');
+    location.reload();
+  }
+}
+
+function doLogout() { localStorage.removeItem('st_user'); stopStatusPolling(); location.reload(); }
+function showUser(u) {
+  const chip = document.getElementById('userChip');
+  chip.style.display = 'flex';
+  document.getElementById('userAvatar').textContent = u.name.charAt(0);
+  document.getElementById('userName').textContent = u.name;
+}
+async function checkLogin() {
+  const u = JSON.parse(localStorage.getItem('st_user') || 'null');
+  if (!u) return;
+  const status = await checkUserStatus(u.email || u.phone);
+  if (status === 'approved') {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    showUser(u);
+    applyProgress();
+  } else if (status === 'pending') {
+    showPendingScreen(u.name);
+  } else if (status === 'denied') {
+    localStorage.removeItem('st_user');
+  }
+}
+
+// ============ SEARCH ============
+function toggleSearch() {
+  document.getElementById('navSearch').classList.toggle('open');
+  const inp = document.getElementById('searchInput');
+  if (document.getElementById('navSearch').classList.contains('open')) inp.focus();
+  else { inp.value = ''; handleSearch(''); }
+}
+function handleSearch(val) { searchQuery = val; renderAll(); }
+
+// ============ BILLBOARD ============
+function renderBillboard() {
+  const featured = VIDEOS.filter(v => v.progress < 100);
+  const v = featured[Math.floor(Math.random() * featured.length)] || VIDEOS[0];
+  document.getElementById('billboardEmoji').textContent = v.emoji;
+  document.getElementById('billboardTitle').innerHTML = v.title + '<br><span class="highlight">' + (BADGE_MAP[v.category]?.[1] || '') + '</span>';
+  document.getElementById('billboardDesc').textContent = v.desc;
+  document.getElementById('billboardPlay').href = 'https://drive.google.com/file/d/' + v.driveId + '/view';
+  document.getElementById('billboardPlay').onclick = function() { markWatched(v.id); };
+  document.getElementById('billboardMeta').textContent = v.duration + '  |  ' + (BADGE_MAP[v.category]?.[1] || '');
+}
+
+// ============ CARD ============
+function makeCard(v) {
+  const url = 'https://drive.google.com/file/d/' + v.driveId + '/view';
+  const badge = BADGE_MAP[v.category];
+  const matchPct = Math.floor(70 + Math.random() * 28) + '%';
+  let progressHtml = '';
+  if (v.progress > 0 && v.progress < 100) progressHtml = '<div class="card-progress"><div class="card-progress-fill" style="width:'+v.progress+'%"></div></div>';
+  else if (v.progress >= 100) progressHtml = '<div class="card-progress"><div class="card-progress-fill" style="width:100%;background:var(--green)"></div></div>';
+
+  const statusText = v.progress >= 100 ? '<span class="done">\u2713 \u05D4\u05D5\u05E9\u05DC\u05DD</span>' : '<span class="notstart">' + v.duration + '</span>';
+
+  return '<a href="'+url+'" target="_blank" class="card" data-id="'+v.id+'" onclick="markWatched('+v.id+')">' +
+    '<div class="card-thumb" data-cat="'+v.category+'">' +
+      '<div class="card-emoji">'+v.emoji+'</div>' +
+      '<div class="card-play-btn"><svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg></div>' +
+      '<span class="card-badge '+badge[0]+'">'+badge[1]+'</span>' +
+      progressHtml +
+    '</div>' +
+    '<div class="card-info-bar">' +
+      '<div class="card-info-title">'+v.title+'</div>' +
+      '<div class="card-info-status">'+statusText+'</div>' +
+    '</div>' +
+    '<div class="card-expand">' +
+      '<div class="card-expand-meta">' +
+        '<span class="card-expand-match">'+matchPct+' \u05D4\u05EA\u05D0\u05DE\u05D4</span>' +
+        '<span class="card-expand-duration">'+v.duration+'</span>' +
+        '<span class="card-expand-badge">'+badge[1]+'</span>' +
+      '</div>' +
+      '<div class="card-expand-desc">'+v.desc+'</div>' +
+      '<div class="card-expand-actions">' +
+        '<div class="card-expand-btn play-sm"><svg viewBox="0 0 24 24" width="14" height="14"><polygon points="6,3 20,12 6,21"/></svg></div>' +
+        '<div class="card-expand-btn" onclick="event.preventDefault();event.stopPropagation();markWatched('+v.id+')">\u2713</div>' +
+      '</div>' +
+    '</div>' +
+  '</a>';
+}
+
+// ============ RENDER ============
+const FOLDER_LINKS = {
+  methods: 'https://drive.google.com/drive/folders/1Nm6rRHAujyX6WPR6AGBauSka3WhXYnoz',
+  supervisor: 'https://drive.google.com/drive/folders/1PFh6tKlrgPhT-pDgc-qiRpT1HfsjU51J',
+  new: 'https://drive.google.com/drive/folders/1R5yThi9LqqkyPeiqsdc8M1BSKizdGWKu',
+  nutrition: 'https://drive.google.com/drive/folders/1lMXEvqNHyit_j705YaVpomyIXZwPPKVL',
+  management: 'https://drive.google.com/drive/folders/1SkapNCFodYidBJhrS21k4cfTRzJf-jjR',
+  hom: 'https://drive.google.com/drive/folders/1UyoIKoTj_47wew9uT5QlLBGuOFHXcba3',
+  wt: 'https://drive.google.com/drive/folders/126u29QGFunfCBz_KnnIMyawhB0BP9Z7N'
+};
+
+// ============ GOOGLE DRIVE API ============
+const FOLDER_IDS = {
+  methods: '1Nm6rRHAujyX6WPR6AGBauSka3WhXYnoz',
+  supervisor: '1PFh6tKlrgPhT-pDgc-qiRpT1HfsjU51J',
+  new: '1R5yThi9LqqkyPeiqsdc8M1BSKizdGWKu',
+  nutrition: '1lMXEvqNHyit_j705YaVpomyIXZwPPKVL',
+  management: '1SkapNCFodYidBJhrS21k4cfTRzJf-jjR',
+  hom: '1UyoIKoTj_47wew9uT5QlLBGuOFHXcba3',
+  wt: '126u29QGFunfCBz_KnnIMyawhB0BP9Z7N'
+};
+
+const DRIVE_API_KEY = 'AIzaSyCGgqQpVV0XCNvhkSh25ErvB6_6sXxhEr0';
+
+async function fetchDriveFiles(folderId, category) {
+  try {
+    const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&fields=id,name,mimeType,webContentLink&key=${DRIVE_API_KEY}`);
+    const data = await response.json();
+    if (data.files) {
+      return data.files.map((f, idx) => ({
+        id: parseInt(folderId.slice(-4) + idx),
+        category,
+        title: f.name.replace(/\.[^/.]+$/, ''),
+        desc: `📁 ${category} - ${f.name}`,
+        duration: '✓',
+        progress: 0,
+        fav: false,
+        driveId: f.id,
+        emoji: '📄'
+      }));
+    }
+  } catch (e) {
+    console.log('Drive API note: files loaded from cache');
+  }
+  return [];
+}
+
+async function loadDriveContent() {
+  let driveVideos = [];
+  for (const [cat, folderId] of Object.entries(FOLDER_IDS)) {
+    const files = await fetchDriveFiles(folderId, cat);
+    driveVideos = driveVideos.concat(files);
+  }
+  if (driveVideos.length > 0) {
+    VIDEOS = driveVideos;
+    renderAll();
+  }
+}
+
+function renderAll() {
+  let videos = VIDEOS;
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    videos = videos.filter(v => v.title.toLowerCase().includes(q) || v.desc.toLowerCase().includes(q));
+  }
+
+  // Progress overview
+  renderProgress();
+
+  // Continue watching
+  const cont = videos.filter(v => v.progress > 0 && v.progress < 100);
+  const cs = document.getElementById('continueSection');
+  if (cont.length > 0 && currentFilter === 'all') {
+    cs.classList.remove('hidden');
+    document.getElementById('continueRow').innerHTML = cont.map(v => makeCard(v)).join('');
+  } else { cs.classList.add('hidden'); }
+
+  // Category sections
+  const container = document.getElementById('allSections');
+  const secs = currentFilter === 'all' ? SECTIONS : SECTIONS.filter(s => s.id === currentFilter);
+  let html = '';
+  for (const sec of secs) {
+    const items = videos.filter(sec.filter);
+    if (!items.length) continue;
+    const done = items.filter(v => v.progress >= 100).length;
+    const folderLink = FOLDER_LINKS[sec.id] ? '<a href="'+FOLDER_LINKS[sec.id]+'" target="_blank" style="margin-left:12px;font-size:13px;color:#54b9c5;text-decoration:none;font-weight:600;">📁 תיקיה</a>' : '';
+    html += '<div class="section" data-section="'+sec.id+'">' +
+      '<div class="section-header">' +
+        '<div style="display:flex;align-items:center;gap:8px;"><div class="section-title">'+sec.title+'</div>'+folderLink+'</div>' +
+        '<span class="section-count">'+done+'/'+items.length+' \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5</span>' +
+      '</div>' +
+      '<div class="row-wrapper">' +
+        '<button class="row-arrow right" onclick="scrollRow(this, 1)">&#8249;</button>' +
+        '<div class="row">'+items.map(v => makeCard(v)).join('')+'</div>' +
+        '<button class="row-arrow left" onclick="scrollRow(this, -1)">&#8250;</button>' +
+      '</div>' +
+    '</div>';
+  }
+  container.innerHTML = html;
+}
+
+// ============ ROW SCROLL ============
+function scrollRow(btn, dir) {
+  const row = btn.parentElement.querySelector('.row');
+  row.scrollBy({ left: dir * 600, behavior: 'smooth' });
+}
+function scrollToContent() {
+  document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============ FILTER ============
+function filterCategory(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.nav-link').forEach(el => {
+    el.classList.toggle('active', el.textContent.trim() === getCatLabel(cat));
+  });
+  renderAll();
+}
+function getCatLabel(cat) {
+  const map = { all:'\u05D4\u05DB\u05DC', new:'\u05DE\u05EA\u05D7\u05D9\u05DC\u05D9\u05DD', supervisor:'\u05DE\u05E4\u05E7\u05D7\u05D9\u05DD', wt:'WT+', general:'\u05DB\u05DC\u05DC\u05D9\u05D9\u05DD', docs:'\u05DE\u05E1\u05DE\u05DB\u05D9\u05DD' };
+  return map[cat] || '\u05D4\u05DB\u05DC';
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============ LOGIN BG ============
+function renderLoginBg() {
+  const emojis = VIDEOS.map(v => v.emoji);
+  const grid = document.getElementById('loginBgGrid');
+  grid.innerHTML = Array.from({length: 24}, () =>
+    '<div class="login-bg-cell">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div>'
+  ).join('');
+}
+
+// ============ PROGRESS ============
+function renderProgress() {
+  const grid = document.getElementById('myProgressGrid');
+  const cats = [
+    { id:'new', name:'\u05DE\u05EA\u05D7\u05D9\u05DC\u05D9\u05DD', color:'var(--green)' },
+    { id:'supervisor', name:'\u05DE\u05E4\u05E7\u05D7\u05D9\u05DD', color:'var(--gold)' },
+    { id:'wt', name:'WT+', color:'#7b2ff7' },
+    { id:'general', name:'\u05DB\u05DC\u05DC\u05D9\u05D9\u05DD', color:'#0ea5e9' },
+    { id:'docs', name:'\u05DE\u05E1\u05DE\u05DB\u05D9\u05DD', color:'#f97316' },
+  ];
+  let td = 0, ta = 0, html = '';
+  for (const c of cats) {
+    const items = VIDEOS.filter(v => v.category === c.id);
+    const done = items.filter(v => v.progress >= 100).length;
+    const pct = items.length ? Math.round(done/items.length*100) : 0;
+    td += done; ta += items.length;
+    html += '<div class="my-progress-card">' +
+      '<div class="my-progress-header"><span class="my-progress-name">'+c.name+'</span><span class="my-progress-pct" style="color:'+c.color+'">'+pct+'%</span></div>' +
+      '<div class="my-progress-bar"><div class="my-progress-fill" style="width:'+pct+'%;background:'+c.color+'"></div></div>' +
+      '<div class="my-progress-count">'+done+'/'+items.length+' \u05D4\u05D5\u05E9\u05DC\u05DE\u05D5</div></div>';
+  }
+  const overallPct = ta ? Math.round(td/ta*100) : 0;
+  html += '<div class="my-progress-overall"><div class="my-progress-overall-pct">'+overallPct+'%</div><div class="my-progress-overall-label">\u05D4\u05EA\u05E7\u05D3\u05DE\u05D5\u05EA \u05DB\u05D5\u05DC\u05DC\u05EA</div></div>';
+  grid.innerHTML = html;
+}
+
+// ============ TELEGRAM NOTIFICATION ============
+// ============ FIREBASE CONFIG ============
+const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+
+async function registerUser(name, email, phone, tab) {
+  try {
+    // Check if email is in member list
+    if (!isMember(email)) {
+      return 'not_allowed';
+    }
+
+    // Check if user already exists in localStorage
+    const existing = JSON.parse(localStorage.getItem('st_user') || 'null');
+    if (existing && existing.email === email) {
+      return 'approved';
+    }
+
+    // New member - approve automatically
+    return 'approved';
+  } catch(e) { console.error(e); return 'not_allowed'; }
+}
+
+async function sendTabNotification(tabName, userName, userEmail, userKey) {
+  try {
+    const res = await fetch(FIREBASE_URL + '/tabMembers.json');
+    const members = await res.json() || [];
+    const list = Array.isArray(members) ? members : Object.values(members);
+    const tabMember = list.find(m => m.name === tabName);
+    if (!tabMember) return;
+    const approveUrl = 'https://superteamhlf.team/approve.html?key=' + userKey;
+    emailjs.send('service_etqui87', 'template_6bo4ai9', {
+      to_email: tabMember.email,
+      tab_name: tabName,
+      user_name: userName,
+      user_email: userEmail,
+      approve_url: approveUrl
+    }).catch(() => {});
+  } catch(e) { console.error(e); }
+}
+
+async function loadTabMembers() {
+  try {
+    const res = await fetch(FIREBASE_URL + '/tabMembers.json');
+    const members = await res.json() || [];
+    const list = Array.isArray(members) ? members : Object.values(members);
+    const sel = document.getElementById('loginTab');
+    list.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.name;
+      opt.textContent = m.name;
+      sel.appendChild(opt);
+    });
+  } catch(e) { console.error(e); }
+}
+
+async function checkUserStatus(email) {
+  try {
+    const res = await fetch(FIREBASE_URL + '/users.json');
+    const allUsers = await res.json() || {};
+    const user = Object.values(allUsers).find(u => u.email === email);
+    if (user) return user.status || 'pending';
+    return 'not_found';
+  } catch(e) { return 'approved'; }
+}
+
+function syncProgressToFirebase() {
+  const u = JSON.parse(localStorage.getItem('st_user') || 'null');
+  if (!u) return;
+  const prog = loadUserProgress();
+  const key = (u.email || u.phone).replace(/[.#$\[\]]/g, '_');
+  fetch(FIREBASE_URL + '/progress/' + key + '.json', {
+    method: 'PUT',
+    body: JSON.stringify(prog)
+  }).catch(() => {});
+}
+
+// ============ NAVBAR SCROLL ============
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ============ INIT ============
+renderLoginBg();
+loadTabMembers();
+checkLogin();
+renderBillboard();
+loadDriveContent().then(() => renderAll()).catch(() => renderAll());
+</script>
+</body>
+</html>
+<!-- Rebuild trigger: Mon Apr  6 12:31:28 CEST 2026 -->
