@@ -977,9 +977,12 @@ async function doLogin() {
   document.querySelector('.login-btn').textContent = 'בודק...';
   const status = await registerUser(name, email, phone, tab);
 
-  if (status === 'pending') {
-    showPendingScreen(name);
+  if (status === 'pending' || status === 'approved') {
+    // Auto-approve since we validate against members list
     localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab, awt }));
+    document.getElementById('loginOverlay').classList.add('hidden');
+    hidePendingScreen();
+    renderAll();
     return;
   }
   if (status === 'denied') {
