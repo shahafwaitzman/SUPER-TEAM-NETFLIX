@@ -23,16 +23,16 @@
     {
       "id": "P3",
       "title": "Implement OAuth2 for Drive file access",
-      "status": "in_progress",
+      "status": "completed",
       "pdr_approved": true,
       "phase": "DO",
-      "checkpoint_commit": "881ce72"
+      "checkpoint_commit": "8b8b6ba"
     }
   ],
   "totals": {
-    "turns": 3,
-    "estimated_tokens": 2500,
-    "budget_remaining": 251500,
+    "turns": 4,
+    "estimated_tokens": 3500,
+    "budget_remaining": 250000,
     "budget_status": "GREEN"
   }
 }
