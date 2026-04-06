@@ -1069,14 +1069,12 @@ function showUser(u) {
 async function checkLogin() {
   const u = JSON.parse(localStorage.getItem('st_user') || 'null');
   if (!u) return;
-  const status = await checkUserStatus(u.email || u.phone);
-  if (status === 'approved') {
+  // Auto-approve users in members list (skip email verification)
+  if (isMember(u.email)) {
     document.getElementById('loginOverlay').classList.add('hidden');
     showUser(u);
     applyProgress();
-  } else if (status === 'pending') {
-    showPendingScreen(u.name);
-  } else if (status === 'denied') {
+  } else {
     localStorage.removeItem('st_user');
   }
 }
