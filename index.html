@@ -1861,11 +1861,6 @@ nav.scrolled { background: rgba(20,20,20,0.97); box-shadow: 0 2px 20px rgba(0,0,
   .card-emoji { font-size: 32px; }
   .billboard h1 { font-size: 24px; }
 }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>emailjs.init('nhwKyEa3uJ8JjmxXQ');</script>
-</head>
-<body>
 
 <!-- LOGIN -->
 <div class="login-overlay" id="loginOverlay">
@@ -2670,60 +2665,3 @@ loadDriveContent().then(() => renderAll()).catch(() => renderAll());
 </script>
 </body>
 </html>
-<!-- Rebuild trigger: Mon Apr  6 12:31:28 CEST 2026 -->
-
-<script>
-// OAuth2 Configuration
-const OAUTH_CLIENT_ID = '1052399470584-3pk6nu127eq0i08mfdgulut1bk2imqep.apps.googleusercontent.com';
-let googleAccessToken = localStorage.getItem('google_access_token');
-
-// Initialize Google Sign-In
-function initGoogleSignIn() {
-  google.accounts.id.initialize({
-    client_id: OAUTH_CLIENT_ID,
-    callback: handleCredentialResponse,
-    scope: 'https://www.googleapis.com/auth/drive.readonly'
-  });
-}
-
-function handleCredentialResponse(response) {
-  console.log('Google Sign-In successful');
-  // Extract the token
-  const token = response.credential;
-  // For OAuth, we need to use Google's token exchange
-  // This is a simplified version - in production you'd handle this on backend
-  googleAccessToken = token;
-  localStorage.setItem('google_access_token', token);
-  loadDriveContent();
-}
-
-// Modify fetchDriveFiles to use OAuth token if available
-async function fetchDriveFilesWithOAuth(folderId, category) {
-  try {
-    const headers = googleAccessToken ? {
-      'Authorization': `Bearer ${googleAccessToken}`
-    } : {};
-    
-    const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&fields=id,name,mimeType,webContentLink`;
-    const response = await fetch(url, { headers });
-    const data = await response.json();
-    
-    if (data.files) {
-      return data.files.map((f, idx) => ({
-        id: parseInt(folderId.slice(-4) + idx),
-        category,
-        title: f.name.replace(/\.[^/.]+$/, ''),
-        desc: `📁 ${category} - ${f.name}`,
-        duration: '✓',
-        progress: 0,
-        fav: false,
-        driveId: f.id,
-        emoji: '📄'
-      }));
-    }
-  } catch (e) {
-    console.log('OAuth Drive API note: ', e.message);
-  }
-  return [];
-}
-</script>
