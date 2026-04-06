@@ -7,16 +7,16 @@
     {
       "id": "P5",
       "title": "Create Netlify function to read Drive files and populate content",
-      "status": "in_progress",
+      "status": "completed",
       "pdr_approved": true,
       "phase": "DO",
-      "checkpoint_commit": "45720ec"
+      "checkpoint_commit": "fabc886"
     }
   ],
   "totals": {
-    "turns": 5,
-    "estimated_tokens": 4500,
-    "budget_remaining": 248500,
+    "turns": 6,
+    "estimated_tokens": 5300,
+    "budget_remaining": 247200,
     "budget_status": "GREEN"
   }
 }
