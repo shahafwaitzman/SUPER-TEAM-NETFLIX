@@ -15,16 +15,16 @@
     {
       "id": "P6",
       "title": "Reset site content and fix Drive integration",
-      "status": "in_progress",
+      "status": "completed",
       "pdr_approved": true,
-      "phase": "DO",
-      "checkpoint_commit": null
+      "phase": "DONE",
+      "checkpoint_commit": "fbc9037"
     }
   ],
   "totals": {
-    "turns": 8,
-    "estimated_tokens": 8300,
-    "budget_remaining": 244200,
+    "turns": 10,
+    "estimated_tokens": 12500,
+    "budget_remaining": 240000,
     "budget_status": "GREEN"
   }
 }
