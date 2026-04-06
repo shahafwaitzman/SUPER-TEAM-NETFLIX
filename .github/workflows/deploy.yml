@@ -13,15 +13,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create deployment archive
-        run: |
-          zip -r deployment.zip . \
-            -x ".git/*" ".github/*" "node_modules/*" ".DS_Store" "*.md"
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Wrangler
+        run: npm install -g @cloudflare/wrangler
 
       - name: Deploy to Cloudflare Pages
-        run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/super-team-academy/deployments" \
-            -H "X-Auth-Email: shahafwai@gmail.com" \
-            -H "X-Auth-Key: ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-            -F "manifest=@deployment.zip;type=application/zip" \
-            | jq .
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: wrangler pages publish . --project-name=super-team-academy
