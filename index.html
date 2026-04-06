@@ -2007,6 +2007,26 @@ nav.scrolled { background: rgba(20,20,20,0.97); box-shadow: 0 2px 20px rgba(0,0,
 <div class="toast" id="toast"></div>
 
 
+
+function populateTabDropdown() {
+  const dropdown = document.getElementById('loginTab');
+  if (!dropdown) return;
+  MEMBERS.forEach(member => {
+    const option = document.createElement('option');
+    option.value = member.email;
+    option.textContent = member.name;
+    dropdown.appendChild(option);
+  });
+}
+
+function syncTabWithEmail() {
+  const selectedEmail = document.getElementById('loginTab').value;
+  const member = getMemberByEmail(selectedEmail);
+  if (member) {
+    document.getElementById('loginEmail').value = member.email;
+  }
+}
+
+populateTabDropdown();
+
 </script>
-</body>
-</html>
