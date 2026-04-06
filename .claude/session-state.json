@@ -7,24 +7,24 @@
     {
       "id": "P1",
       "title": "Update Google Drive API Key in code",
-      "status": "pending",
-      "pdr_approved": false,
-      "phase": "PLAN",
-      "checkpoint_commit": null
+      "status": "completed",
+      "pdr_approved": true,
+      "phase": "DO",
+      "checkpoint_commit": "3c89413"
     },
     {
       "id": "P2",
       "title": "Verify API works and deploy to production",
-      "status": "pending",
+      "status": "in_progress",
       "pdr_approved": false,
       "phase": "PLAN",
       "checkpoint_commit": null
     }
   ],
   "totals": {
-    "turns": 0,
-    "estimated_tokens": 0,
-    "budget_remaining": 255000,
+    "turns": 1,
+    "estimated_tokens": 500,
+    "budget_remaining": 254500,
     "budget_status": "GREEN"
   }
 }
