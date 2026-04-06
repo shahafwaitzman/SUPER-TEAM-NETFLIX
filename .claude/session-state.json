@@ -31,16 +31,16 @@
     {
       "id": "P4",
       "title": "Add Google Sign-In button and test OAuth flow",
-      "status": "in_progress",
+      "status": "completed",
       "pdr_approved": true,
       "phase": "DO",
-      "checkpoint_commit": "4dcc332"
+      "checkpoint_commit": "a3a4c91"
     }
   ],
   "totals": {
-    "turns": 4,
-    "estimated_tokens": 3500,
-    "budget_remaining": 250000,
+    "turns": 5,
+    "estimated_tokens": 4500,
+    "budget_remaining": 248500,
     "budget_status": "GREEN"
   }
 }
