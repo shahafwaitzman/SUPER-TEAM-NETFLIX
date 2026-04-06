@@ -796,6 +796,41 @@ nav.scrolled { background: rgba(20,20,20,0.97); box-shadow: 0 2px 20px rgba(0,0,
   <div id="allSections"></div>
 </main>
 
+<!-- MEMBERS PAGE -->
+<section id="membersPage" class="page hidden">
+  <div style="padding: 100px 40px 40px; max-width: 1400px; margin: 0 auto;">
+    <h1 style="font-size: 32px; font-weight: 900; margin-bottom: 10px; color: var(--white);">חברי הצוות</h1>
+    <p style="color: var(--text-dim); margin-bottom: 40px; font-size: 15px;">14 חברי הצוות של Super Team Academy</p>
+    
+    <div id="membersGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;"></div>
+  </div>
+</section>
+
+<!-- AWT PROFILE PAGE -->
+<section id="awtPage" class="page hidden">
+  <div style="padding: 100px 40px 40px; max-width: 900px; margin: 0 auto;">
+    <h1 style="font-size: 32px; font-weight: 900; margin-bottom: 20px; color: var(--white);">Advanced Way Team (AWT)</h1>
+    <div style="background: var(--bg-card); border-radius: 12px; padding: 40px; border-left: 4px solid var(--red);">
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--red);">מי אנחנו?</h2>
+      <p style="color: var(--text); line-height: 1.8; margin-bottom: 24px; font-size: 16px;">
+        צוות AWT (Advanced Way Team) הוא קבוצה של 14 מנהלים ומנחים המתנדבים לתי יתד Super Team Academy. אנחנו מחויבים לספק חינוך איכותי ולהתפתח יחד כקהילה.
+      </p>
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px; margin-top: 40px; color: var(--red);">המטרות שלנו</h2>
+      <ul style="color: var(--text); line-height: 2; font-size: 16px; margin-bottom: 24px;">
+        <li>✓ מתן חינוך איכותי ומעשי</li>
+        <li>✓ בניית קהילה חזקה ותומכת</li>
+        <li>✓ פיתוח מנהיגות בקרב החברים</li>
+        <li>✓ יישום ידע בעולם האמיתי</li>
+      </ul>
+      <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--bg-hover);">
+        <p style="color: var(--text-dim); font-size: 14px;">
+          עבור שאלות או משוב, אנא צור קשר עם צוות הניהול.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <div class="footer">
   <div class="footer-links">
@@ -857,6 +892,32 @@ const SECTIONS = [
   { id:'wt', title:'WT \u05D5\u05DE\u05E2\u05DC\u05D4', filter: v => v.category==='wt' },
   { id:'general', title:'\u05DB\u05DC\u05DC\u05D9\u05D9\u05DD', filter: v => v.category==='general' },
 ];
+
+// ===== TEAM MEMBERS LIST =====
+const MEMBERS = [
+  { name: 'שחף ויצמן', email: 'shahafwai@gmail.com' },
+  { name: 'הודיה אוחיון', email: 'hodaya1507ohayon@gmail.com' },
+  { name: 'רינת ישראל', email: 'Rinati0010@gmail.com' },
+  { name: 'יעל רותם', email: 'ylasko76@gmail.com' },
+  { name: 'עדן טיבי תדמור', email: 'Edentibi5@gmail.com' },
+  { name: 'ליז מאירוביץ', email: 'Lizmeirovich1@gmail.com' },
+  { name: 'רבקה דהן', email: 'Rivkanati@gmail.com' },
+  { name: 'פולי מאירוביץ ויצמן', email: 'Polly70meirovich@gmail.com' },
+  { name: 'נוגה אזרד', email: 'nogazrad122@gmail.com' },
+  { name: 'מישל אסא', email: 'Michellelesdman@gmail.com' },
+  { name: 'מלי עטר', email: 'maliat1405@gmail.com' },
+  { name: 'דנה צפניה', email: 'zfaniadana@gmail.com' },
+  { name: 'גיא אסא', email: 'guyassa6@gmail.com' },
+  { name: 'עדי שור', email: 'Adishor2025@gmail.com' }
+];
+
+function isMember(email) {
+  return MEMBERS.some(m => m.email.toLowerCase() === email.toLowerCase());
+}
+
+function getMemberByEmail(email) {
+  return MEMBERS.find(m => m.email.toLowerCase() === email.toLowerCase());
+}
 
 const BADGE_MAP = {
   new: ['badge-new', '\u05E6\u05D5\u05E2\u05D3 \u05D7\u05D3\u05E9'],
@@ -1243,23 +1304,19 @@ const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.fireb
 
 async function registerUser(name, email, phone, tab) {
   try {
-    // Check if user already exists
-    const checkRes = await fetch(FIREBASE_URL + '/users.json');
-    const allUsers = await checkRes.json() || {};
-    const existing = Object.values(allUsers).find(u => u.email === email);
-    if (existing) {
-      return existing.status || 'pending';
+    // Check if email is in member list
+    if (!isMember(email)) {
+      return 'not_allowed';
     }
-    // Register new user as pending
-    const regRes = await fetch(FIREBASE_URL + '/users.json', {
-      method: 'POST',
-      body: JSON.stringify({ name, email, phone, tab, status: 'pending', registeredAt: new Date().toISOString() })
-    });
-    const regData = await regRes.json();
-    const userKey = regData.name;
-    // Send email notification to TAB member
-    sendTabNotification(tab, name, email, userKey);
-    return 'pending';
+
+    // Check if user already exists in localStorage
+    const existing = JSON.parse(localStorage.getItem('st_user') || 'null');
+    if (existing && existing.email === email) {
+      return 'approved';
+    }
+
+    // New member - approve automatically
+    return 'approved';
   } catch(e) { console.error(e); return 'not_allowed'; }
 }
 
@@ -1322,11 +1379,55 @@ window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
 });
 
+// ===== PAGE NAVIGATION =====
+function showPage(pageId) {
+  document.querySelectorAll('[id$="Page"]').forEach(p => p.classList.add('hidden'));
+  document.getElementById('mainContent').classList.add('hidden');
+  if (pageId === 'main') {
+    document.getElementById('mainContent').classList.remove('hidden');
+  } else {
+    document.getElementById(pageId).classList.remove('hidden');
+  }
+}
+
+// ===== RENDER MEMBERS GRID =====
+function renderMembers() {
+  const grid = document.getElementById('membersGrid');
+  if (!grid) return;
+  grid.innerHTML = MEMBERS.map(member => `
+    <div style="background: var(--bg-card); border-radius: 12px; padding: 24px; text-align: center; border: 1px solid var(--bg-hover);">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--red), var(--gold)); margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: var(--white);">
+        ${member.name.charAt(0)}
+      </div>
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px;">${member.name}</h3>
+      <p style="color: var(--text-dim); font-size: 13px; word-break: break-all;">${member.email}</p>
+    </div>
+  `).join('');
+}
+
+// ===== ADD PAGE NAV BUTTONS =====
+function addPageButtons() {
+  const navRight = document.querySelector('.nav-right');
+  if (!navRight) return;
+  const membersBtn = document.createElement('button');
+  membersBtn.textContent = '👥 חברים';
+  membersBtn.style.cssText = 'background:none;border:none;color:var(--text-dim);font-size:13px;font-weight:500;cursor:pointer;margin-right:16px;padding:0;';
+  membersBtn.onclick = () => { showPage('membersPage'); membersBtn.style.color = 'var(--white)'; if (navRight.lastChild) navRight.lastChild.style.color = 'var(--text-dim)'; };
+  const awtBtn = document.createElement('button');
+  awtBtn.textContent = '🏢 AWT';
+  awtBtn.style.cssText = 'background:none;border:none;color:var(--text-dim);font-size:13px;font-weight:500;cursor:pointer;margin-right:16px;padding:0;';
+  awtBtn.onclick = () => { showPage('awtPage'); awtBtn.style.color = 'var(--white)'; membersBtn.style.color = 'var(--text-dim)'; };
+  navRight.insertBefore(awtBtn, navRight.firstChild);
+  navRight.insertBefore(membersBtn, navRight.firstChild);
+}
+
 // ============ INIT ============
 renderLoginBg();
 loadTabMembers();
 checkLogin();
 renderBillboard();
+addPageButtons();
+renderMembers();
 loadDriveContent().then(() => renderAll()).catch(() => renderAll());
 </script>
 </body>
