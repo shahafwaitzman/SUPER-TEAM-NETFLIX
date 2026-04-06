@@ -6,27 +6,19 @@
   "priorities": [
     {
       "id": "P1",
-      "title": "Fix Cloudflare Pages deployment (unblock P2)",
-      "status": "completed",
-      "pdr_approved": true,
-      "phase": "DO",
-      "checkpoint_commit": "d38a3e3"
+      "title": "Update Google Drive API Key in code",
+      "status": "pending",
+      "pdr_approved": false,
+      "phase": "PLAN",
+      "checkpoint_commit": null
     },
     {
       "id": "P2",
-      "title": "Verify Google Drive API integration is live",
-      "status": "completed",
+      "title": "Verify API works and deploy to production",
+      "status": "pending",
       "pdr_approved": false,
       "phase": "PLAN",
-      "checkpoint_commit": "b525cbf"
-    },
-    {
-      "id": "P3",
-      "title": "Implement TAB member authentication and display",
-      "status": "completed",
-      "pdr_approved": true,
-      "phase": "DO",
-      "checkpoint_commit": "cf74ed3"
+      "checkpoint_commit": null
     }
   ],
   "totals": {
