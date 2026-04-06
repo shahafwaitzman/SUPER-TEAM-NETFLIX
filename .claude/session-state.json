@@ -5,36 +5,12 @@
   "budget_per_priority": 60000,
   "priorities": [
     {
-      "id": "P1",
-      "title": "Update Google Drive API Key in code",
-      "status": "completed",
+      "id": "P5",
+      "title": "Create Netlify function to read Drive files and populate content",
+      "status": "in_progress",
       "pdr_approved": true,
       "phase": "DO",
-      "checkpoint_commit": "3c89413"
-    },
-    {
-      "id": "P2",
-      "title": "Verify API works and deploy to production",
-      "status": "completed",
-      "pdr_approved": true,
-      "phase": "DO",
-      "checkpoint_commit": "d5c5cd8"
-    },
-    {
-      "id": "P3",
-      "title": "Implement OAuth2 for Drive file access",
-      "status": "completed",
-      "pdr_approved": true,
-      "phase": "DO",
-      "checkpoint_commit": "8b8b6ba"
-    },
-    {
-      "id": "P4",
-      "title": "Add Google Sign-In button and test OAuth flow",
-      "status": "completed",
-      "pdr_approved": true,
-      "phase": "DO",
-      "checkpoint_commit": "a3a4c91"
+      "checkpoint_commit": "45720ec"
     }
   ],
   "totals": {
