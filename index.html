@@ -695,9 +695,13 @@ nav.scrolled { background: rgba(20,20,20,0.97); box-shadow: 0 2px 20px rgba(0,0,
     </div>
     <div class="login-field">
       <label>ה-TAB שלי</label>
-      <select id="loginTab" style="width:100%;background:#333;border:none;border-radius:4px;padding:14px;color:#fff;font-size:16px;font-family:inherit;outline:none;appearance:none;cursor:pointer">
+      <select id="loginTab" style="width:100%;background:#333;border:none;border-radius:4px;padding:14px;color:#fff;font-size:16px;font-family:inherit;outline:none;appearance:none;cursor:pointer" onchange="syncTabWithEmail()">
         <option value="">בחר את ה-TAB שלך</option>
       </select>
+    </div>
+    <div class="login-field">
+      <label>שם ה-AWT שלי</label>
+      <input type="text" id="loginAWT" placeholder="הזן את שם ה-AWT שלך" style="width:100%">
     </div>
     <button class="login-btn" onclick="doLogin()">כניסה לאקדמיה</button>
     <div class="login-privacy">הפרטים שלך נשמרים רק במכשיר זה</div>
@@ -968,14 +972,14 @@ async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const phone = document.getElementById('loginPhone').value.trim();
   const tab = document.getElementById('loginTab').value;
-  if (!name || !email || !phone || !tab) { showToast('נא למלא את כל השדות'); return; }
+  const awt = document.getElementById("loginAWT").value.trim(); if (!name || !email || !phone || !tab || !awt) { showToast('נא למלא את כל השדות'); return; }
 
   document.querySelector('.login-btn').textContent = 'בודק...';
   const status = await registerUser(name, email, phone, tab);
 
   if (status === 'pending') {
     showPendingScreen(name);
-    localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab }));
+    localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab, awt }));
     return;
   }
   if (status === 'denied') {
@@ -990,7 +994,7 @@ async function doLogin() {
   }
 
   // approved
-  localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab }));
+  localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab, awt }));
   document.getElementById('loginOverlay').classList.add('hidden');
   hidePendingScreen();
   showUser({ name, phone });
@@ -1421,6 +1425,31 @@ function addPageButtons() {
   navRight.insertBefore(membersBtn, navRight.firstChild);
 }
 
+// ===== POPULATE TAB DROPDOWN =====
+function populateTabDropdown() {
+  const select = document.getElementById('loginTab');
+  if (!select) return;
+  MEMBERS.forEach(member => {
+    const option = document.createElement('option');
+    option.value = member.email;
+    option.textContent = member.name;
+    select.appendChild(option);
+  });
+}
+
+// ===== SYNC TAB WITH EMAIL =====
+function syncTabWithEmail() {
+  const email = document.getElementById('loginTab').value;
+  const nameInput = document.getElementById('loginName');
+  if (email && nameInput && !nameInput.value) {
+    const member = getMemberByEmail(email);
+    if (member) {
+      nameInput.value = member.name;
+      document.getElementById('loginEmail').value = member.email;
+    }
+  }
+}
+
 // ============ INIT ============
 renderLoginBg();
 loadTabMembers();
@@ -1428,6 +1457,7 @@ checkLogin();
 renderBillboard();
 addPageButtons();
 renderMembers();
+populateTabDropdown();
 loadDriveContent().then(() => renderAll()).catch(() => renderAll());
 </script>
 </body>
