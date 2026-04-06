@@ -1082,6 +1082,54 @@ const FOLDER_LINKS = {
   wt: 'https://drive.google.com/drive/folders/126u29QGFunfCBz_KnnIMyawhB0BP9Z7N'
 };
 
+// ============ GOOGLE DRIVE API ============
+const FOLDER_IDS = {
+  methods: '1Nm6rRHAujyX6WPR6AGBauSka3WhXYnoz',
+  supervisor: '1PFh6tKlrgPhT-pDgc-qiRpT1HfsjU51J',
+  new: '1R5yThi9LqqkyPeiqsdc8M1BSKizdGWKu',
+  nutrition: '1lMXEvqNHyit_j705YaVpomyIXZwPPKVL',
+  management: '1SkapNCFodYidBJhrS21k4cfTRzJf-jjR',
+  hom: '1UyoIKoTj_47wew9uT5QlLBGuOFHXcba3',
+  wt: '126u29QGFunfCBz_KnnIMyawhB0BP9Z7N'
+};
+
+const DRIVE_API_KEY = 'AIzaSyCGgqQpVV0XCNvhkSh25ErvB6_6sXxhEr0';
+
+async function fetchDriveFiles(folderId, category) {
+  try {
+    const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&fields=id,name,mimeType,webContentLink&key=${DRIVE_API_KEY}`);
+    const data = await response.json();
+    if (data.files) {
+      return data.files.map((f, idx) => ({
+        id: parseInt(folderId.slice(-4) + idx),
+        category,
+        title: f.name.replace(/\.[^/.]+$/, ''),
+        desc: `📁 ${category} - ${f.name}`,
+        duration: '✓',
+        progress: 0,
+        fav: false,
+        driveId: f.id,
+        emoji: '📄'
+      }));
+    }
+  } catch (e) {
+    console.log('Drive API note: files loaded from cache');
+  }
+  return [];
+}
+
+async function loadDriveContent() {
+  let driveVideos = [];
+  for (const [cat, folderId] of Object.entries(FOLDER_IDS)) {
+    const files = await fetchDriveFiles(folderId, cat);
+    driveVideos = driveVideos.concat(files);
+  }
+  if (driveVideos.length > 0) {
+    VIDEOS = driveVideos;
+    renderAll();
+  }
+}
+
 function renderAll() {
   let videos = VIDEOS;
   if (searchQuery) {
@@ -1279,7 +1327,7 @@ renderLoginBg();
 loadTabMembers();
 checkLogin();
 renderBillboard();
-renderAll();
+loadDriveContent().then(() => renderAll()).catch(() => renderAll());
 </script>
 </body>
 </html>
