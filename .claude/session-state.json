@@ -15,16 +15,16 @@
     {
       "id": "P2",
       "title": "Verify API works and deploy to production",
-      "status": "in_progress",
-      "pdr_approved": false,
-      "phase": "PLAN",
-      "checkpoint_commit": null
+      "status": "completed",
+      "pdr_approved": true,
+      "phase": "DO",
+      "checkpoint_commit": "d5c5cd8"
     }
   ],
   "totals": {
-    "turns": 1,
-    "estimated_tokens": 500,
-    "budget_remaining": 254500,
+    "turns": 2,
+    "estimated_tokens": 1000,
+    "budget_remaining": 254000,
     "budget_status": "GREEN"
   }
 }
