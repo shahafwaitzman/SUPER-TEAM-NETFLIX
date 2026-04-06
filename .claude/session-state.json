@@ -19,12 +19,20 @@
       "pdr_approved": true,
       "phase": "DO",
       "checkpoint_commit": "d5c5cd8"
+    },
+    {
+      "id": "P3",
+      "title": "Implement OAuth2 for Drive file access",
+      "status": "in_progress",
+      "pdr_approved": true,
+      "phase": "DO",
+      "checkpoint_commit": "881ce72"
     }
   ],
   "totals": {
-    "turns": 2,
-    "estimated_tokens": 1000,
-    "budget_remaining": 254000,
+    "turns": 3,
+    "estimated_tokens": 2500,
+    "budget_remaining": 251500,
     "budget_status": "GREEN"
   }
 }
