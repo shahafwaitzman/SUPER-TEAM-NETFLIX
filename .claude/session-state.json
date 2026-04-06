@@ -9,14 +9,22 @@
       "title": "Create Netlify function to read Drive files and populate content",
       "status": "completed",
       "pdr_approved": true,
+      "phase": "DONE",
+      "checkpoint_commit": "412d686"
+    },
+    {
+      "id": "P6",
+      "title": "Reset site content and fix Drive integration",
+      "status": "in_progress",
+      "pdr_approved": true,
       "phase": "DO",
-      "checkpoint_commit": "fabc886"
+      "checkpoint_commit": null
     }
   ],
   "totals": {
-    "turns": 6,
-    "estimated_tokens": 5300,
-    "budget_remaining": 247200,
+    "turns": 8,
+    "estimated_tokens": 8300,
+    "budget_remaining": 244200,
     "budget_status": "GREEN"
   }
 }
