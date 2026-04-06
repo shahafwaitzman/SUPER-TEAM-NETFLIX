@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Team Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #141414;
+  --card: #1a1a1a;
+  --red: #e50914;
+  --green: #46d369;
+  --gold: #f5c518;
+  --white: #fff;
+  --text: #e5e5e5;
+  --text-dim: #999;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  min-height: 100vh;
+}
+.admin-login {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh;
+}
+.admin-login-box {
+  background: var(--card); border-radius: 8px; padding: 40px;
+  width: 360px; text-align: center;
+}
+.admin-login-box h2 { font-size: 22px; margin-bottom: 20px; color: var(--white); }
+.admin-login-box input {
+  width: 100%; background: #333; border: none; border-radius: 4px;
+  padding: 14px; color: var(--white); font-size: 16px; font-family: inherit;
+  outline: none; margin-bottom: 16px; direction: ltr; text-align: center;
+}
+.admin-login-box input:focus { border-bottom: 2px solid var(--red); }
+.admin-login-box button {
+  width: 100%; padding: 14px; background: var(--red); color: #fff;
+  font-size: 16px; font-weight: 800; border: none; border-radius: 4px;
+  cursor: pointer; font-family: inherit;
+}
+
+.admin-panel { display: none; padding: 24px; max-width: 1000px; margin: 0 auto; }
+.admin-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px; padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.admin-header h1 { font-size: 28px; color: var(--white); }
+.admin-stats { display: flex; gap: 24px; }
+.admin-stat { text-align: center; }
+.admin-stat-num { font-size: 32px; font-weight: 900; }
+.admin-stat-label { font-size: 12px; color: var(--text-dim); }
+
+.admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+.admin-tab {
+  padding: 8px 20px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.15);
+  background: transparent; color: var(--text-dim); font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.admin-tab.active { background: var(--white); color: #000; border-color: var(--white); }
+.admin-tab .count {
+  display: inline-block; min-width: 20px; height: 20px; line-height: 20px;
+  border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center;
+  margin-right: 6px;
+}
+.admin-tab.active .count { background: var(--red); color: #fff; }
+
+.user-list { display: flex; flex-direction: column; gap: 8px; }
+.user-card {
+  background: var(--card); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.2s;
+}
+.user-card:hover { border-color: rgba(255,255,255,0.15); }
+.user-info { display: flex; align-items: center; gap: 14px; }
+.user-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: #fff;
+}
+.user-avatar.pending { background: var(--gold); color: #000; }
+.user-avatar.approved { background: var(--green); color: #000; }
+.user-avatar.denied { background: #666; }
+.user-details { }
+.user-name { font-size: 15px; font-weight: 700; color: var(--white); }
+.user-phone { font-size: 13px; color: var(--text-dim); direction: ltr; text-align: right; }
+.user-date { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.user-status {
+  font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 4px;
+}
+.user-status.pending { background: rgba(245,197,24,0.15); color: var(--gold); }
+.user-status.approved { background: rgba(70,211,105,0.15); color: var(--green); }
+.user-status.denied { background: rgba(255,255,255,0.06); color: var(--text-dim); }
+
+.user-actions { display: flex; gap: 8px; }
+.btn-approve {
+  padding: 8px 18px; border-radius: 4px; border: none;
+  background: var(--green); color: #000; font-weight: 700;
+  font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.btn-deny {
+  padding: 8px 18px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);
+  background: transparent; color: var(--text-dim); font-weight: 600;
+  font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.btn-deny:hover { border-color: var(--red); color: var(--red); }
+
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--text-dim);
+  font-size: 15px;
+}
+
+/* Progress section */
+.admin-progress { margin-top: 32px; }
+.admin-progress h2 { font-size: 20px; color: var(--white); margin-bottom: 16px; }
+.progress-table { width: 100%; border-collapse: collapse; }
+.progress-table th {
+  text-align: right; padding: 10px 14px; font-size: 13px;
+  color: var(--text-dim); border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.progress-table td {
+  padding: 10px 14px; font-size: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.progress-bar-sm {
+  height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;
+  overflow: hidden; width: 100px; display: inline-block; vertical-align: middle;
+  margin-left: 8px;
+}
+.progress-bar-sm-fill { height: 100%; border-radius: 3px; background: var(--green); }
+
+@media (max-width: 600px) {
+  .admin-panel { padding: 12px; }
+  .admin-header { flex-direction: column; gap: 16px; }
+  .user-card { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .user-actions { width: 100%; }
+  .btn-approve, .btn-deny { flex: 1; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="admin-login" id="adminLogin">
+  <div class="admin-login-box">
+    <h2>Admin Panel</h2>
+    <input type="password" id="adminPass" placeholder="סיסמת אדמין" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button onclick="adminLogin()">כניסה</button>
+  </div>
+</div>
+
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-header">
+    <h1>Super Team Admin</h1>
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <div class="admin-stat-num" id="statPending" style="color:var(--gold)">0</div>
+        <div class="admin-stat-label">ממתינים</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-num" id="statApproved" style="color:var(--green)">0</div>
+        <div class="admin-stat-label">מאושרים</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat-num" id="statTotal" style="color:var(--white)">0</div>
+        <div class="admin-stat-label">סה"כ</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="setTab('pending')" id="tabPending">ממתינים <span class="count" id="countPending">0</span></button>
+    <button class="admin-tab" onclick="setTab('approved')" id="tabApproved">מאושרים <span class="count" id="countApproved">0</span></button>
+    <button class="admin-tab" onclick="setTab('all')" id="tabAll">הכל <span class="count" id="countAll">0</span></button>
+    <button class="admin-tab" onclick="setTab('progress')" id="tabProgress">התקדמות</button>
+  </div>
+
+  <div class="user-list" id="userList"></div>
+
+  <div class="admin-progress" id="progressView" style="display:none">
+    <h2>התקדמות משתמשים</h2>
+    <table class="progress-table" id="progressTable">
+      <thead><tr><th>שם</th><th>טלפון</th><th>התקדמות</th><th>סרטונים שנצפו</th></tr></thead>
+      <tbody id="progressBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+const ADMIN_PASSWORD = 'superteam2026';
+
+let currentTab = 'pending';
+let usersData = {};
+
+// Check for auto-approve link from email
+async function checkAutoApprove() {
+  const params = new URLSearchParams(window.location.search);
+  const approveKey = params.get('approve');
+  if (approveKey) {
+    try {
+      await fetch(FIREBASE_URL + '/users/' + approveKey + '.json', {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'approved' })
+      });
+      document.getElementById('adminLogin').innerHTML = '<div class="admin-login-box"><h2 style="color:var(--green)">&#10003; המשתמש אושר בהצלחה!</h2><p style="color:var(--text);margin-top:12px">אפשר לסגור את הדף הזה.</p><button onclick="location.href=\'admin.html\'" style="margin-top:16px;padding:12px 24px;background:var(--red);color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">לפאנל אדמין</button></div>';
+    } catch(e) {
+      document.getElementById('adminLogin').innerHTML = '<div class="admin-login-box"><h2 style="color:var(--red)">שגיאה באישור</h2></div>';
+    }
+    return;
+  }
+}
+checkAutoApprove();
+
+function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadUsers();
+  } else { alert('Wrong password'); }
+}
+
+async function loadUsers() {
+  try {
+    const res = await fetch(FIREBASE_URL + '/users.json');
+    usersData = await res.json() || {};
+    renderUsers();
+  } catch(e) { console.error(e); }
+}
+
+function renderUsers() {
+  const users = Object.entries(usersData);
+  const pending = users.filter(([,u]) => u.status === 'pending');
+  const approved = users.filter(([,u]) => u.status === 'approved');
+  const denied = users.filter(([,u]) => u.status === 'denied');
+
+  document.getElementById('statPending').textContent = pending.length;
+  document.getElementById('statApproved').textContent = approved.length;
+  document.getElementById('statTotal').textContent = users.length;
+  document.getElementById('countPending').textContent = pending.length;
+  document.getElementById('countApproved').textContent = approved.length;
+  document.getElementById('countAll').textContent = users.length;
+
+  const list = document.getElementById('userList');
+  const progressView = document.getElementById('progressView');
+
+  if (currentTab === 'progress') {
+    list.style.display = 'none';
+    progressView.style.display = 'block';
+    renderProgressView(approved);
+    return;
+  }
+
+  list.style.display = 'flex';
+  progressView.style.display = 'none';
+
+  let filtered = users;
+  if (currentTab === 'pending') filtered = pending;
+  else if (currentTab === 'approved') filtered = approved;
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state">' + (currentTab === 'pending' ? 'אין ממתינים' : 'אין משתמשים') + '</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(([key, u]) => {
+    const statusClass = u.status || 'pending';
+    const statusText = u.status === 'approved' ? 'מאושר' : u.status === 'denied' ? 'נדחה' : 'ממתין';
+    const date = u.registeredAt ? new Date(u.registeredAt).toLocaleString('he-IL') : '';
+    const actions = u.status === 'pending' ?
+      '<div class="user-actions">' +
+        '<button class="btn-approve" onclick="setStatus(\''+key+'\',\'approved\')">אשר</button>' +
+        '<button class="btn-deny" onclick="setStatus(\''+key+'\',\'denied\')">דחה</button>' +
+      '</div>' :
+      '<span class="user-status '+statusClass+'">'+statusText+'</span>';
+
+    return '<div class="user-card">' +
+      '<div class="user-info">' +
+        '<div class="user-avatar '+statusClass+'">'+u.name.charAt(0)+'</div>' +
+        '<div class="user-details">' +
+          '<div class="user-name">'+u.name+'</div>' +
+          '<div class="user-phone">'+(u.email || '')+'</div>' +
+          '<div class="user-phone">'+u.phone+'</div>' +
+          (u.tab ? '<div class="user-date" style="color:var(--gold)">TAB: '+u.tab+'</div>' : '') +
+          '<div class="user-date">'+date+'</div>' +
+        '</div>' +
+      '</div>' +
+      actions +
+    '</div>';
+  }).join('');
+}
+
+async function renderProgressView(approvedUsers) {
+  const body = document.getElementById('progressBody');
+  let html = '';
+  for (const [uid, u] of approvedUsers) {
+    let watched = 0, total = 34;
+    try {
+      const progKey = (u.email || u.phone).replace(/[.#$\[\]]/g, '_');
+      const res = await fetch(FIREBASE_URL + '/progress/' + progKey + '.json');
+      const prog = await res.json() || {};
+      watched = Object.values(prog).filter(v => v >= 100).length;
+    } catch(e) {}
+    const pct = Math.round(watched / total * 100);
+    html += '<tr><td>'+u.name+'</td><td style="direction:ltr;text-align:right">'+u.phone+'</td>' +
+      '<td>'+pct+'% <div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:'+pct+'%"></div></div></td>' +
+      '<td>'+watched+'/'+total+'</td></tr>';
+  }
+  body.innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:var(--text-dim)">אין נתונים</td></tr>';
+}
+
+async function setStatus(key, status) {
+  await fetch(FIREBASE_URL + '/users/' + key + '.json', {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  });
+  usersData[key].status = status;
+  renderUsers();
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  renderUsers();
+}
+
+setInterval(loadUsers, 10000);
+</script>
+</body>
+</html>

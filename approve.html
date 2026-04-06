@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אישור משתמש - Super Team Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #141414; color: #e5e5e5;
+  font-family: 'Heebo', sans-serif;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.box {
+  background: #1a1a1a; border-radius: 10px;
+  padding: 48px 40px; text-align: center;
+  max-width: 420px; width: 90%;
+}
+.icon { font-size: 64px; margin-bottom: 20px; }
+h1 { font-size: 24px; color: #fff; margin-bottom: 12px; }
+p { font-size: 15px; color: #999; line-height: 1.6; }
+.btn {
+  display: inline-block; margin-top: 24px;
+  padding: 12px 28px; background: #e50914; color: #fff;
+  border-radius: 4px; font-size: 15px; font-weight: 700;
+  text-decoration: none; font-family: inherit;
+}
+</style>
+</head>
+<body>
+<div class="box" id="box">
+  <div class="icon">⏳</div>
+  <h1>מאשר...</h1>
+  <p>אנא המתן</p>
+</div>
+
+<script>
+const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+
+async function approve() {
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('key');
+  const box = document.getElementById('box');
+
+  if (!key) {
+    box.innerHTML = '<div class="icon">❌</div><h1>לינק לא תקין</h1><p>הלינק שקיבלת אינו תקין.</p>';
+    return;
+  }
+
+  try {
+    // Get user info first
+    const userRes = await fetch(FIREBASE_URL + '/users/' + key + '.json');
+    const user = await userRes.json();
+
+    if (!user) {
+      box.innerHTML = '<div class="icon">❌</div><h1>משתמש לא נמצא</h1>';
+      return;
+    }
+
+    if (user.status === 'approved') {
+      box.innerHTML = '<div class="icon">✅</div><h1 style="color:#46d369">' + user.name + ' כבר מאושר!</h1><p>המשתמש כבר קיבל גישה לאקדמיה.</p>';
+      return;
+    }
+
+    // Approve
+    await fetch(FIREBASE_URL + '/users/' + key + '.json', {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'approved' })
+    });
+
+    box.innerHTML =
+      '<div class="icon">✅</div>' +
+      '<h1 style="color:#46d369">' + user.name + ' אושר!</h1>' +
+      '<p>' + user.name + ' יכול כעת להיכנס לאקדמיה.</p>';
+
+  } catch(e) {
+    box.innerHTML = '<div class="icon">❌</div><h1 style="color:#e50914">שגיאה</h1><p>נסה שוב מאוחר יותר.</p>';
+  }
+}
+
+approve();
+</script>
+</body>
+</html>
