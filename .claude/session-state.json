@@ -5,20 +5,12 @@
   "budget_per_priority": 60000,
   "priorities": [
     {
-      "id": "P5",
-      "title": "Create Netlify function to read Drive files and populate content",
-      "status": "completed",
+      "id": "P7",
+      "title": "Fix login button validation and make AWT field optional",
+      "status": "in_progress",
       "pdr_approved": true,
-      "phase": "DONE",
-      "checkpoint_commit": "412d686"
-    },
-    {
-      "id": "P6",
-      "title": "Reset site content and fix Drive integration",
-      "status": "completed",
-      "pdr_approved": true,
-      "phase": "DONE",
-      "checkpoint_commit": "fbc9037"
+      "phase": "EXECUTE",
+      "checkpoint_commit": null
     }
   ],
   "totals": {

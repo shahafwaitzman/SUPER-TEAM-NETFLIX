@@ -959,7 +959,8 @@ async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const phone = document.getElementById('loginPhone').value.trim();
   const tab = document.getElementById('loginTab').value;
-  const awt = document.getElementById("loginAWT").value.trim(); if (!name || !email || !phone || !tab || !awt) { showToast('נא למלא את כל השדות'); return; }
+  const awt = document.getElementById("loginAWT").value.trim();
+  if (!name || !email || !phone || !tab) { showToast('נא למלא את כל השדות'); return; }
 
   document.querySelector('.login-btn').textContent = 'בודק...';
   const status = await registerUser(name, email, phone, tab);
