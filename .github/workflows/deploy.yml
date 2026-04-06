@@ -18,13 +18,11 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Wrangler
-        run: npm install -g @cloudflare/wrangler
-
       - name: Deploy to Cloudflare Pages
         run: |
+          npm install -g @cloudflare/wrangler
           wrangler pages publish . \
             --project-name=super-team-academy \
-            --account-id=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+            --account-id ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
