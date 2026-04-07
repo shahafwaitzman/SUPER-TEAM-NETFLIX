@@ -970,6 +970,7 @@ async function registerUser(name, email, phone, tab) {
     console.log('[registerUser] Creating new user in Firebase...');
     const regRes = await fetch(FIREBASE_URL + '/users.json', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, phone, tab, status: 'pending', registeredAt: new Date().toISOString() })
     });
     console.log('[registerUser] POST response status:', regRes.status);
