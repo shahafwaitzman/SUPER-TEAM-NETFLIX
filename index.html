@@ -953,6 +953,70 @@ function applyProgress() {
   VIDEOS.forEach(v => { v.progress = prog[v.id] || 0; });
 }
 
+// ============ FIREBASE CONFIG ============
+const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+
+async function registerUser(name, email, phone, tab) {
+  try {
+    // Check if user already exists
+    const checkRes = await fetch(FIREBASE_URL + '/users.json');
+    const allUsers = await checkRes.json() || {};
+    const existing = Object.values(allUsers).find(u => u.email === email);
+    if (existing) {
+      return existing.status || 'pending';
+    }
+    // Register new user as pending
+    const regRes = await fetch(FIREBASE_URL + '/users.json', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, phone, tab, status: 'pending', registeredAt: new Date().toISOString() })
+    });
+    const regData = await regRes.json();
+    const userKey = regData.name;
+    // Send email notification to TAB member
+    sendTabNotification(tab, name, email, userKey);
+    return 'pending';
+  } catch(e) { console.error(e); return 'not_allowed'; }
+}
+
+async function checkUserStatus(email) {
+  try {
+    const res = await fetch(FIREBASE_URL + '/users.json');
+    const allUsers = await res.json() || {};
+    const user = Object.values(allUsers).find(u => u.email === email);
+    if (user) return user.status || 'pending';
+    return 'not_found';
+  } catch(e) { return 'approved'; }
+}
+
+async function sendTabNotification(tabName, userName, userEmail, userKey) {
+  try {
+    const res = await fetch(FIREBASE_URL + '/tabMembers.json');
+    const members = await res.json() || [];
+    const list = Array.isArray(members) ? members : Object.values(members);
+    const tabMember = list.find(m => m.name === tabName);
+    if (!tabMember) return;
+    const approveUrl = 'https://superteamhlf.team/approve.html?key=' + userKey;
+    emailjs.send('service_etqui87', 'template_6bo4ai9', {
+      to_email: tabMember.email,
+      tab_name: tabName,
+      user_name: userName,
+      user_email: userEmail,
+      approve_url: approveUrl
+    }).catch(() => {});
+  } catch(e) { console.error(e); }
+}
+
+function syncProgressToFirebase() {
+  const u = JSON.parse(localStorage.getItem('st_user') || 'null');
+  if (!u) return;
+  const prog = loadUserProgress();
+  const key = (u.email || u.phone).replace(/[.#$\[\]]/g, '_');
+  fetch(FIREBASE_URL + '/progress/' + key + '.json', {
+    method: 'PUT',
+    body: JSON.stringify(prog)
+  }).catch(() => {});
+}
+
 // ============ LOGIN ============
 async function doLogin() {
   const name = document.getElementById('loginName').value.trim();
