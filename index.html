@@ -895,7 +895,9 @@ const MEMBERS = [
   { name: 'מלי עטר', email: 'maliat1405@gmail.com' },
   { name: 'דנה צפניה', email: 'zfaniadana@gmail.com' },
   { name: 'גיא אסא', email: 'guyassa6@gmail.com' },
-  { name: 'עדי שור', email: 'Adishor2025@gmail.com' }
+  { name: 'עדי שור', email: 'Adishor2025@gmail.com' },
+  { name: 'אסף עטר', email: 'gvanit5560759@walla.com' },
+  { name: 'הדר כהן', email: 'Hadarcohenhlf@gmail.com' }
 ];
 
 function isMember(email) {
@@ -1049,12 +1051,21 @@ async function doLogin() {
   document.querySelector('.login-btn').textContent = 'בודק...';
   const status = await registerUser(name, email, phone, tab);
 
-  if (status === 'pending' || status === 'approved') {
-    // Auto-approve since we validate against members list
+  if (status === 'approved') {
+    // Only allow login if TAB member has approved
     localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab, awt }));
     document.getElementById('loginOverlay').classList.add('hidden');
     hidePendingScreen();
+    showUser({ name, phone });
+    applyProgress();
     renderAll();
+    showToast('ברוך הבא, ' + name + '!');
+    return;
+  }
+  if (status === 'pending') {
+    // User registered but waiting for TAB approval
+    showPendingScreen(name);
+    document.querySelector('.login-btn').textContent = 'כניסה לאקדמיה';
     return;
   }
   if (status === 'denied') {
@@ -1067,15 +1078,6 @@ async function doLogin() {
     document.querySelector('.login-btn').textContent = 'כניסה לאקדמיה';
     return;
   }
-
-  // approved
-  localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab, awt }));
-  document.getElementById('loginOverlay').classList.add('hidden');
-  hidePendingScreen();
-  showUser({ name, phone });
-  applyProgress();
-  renderAll();
-  showToast('\u05D1\u05E8\u05D5\u05DA \u05D4\u05D1\u05D0, ' + name + '!');
 }
 
 function showPendingScreen(name) {
