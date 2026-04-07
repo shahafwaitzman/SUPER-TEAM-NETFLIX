@@ -722,11 +722,6 @@ nav.scrolled { background: rgba(20,20,20,0.97); box-shadow: 0 2px 20px rgba(0,0,
       <input type="text" id="loginAWT" placeholder="הזן את שם ה-AWT שלך" style="width:100%">
     </div>
     <button class="login-btn" onclick="doLogin()">כניסה לאקדמיה</button>
-    <div style="margin-top:20px;text-align:center;border-top:1px solid #333;padding-top:20px">
-      <p style="color:#999;font-size:12px;margin-bottom:15px">או</p>
-      <div id="g_id_onload" data-client_id="1052399470584-3pk6nu127eq0i08mfdgulut1bk2imqep.apps.googleusercontent.com" data-callback="handleCredentialResponse"></div>
-      <div id="g_id_render" data-type="standard" data-size="large" data-theme="dark" data-text="signin_with" data-locale="he" data-logo_alignment="center"></div>
-    </div>
     <div class="login-privacy">הפרטים שלך נשמרים רק במכשיר זה</div>
   </div>
 </div>
@@ -1008,7 +1003,7 @@ async function sendTabNotification(tabName, userName, userEmail, userKey) {
     const list = Array.isArray(members) ? members : Object.values(members);
     const tabMember = list.find(m => m.name === tabName);
     if (!tabMember) return;
-    const approveUrl = 'https://superteamhlf.team/approve.html?key=' + userKey;
+    const approveUrl = window.location.origin + '/SUPER-TEAM-NETFLIX/approve.html?key=' + userKey;
     emailjs.send('service_etqui87', 'template_6bo4ai9', {
       to_email: tabMember.email,
       tab_name: tabName,
