@@ -65,10 +65,15 @@ async function approve() {
     }
 
     // Approve
-    await fetch(FIREBASE_URL + '/users/' + key + '.json', {
+    const patchRes = await fetch(FIREBASE_URL + '/users/' + key + '.json', {
       method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'approved' })
     });
+
+    if (!patchRes.ok) {
+      throw new Error('Failed to update status: ' + patchRes.status);
+    }
 
     box.innerHTML =
       '<div class="icon">✅</div>' +
