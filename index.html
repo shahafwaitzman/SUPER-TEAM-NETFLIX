@@ -1221,11 +1221,12 @@ const FOLDER_IDS = {
   documents: MAIN_FOLDER_ID
 };
 
-const DRIVE_API_KEY = 'AIzaSyB1hH50REJm_hu71AjYO8e4m3BdQC6GQ0g';
-
+// API Key removed for security - use backend service instead
 async function fetchDriveFiles(folderId, category) {
   try {
-    const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&fields=id,name,mimeType,webContentLink&key=${DRIVE_API_KEY}`);
+    // Note: Google Drive API requires authentication. This should be handled via backend.
+    console.warn('[fetchDriveFiles] Direct Drive API calls require backend authentication');
+    return [];
     const data = await response.json();
     if (data.files) {
       return data.files.map((f, idx) => ({
