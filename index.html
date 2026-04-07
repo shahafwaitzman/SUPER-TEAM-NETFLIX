@@ -1011,7 +1011,7 @@ async function sendTabNotification(tabEmail, userName, userEmail, userKey) {
     }
     console.log('[sendTabNotification] Found member:', tabMember);
 
-    const approveUrl = window.location.origin + '/SUPER-TEAM-NETFLIX/approve.html?key=' + userKey;
+    const approveUrl = window.location.origin + '/approve.html?key=' + userKey;
     console.log('[sendTabNotification] Sending email to:', tabMember.email);
     console.log('[sendTabNotification] Approve URL:', approveUrl);
 

@@ -20,68 +20,93 @@ body {
 }
 .icon { font-size: 64px; margin-bottom: 20px; }
 h1 { font-size: 24px; color: #fff; margin-bottom: 12px; }
-p { font-size: 15px; color: #999; line-height: 1.6; }
+p { font-size: 15px; color: #999; line-height: 1.6; margin-bottom: 12px; }
 .btn {
   display: inline-block; margin-top: 24px;
   padding: 12px 28px; background: #e50914; color: #fff;
   border-radius: 4px; font-size: 15px; font-weight: 700;
   text-decoration: none; font-family: inherit;
+  cursor: pointer; border: none;
 }
+.btn:hover { background: #b20710; }
+.debug { font-size: 12px; color: #666; margin-top: 24px; padding: 12px; background: #0a0a0a; border-radius: 4px; }
 </style>
 </head>
 <body>
 <div class="box" id="box">
   <div class="icon">⏳</div>
-  <h1>מאשר...</h1>
-  <p>אנא המתן</p>
+  <h1>מעבד...</h1>
+  <p>נא המתן</p>
+  <div class="debug" id="debug"></div>
 </div>
 
 <script>
 const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
 
+function log(msg) {
+  console.log('[approve] ' + msg);
+  document.getElementById('debug').innerHTML += msg + '<br>';
+}
+
 async function approve() {
-  const params = new URLSearchParams(window.location.search);
-  const key = params.get('key');
-  const box = document.getElementById('box');
-
-  if (!key) {
-    box.innerHTML = '<div class="icon">❌</div><h1>לינק לא תקין</h1><p>הלינק שקיבלת אינו תקין.</p>';
-    return;
-  }
-
   try {
+    log('התחלה...');
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get('key');
+    const box = document.getElementById('box');
+
+    if (!key) {
+      log('❌ אין KEY בURL');
+      box.innerHTML = '<div class="icon">❌</div><h1>לינק לא תקין</h1><p>הלינק שקיבלת אינו תקין.</p>';
+      return;
+    }
+    
+    log('KEY: ' + key);
+
     // Get user info first
+    log('בדיקת משתמש בFirebase...');
     const userRes = await fetch(FIREBASE_URL + '/users/' + key + '.json');
+    log('Firebase response: ' + userRes.status);
     const user = await userRes.json();
+    log('משתמש: ' + (user ? user.name : 'לא נמצא'));
 
     if (!user) {
+      log('❌ משתמש לא נמצא');
       box.innerHTML = '<div class="icon">❌</div><h1>משתמש לא נמצא</h1>';
       return;
     }
 
     if (user.status === 'approved') {
+      log('ℹ️ משתמש כבר מאושר');
       box.innerHTML = '<div class="icon">✅</div><h1 style="color:#46d369">' + user.name + ' כבר מאושר!</h1><p>המשתמש כבר קיבל גישה לאקדמיה.</p>';
       return;
     }
 
     // Approve
+    log('שליחת PATCH לFirebase...');
     const patchRes = await fetch(FIREBASE_URL + '/users/' + key + '.json', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'approved' })
     });
 
+    log('PATCH response: ' + patchRes.status);
     if (!patchRes.ok) {
       throw new Error('Failed to update status: ' + patchRes.status);
     }
 
+    const patchData = await patchRes.json();
+    log('✅ STATUS עודכן לapproved');
+
     box.innerHTML =
       '<div class="icon">✅</div>' +
       '<h1 style="color:#46d369">' + user.name + ' אושר!</h1>' +
-      '<p>' + user.name + ' יכול כעת להיכנס לאקדמיה.</p>';
+      '<p>' + user.name + ' יכול כעת להיכנס לאקדמיה.</p>' +
+      '<a href="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/" class="btn">חזור לאקדמיה</a>';
 
   } catch(e) {
-    box.innerHTML = '<div class="icon">❌</div><h1 style="color:#e50914">שגיאה</h1><p>נסה שוב מאוחר יותר.</p>';
+    log('❌ שגיאה: ' + e.message);
+    box.innerHTML = '<div class="icon">❌</div><h1 style="color:#e50914">שגיאה</h1><p>' + e.message + '</p><p>נסה שוב מאוחר יותר.</p>';
   }
 }
 
