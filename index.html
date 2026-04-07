@@ -1064,6 +1064,8 @@ async function doLogin() {
   }
   if (status === 'pending') {
     // User registered but waiting for TAB approval
+    // IMPORTANT: Save to localStorage so "Check again" button can find the user
+    localStorage.setItem('st_user', JSON.stringify({ name, email, phone, tab, awt }));
     showPendingScreen(name);
     document.querySelector('.login-btn').textContent = 'כניסה לאקדמיה';
     return;
@@ -1116,16 +1118,19 @@ function stopStatusPolling() {
 
 async function recheckStatus() {
   const u = JSON.parse(localStorage.getItem('st_user') || 'null');
-  if (!u) return;
+  console.log('[recheckStatus] Checking for user:', !!u);
+  if (!u) { console.log('[recheckStatus] No user, returning'); return; }
   const status = await checkUserStatus(u.email || u.phone);
+  console.log('[recheckStatus] Status:', status);
   if (status === 'approved') {
-    document.getElementById('loginOverlay').classList.add('hidden');
+    console.log('[recheckStatus] ✅ APPROVED!');
     hidePendingScreen();
     showUser(u);
     applyProgress();
     renderAll();
     showToast('אושרת! ברוך הבא, ' + u.name + '!');
   } else if (status === 'denied') {
+    console.log('[recheckStatus] ❌ DENIED');
     hidePendingScreen();
     localStorage.removeItem('st_user');
     showToast('\u05D4\u05D2\u05D9\u05E9\u05D4 \u05E0\u05D3\u05D7\u05EA\u05D4.');
