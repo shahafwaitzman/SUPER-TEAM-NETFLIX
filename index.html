@@ -1139,6 +1139,52 @@ async function checkLogin() {
   }
 }
 
+// ============ TOAST NOTIFICATIONS ============
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============ FILTER CATEGORIES ============
+let currentFilter = 'all';
+function filterCategory(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderAll();
+}
+
+// ============ SCROLLING ============
+function scrollToContent() {
+  document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+}
+
+function scrollRow(btn, dir) {
+  const row = btn.closest('.content-row');
+  if (!row) return;
+  const list = row.querySelector('.row-content');
+  if (!list) return;
+  const scrollAmount = 300;
+  list.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+}
+
+// ============ RENDER ALL ============
+function renderAll() {
+  const u = JSON.parse(localStorage.getItem('st_user') || 'null');
+  if (!u) {
+    // Not logged in, show login
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    return;
+  }
+  // Logged in, show academy
+  document.getElementById('loginOverlay').classList.add('hidden');
+  showUser(u);
+  applyProgress();
+}
+
 // ============ SEARCH ============
 function toggleSearch() {
   document.getElementById('navSearch').classList.toggle('open');
