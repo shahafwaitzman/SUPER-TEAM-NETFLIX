@@ -1223,27 +1223,7 @@ const FOLDER_IDS = {
 
 // API Key removed for security - use backend service instead
 async function fetchDriveFiles(folderId, category) {
-  try {
-    // Note: Google Drive API requires authentication. This should be handled via backend.
-    console.warn('[fetchDriveFiles] Direct Drive API calls require backend authentication');
-    return [];
-    const data = await response.json();
-    if (data.files) {
-      return data.files.map((f, idx) => ({
-        id: parseInt(folderId.slice(-4) + idx),
-        category,
-        title: f.name.replace(/\.[^/.]+$/, ''),
-        desc: `📁 ${category} - ${f.name}`,
-        duration: '✓',
-        progress: 0,
-        fav: false,
-        driveId: f.id,
-        emoji: '📄'
-      }));
-    }
-  } catch (e) {
-    console.log('Drive API note: files loaded from cache');
-  }
+  console.warn('[fetchDriveFiles] Direct Drive API calls require backend authentication');
   return [];
 }
 
