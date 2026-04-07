@@ -978,7 +978,8 @@ async function registerUser(name, email, phone, tab) {
     const userKey = regData.name;
     // Send email notification to TAB member
     console.log('[registerUser] Sending email to TAB...');
-    sendTabNotification(tab, name, email, userKey);
+    // tab comes as email from dropdown, find the member and send notification
+    await sendTabNotification(tab, name, email, userKey);
     return 'pending';
   } catch(e) {
     console.error('[registerUser] ERROR:', e.message);
@@ -996,22 +997,32 @@ async function checkUserStatus(email) {
   } catch(e) { return 'approved'; }
 }
 
-async function sendTabNotification(tabName, userName, userEmail, userKey) {
+async function sendTabNotification(tabEmail, userName, userEmail, userKey) {
   try {
-    const res = await fetch(FIREBASE_URL + '/tabMembers.json');
-    const members = await res.json() || [];
-    const list = Array.isArray(members) ? members : Object.values(members);
-    const tabMember = list.find(m => m.name === tabName);
-    if (!tabMember) return;
+    console.log('[sendTabNotification] Looking for member with email:', tabEmail);
+    // First try to find from MEMBERS array (client-side)
+    const tabMember = MEMBERS.find(m => m.email.toLowerCase() === tabEmail.toLowerCase());
+    if (!tabMember) {
+      console.log('[sendTabNotification] Member not found in MEMBERS array');
+      return;
+    }
+    console.log('[sendTabNotification] Found member:', tabMember);
+
     const approveUrl = window.location.origin + '/SUPER-TEAM-NETFLIX/approve.html?key=' + userKey;
-    emailjs.send('service_etqui87', 'template_6bo4ai9', {
+    console.log('[sendTabNotification] Sending email to:', tabMember.email);
+    console.log('[sendTabNotification] Approve URL:', approveUrl);
+
+    const result = await emailjs.send('service_etqui87', 'template_6bo4ai9', {
       to_email: tabMember.email,
-      tab_name: tabName,
+      tab_name: tabMember.name,
       user_name: userName,
       user_email: userEmail,
       approve_url: approveUrl
-    }).catch(() => {});
-  } catch(e) { console.error(e); }
+    });
+    console.log('[sendTabNotification] Email sent successfully:', result);
+  } catch(e) {
+    console.error('[sendTabNotification] Error:', e);
+  }
 }
 
 function syncProgressToFirebase() {
