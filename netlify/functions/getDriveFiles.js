@@ -12,7 +12,15 @@ exports.handler = async (event) => {
     }
 
     // Google Drive API call
-    const apiKey = 'AIzaSyB1hH50REJm_hu71AjYO8e4m3BdQC6GQ0g';
+    // SECURITY: API key should be provided via environment variable, not hardcoded
+    const apiKey = process.env.GOOGLE_DRIVE_API_KEY;
+    if (!apiKey) {
+      console.log('[getDriveFiles] Error: GOOGLE_DRIVE_API_KEY environment variable not set');
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'API configuration missing' })
+      };
+    }
     const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&fields=id,name,mimeType,webContentLink&key=${apiKey}`;
     console.log('[getDriveFiles] Calling Drive API for folder:', folderId);
 
