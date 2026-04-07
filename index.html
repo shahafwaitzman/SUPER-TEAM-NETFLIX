@@ -1185,17 +1185,33 @@ function scrollRow(btn, dir) {
 }
 
 // ============ RENDER ALL ============
-function renderAll() {
+async function renderAll() {
   const u = JSON.parse(localStorage.getItem('st_user') || 'null');
   if (!u) {
-    // Not logged in, show login
+    // Not logged in, show login overlay
     document.getElementById('loginOverlay').classList.remove('hidden');
     return;
   }
-  // Logged in, show academy
-  document.getElementById('loginOverlay').classList.add('hidden');
-  showUser(u);
-  applyProgress();
+  // User in localStorage - verify their status in Firebase before showing academy
+  try {
+    const status = await checkUserStatus(u.email || u.phone);
+    if (status === 'approved') {
+      // Approved by TAB member - show academy
+      document.getElementById('loginOverlay').classList.add('hidden');
+      showUser(u);
+      applyProgress();
+      return;
+    }
+    // Not approved (pending, denied, or not found) - clear from localStorage and show login
+    localStorage.removeItem('st_user');
+    document.getElementById('loginOverlay').classList.remove('hidden');
+  } catch(e) {
+    // Error checking Firebase - allow access as fallback (might be offline)
+    console.error('[renderAll] Error checking status:', e.message);
+    document.getElementById('loginOverlay').classList.add('hidden');
+    showUser(u);
+    applyProgress();
+  }
 }
 
 // ============ SEARCH ============
@@ -1978,7 +1994,9 @@ function syncTabWithEmail() {
   }
 }
 
+// Initialize on page load
 populateTabDropdown();
+renderAll();
 </script>
 
 </style>
