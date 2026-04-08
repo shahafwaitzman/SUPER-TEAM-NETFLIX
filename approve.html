@@ -60,7 +60,7 @@ async function approve() {
       box.innerHTML = '<div class="icon">❌</div><h1>לינק לא תקין</h1><p>הלינק שקיבלת אינו תקין.</p>';
       return;
     }
-    
+
     log('KEY: ' + key);
 
     // Get user info first
@@ -98,11 +98,17 @@ async function approve() {
     const patchData = await patchRes.json();
     log('✅ STATUS עודכן לapproved');
 
+    // Detect deployment context and build correct return URL
+    const backUrl = window.location.origin.includes('github.io')
+      ? window.location.origin + '/SUPER-TEAM-NETFLIX/'
+      : window.location.origin + '/';
+    log('Return URL: ' + backUrl);
+
     box.innerHTML =
       '<div class="icon">✅</div>' +
       '<h1 style="color:#46d369">' + user.name + ' אושר!</h1>' +
       '<p>' + user.name + ' יכול כעת להיכנס לאקדמיה.</p>' +
-      '<a href="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/" class="btn">חזור לאקדמיה</a>';
+      '<a href="' + backUrl + '" class="btn">חזור לאקדמיה</a>';
 
   } catch(e) {
     log('❌ שגיאה: ' + e.message);
