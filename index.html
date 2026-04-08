@@ -1002,31 +1002,18 @@ async function checkUserStatus(email) {
 
 async function sendTabNotification(tabEmail, userName, userEmail, userKey) {
   try {
-    console.log('[sendTabNotification] Starting email send...');
-    console.log('[sendTabNotification] Parameters:', { tabEmail, userName, userEmail, userKey });
-
-    // Verify EmailJS is loaded
-    if (!window.emailjs) {
-      console.error('[sendTabNotification] ❌ EmailJS not loaded!');
-      return false;
-    }
-    console.log('[sendTabNotification] ✓ EmailJS loaded');
-
+    console.log('[sendTabNotification] Looking for member with email:', tabEmail);
     // First try to find from MEMBERS array (client-side)
     const tabMember = MEMBERS.find(m => m.email.toLowerCase() === tabEmail.toLowerCase());
     if (!tabMember) {
-      console.log('[sendTabNotification] ❌ Member not found in MEMBERS array:', tabEmail);
-      console.log('[sendTabNotification] Available members:', MEMBERS.map(m => m.email));
-      return false;
+      console.log('[sendTabNotification] Member not found in MEMBERS array');
+      return;
     }
-    console.log('[sendTabNotification] ✓ Found member:', tabMember.name);
+    console.log('[sendTabNotification] Found member:', tabMember);
 
     const approveUrl = window.location.origin + '/approve.html?key=' + userKey;
+    console.log('[sendTabNotification] Sending email to:', tabMember.email);
     console.log('[sendTabNotification] Approve URL:', approveUrl);
-
-    console.log('[sendTabNotification] Attempting to send email via EmailJS...');
-    console.log('[sendTabNotification] Service ID:', 'service_etqui87');
-    console.log('[sendTabNotification] Template ID:', 'template_6bo4ai9');
 
     const result = await emailjs.send('service_etqui87', 'template_6bo4ai9', {
       to_email: tabMember.email,
@@ -1035,14 +1022,9 @@ async function sendTabNotification(tabEmail, userName, userEmail, userKey) {
       user_email: userEmail,
       approve_url: approveUrl
     });
-    console.log('[sendTabNotification] ✅ Email sent successfully!');
-    console.log('[sendTabNotification] Response:', result);
-    return true;
+    console.log('[sendTabNotification] Email sent successfully:', result);
   } catch(e) {
-    console.error('[sendTabNotification] ❌ ERROR:', e);
-    console.error('[sendTabNotification] Error message:', e.message);
-    console.error('[sendTabNotification] Error details:', JSON.stringify(e));
-    return false;
+    console.error('[sendTabNotification] Error:', e);
   }
 }
 
@@ -1109,41 +1091,13 @@ function showPendingScreen(name) {
     document.body.appendChild(el);
   }
   el.innerHTML = '<div style="max-width:400px;padding:40px">' +
-    '<div style="font-size:60px;margin-bottom:20px">⏳</div>' +
-    '<h2 style="color:#fff;font-size:24px;margin-bottom:10px">שלום ' + name + '!</h2>' +
-    '<p style="color:#999;font-size:16px;line-height:1.6;margin-bottom:24px">הבקשה שלך נשלחה למנהל הצוות.<br>תקבל אישור בקרוב.</p>' +
-    '<button id="recheckBtn" style="padding:12px 28px;background:#e50914;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">בדוק שוב</button>' +
-    '<p style="color:#666;font-size:12px;margin-top:16px">הדף בודק אוטומטית כל 15 שניות</p>' +
+    '<div style="font-size:60px;margin-bottom:20px">\u23F3</div>' +
+    '<h2 style="color:#fff;font-size:24px;margin-bottom:10px">\u05E9\u05DC\u05D5\u05DD ' + name + '!</h2>' +
+    '<p style="color:#999;font-size:16px;line-height:1.6;margin-bottom:24px">\u05D4\u05D1\u05E7\u05E9\u05D4 \u05E9\u05DC\u05DA \u05E0\u05E9\u05DC\u05D7\u05D4 \u05DC\u05DE\u05E0\u05D4\u05DC \u05D4\u05E6\u05D5\u05D5\u05EA.<br>\u05EA\u05E7\u05D1\u05DC \u05D0\u05D9\u05E9\u05D5\u05E8 \u05D1\u05E7\u05E8\u05D5\u05D1.</p>' +
+    '<button onclick="recheckStatus()" style="padding:12px 28px;background:#e50914;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">\u05D1\u05D3\u05D5\u05E7 \u05E9\u05D5\u05D1</button>' +
+    '<p style="color:#666;font-size:12px;margin-top:16px">\u05D4\u05D3\u05E3 \u05D1\u05D5\u05D3\u05E7 \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA \u05DB\u05DC 15 \u05E9\u05E0\u05D9\u05D5\u05EA</p>' +
   '</div>';
   el.style.display = 'flex';
-  
-  // Robust button binding with retry logic
-  let bindAttempts = 0;
-  const maxAttempts = 10;
-  
-  function bindButtonListener() {
-    const btn = document.getElementById('recheckBtn');
-    if (btn) {
-      console.log('[pendingScreen] Button found, binding listener');
-      btn.addEventListener('click', () => {
-        console.log('[pendingScreen] ✅ Check button clicked');
-        recheckStatus();
-      });
-      console.log('[pendingScreen] ✅ Button listener bound successfully');
-      return true;
-    } else {
-      bindAttempts++;
-      if (bindAttempts < maxAttempts) {
-        console.log(`[pendingScreen] Button not found (attempt ${bindAttempts}/${maxAttempts}), retrying...`);
-        setTimeout(bindButtonListener, 50);
-      } else {
-        console.error('[pendingScreen] ❌ Failed to bind button listener after ' + maxAttempts + ' attempts');
-      }
-      return false;
-    }
-  }
-  
-  bindButtonListener();
   startStatusPolling();
 }
 
@@ -2052,4 +2006,3 @@ renderAll();
 
 </style>
 <!-- Force redeploy at Tue Apr  7 20:49:54 CEST 2026 -->
-<!-- Force rebuild on Wed Apr  8 08:47:07 CEST 2026
