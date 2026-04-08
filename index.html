@@ -1002,18 +1002,31 @@ async function checkUserStatus(email) {
 
 async function sendTabNotification(tabEmail, userName, userEmail, userKey) {
   try {
-    console.log('[sendTabNotification] Looking for member with email:', tabEmail);
+    console.log('[sendTabNotification] Starting email send...');
+    console.log('[sendTabNotification] Parameters:', { tabEmail, userName, userEmail, userKey });
+
+    // Verify EmailJS is loaded
+    if (!window.emailjs) {
+      console.error('[sendTabNotification] ❌ EmailJS not loaded!');
+      return false;
+    }
+    console.log('[sendTabNotification] ✓ EmailJS loaded');
+
     // First try to find from MEMBERS array (client-side)
     const tabMember = MEMBERS.find(m => m.email.toLowerCase() === tabEmail.toLowerCase());
     if (!tabMember) {
-      console.log('[sendTabNotification] Member not found in MEMBERS array');
-      return;
+      console.log('[sendTabNotification] ❌ Member not found in MEMBERS array:', tabEmail);
+      console.log('[sendTabNotification] Available members:', MEMBERS.map(m => m.email));
+      return false;
     }
-    console.log('[sendTabNotification] Found member:', tabMember);
+    console.log('[sendTabNotification] ✓ Found member:', tabMember.name);
 
     const approveUrl = window.location.origin + '/approve.html?key=' + userKey;
-    console.log('[sendTabNotification] Sending email to:', tabMember.email);
     console.log('[sendTabNotification] Approve URL:', approveUrl);
+
+    console.log('[sendTabNotification] Attempting to send email via EmailJS...');
+    console.log('[sendTabNotification] Service ID:', 'service_etqui87');
+    console.log('[sendTabNotification] Template ID:', 'template_6bo4ai9');
 
     const result = await emailjs.send('service_etqui87', 'template_6bo4ai9', {
       to_email: tabMember.email,
@@ -1022,9 +1035,14 @@ async function sendTabNotification(tabEmail, userName, userEmail, userKey) {
       user_email: userEmail,
       approve_url: approveUrl
     });
-    console.log('[sendTabNotification] Email sent successfully:', result);
+    console.log('[sendTabNotification] ✅ Email sent successfully!');
+    console.log('[sendTabNotification] Response:', result);
+    return true;
   } catch(e) {
-    console.error('[sendTabNotification] Error:', e);
+    console.error('[sendTabNotification] ❌ ERROR:', e);
+    console.error('[sendTabNotification] Error message:', e.message);
+    console.error('[sendTabNotification] Error details:', JSON.stringify(e));
+    return false;
   }
 }
 
