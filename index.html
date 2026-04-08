@@ -1109,23 +1109,41 @@ function showPendingScreen(name) {
     document.body.appendChild(el);
   }
   el.innerHTML = '<div style="max-width:400px;padding:40px">' +
-    '<div style="font-size:60px;margin-bottom:20px">\u23F3</div>' +
-    '<h2 style="color:#fff;font-size:24px;margin-bottom:10px">\u05E9\u05DC\u05D5\u05DD ' + name + '!</h2>' +
-    '<p style="color:#999;font-size:16px;line-height:1.6;margin-bottom:24px">\u05D4\u05D1\u05E7\u05E9\u05D4 \u05E9\u05DC\u05DA \u05E0\u05E9\u05DC\u05D7\u05D4 \u05DC\u05DE\u05E0\u05D4\u05DC \u05D4\u05E6\u05D5\u05D5\u05EA.<br>\u05EA\u05E7\u05D1\u05DC \u05D0\u05D9\u05E9\u05D5\u05E8 \u05D1\u05E7\u05E8\u05D5\u05D1.</p>' +
-    '<button id="recheckBtn" style="padding:12px 28px;background:#e50914;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">\u05D1\u05D3\u05D5\u05E7 \u05E9\u05D5\u05D1</button>' +
-    '<p style="color:#666;font-size:12px;margin-top:16px">\u05D4\u05D3\u05E3 \u05D1\u05D5\u05D3\u05E7 \u05D0\u05D5\u05D8\u05D5\u05DE\u05D8\u05D9\u05EA \u05DB\u05DC 15 \u05E9\u05E0\u05D9\u05D5\u05EA</p>' +
+    '<div style="font-size:60px;margin-bottom:20px">⏳</div>' +
+    '<h2 style="color:#fff;font-size:24px;margin-bottom:10px">שלום ' + name + '!</h2>' +
+    '<p style="color:#999;font-size:16px;line-height:1.6;margin-bottom:24px">הבקשה שלך נשלחה למנהל הצוות.<br>תקבל אישור בקרוב.</p>' +
+    '<button id="recheckBtn" style="padding:12px 28px;background:#e50914;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">בדוק שוב</button>' +
+    '<p style="color:#666;font-size:12px;margin-top:16px">הדף בודק אוטומטית כל 15 שניות</p>' +
   '</div>';
   el.style.display = 'flex';
-  // Use addEventListener for reliable button handler
-  setTimeout(() => {
+  
+  // Robust button binding with retry logic
+  let bindAttempts = 0;
+  const maxAttempts = 10;
+  
+  function bindButtonListener() {
     const btn = document.getElementById('recheckBtn');
     if (btn) {
+      console.log('[pendingScreen] Button found, binding listener');
       btn.addEventListener('click', () => {
-        console.log('[pendingScreen] Check button clicked');
+        console.log('[pendingScreen] ✅ Check button clicked');
         recheckStatus();
       });
+      console.log('[pendingScreen] ✅ Button listener bound successfully');
+      return true;
+    } else {
+      bindAttempts++;
+      if (bindAttempts < maxAttempts) {
+        console.log(`[pendingScreen] Button not found (attempt ${bindAttempts}/${maxAttempts}), retrying...`);
+        setTimeout(bindButtonListener, 50);
+      } else {
+        console.error('[pendingScreen] ❌ Failed to bind button listener after ' + maxAttempts + ' attempts');
+      }
+      return false;
     }
-  }, 0);
+  }
+  
+  bindButtonListener();
   startStatusPolling();
 }
 
