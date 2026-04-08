@@ -1011,11 +1011,8 @@ async function sendTabNotification(tabEmail, userName, userEmail, userKey) {
     }
     console.log('[sendTabNotification] Found member:', tabMember);
 
-    // Detect deployment context - GitHub Pages vs custom domain
-    const approveBasePath = window.location.origin.includes('github.io')
-      ? window.location.origin + '/SUPER-TEAM-NETFLIX/approve.html'
-      : window.location.origin + '/approve.html';
-    const approveUrl = approveBasePath + '?key=' + userKey;
+    // Always use GitHub Pages for approval (custom domain doesn't have approve.html)
+    const approveUrl = 'https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/approve.html?key=' + userKey;
     console.log('[sendTabNotification] Sending email to:', tabMember.email);
     console.log('[sendTabNotification] Approve URL:', approveUrl);
 
