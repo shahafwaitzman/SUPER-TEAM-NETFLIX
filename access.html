@@ -106,9 +106,12 @@ async function verify() {
           user.email === email && 
           user.tab === tab && 
           user.status === 'approved') {
-        // Match found!
+        // Match found! Redirect to home page
         msgDiv.style.display = 'none';
-        window.location.href = 'academy.html?user=' + encodeURIComponent(email);
+        const homeUrl = window.location.origin.includes('github.io')
+          ? window.location.origin + '/SUPER-TEAM-NETFLIX/'
+          : window.location.origin + '/';
+        window.location.href = homeUrl;
         return;
       }
     }

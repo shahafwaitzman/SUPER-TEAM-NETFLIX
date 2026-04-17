@@ -128,7 +128,12 @@ async function approve() {
       'אם יש שאלות - אני כאן! 💪'
     );
     
-    const whatsappLink = 'https://wa.me/' + (user.phone || '').replace(/\D/g, '') + '?text=' + whatsappMsg;
+    // Format phone for WhatsApp: Israeli numbers (050-xxx) need to be 972501xx
+    let phoneDigits = (user.phone || '').replace(/\D/g, '');
+    if (phoneDigits.startsWith('0')) {
+      phoneDigits = '972' + phoneDigits.slice(1);
+    }
+    const whatsappLink = 'https://wa.me/' + phoneDigits + '?text=' + whatsappMsg;
 
     box.innerHTML =
       '<div class="icon">✅</div>' +
@@ -137,7 +142,7 @@ async function approve() {
       '<div style="margin-top:20px;">' +
         '<a href="' + whatsappLink + '" class="btn-whatsapp" target="_blank">💬 שלח בוואטאפ</a>' +
       '</div>' +
-      '<p style="color:#999; font-size:12px; margin-top:24px;">מעבר לעמוד הבית בעוד 3 שניות...</p>';
+      '<p style="color:#999; font-size:12px; margin-top:24px;">מעבור לעמוד הבית בעוד 3 שניות...</p>';
 
     log('🔄 Redirecting to: ' + backUrl);
     setTimeout(() => {
