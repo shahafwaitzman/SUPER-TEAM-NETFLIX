@@ -63,7 +63,6 @@ async function approve() {
 
     log('KEY: ' + key);
 
-    // Get user info first
     log('בדיקת משתמש בFirebase...');
     const userRes = await fetch(FIREBASE_URL + '/users/' + key + '.json');
     log('Firebase response: ' + userRes.status);
@@ -79,10 +78,13 @@ async function approve() {
     if (user.status === 'approved') {
       log('ℹ️ משתמש כבר מאושר');
       box.innerHTML = '<div class="icon">✅</div><h1 style="color:#46d369">' + user.name + ' כבר מאושר!</h1><p>המשתמש כבר קיבל גישה לאקדמיה.</p>';
+      const backUrl = window.location.origin.includes('github.io')
+        ? window.location.origin + '/SUPER-TEAM-NETFLIX/'
+        : window.location.origin + '/';
+      setTimeout(() => { window.location.href = backUrl; }, 2000);
       return;
     }
 
-    // Approve
     log('שליחת PATCH לFirebase...');
     const patchRes = await fetch(FIREBASE_URL + '/users/' + key + '.json', {
       method: 'PATCH',
@@ -98,7 +100,6 @@ async function approve() {
     const patchData = await patchRes.json();
     log('✅ STATUS עודכן לapproved');
 
-    // Detect deployment context and build correct return URL
     const backUrl = window.location.origin.includes('github.io')
       ? window.location.origin + '/SUPER-TEAM-NETFLIX/'
       : window.location.origin + '/';
@@ -108,7 +109,12 @@ async function approve() {
       '<div class="icon">✅</div>' +
       '<h1 style="color:#46d369">' + user.name + ' אושר!</h1>' +
       '<p>' + user.name + ' יכול כעת להיכנס לאקדמיה.</p>' +
-      '<a href="' + backUrl + '" class="btn">חזור לאקדמיה</a>';
+      '<p style="color:#999; font-size:12px; margin-top:20px;">מעבר לאקדמיה...</p>';
+
+    log('🔄 Redirecting to: ' + backUrl);
+    setTimeout(() => {
+      window.location.href = backUrl;
+    }, 2000);
 
   } catch(e) {
     log('❌ שגיאה: ' + e.message);
