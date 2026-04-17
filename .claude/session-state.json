@@ -1,22 +1,36 @@
 {
-  "session_start": "2026-04-06T11:09:11Z",
+  "session_start": "2026-04-17T09:08:02Z",
   "budget_total": 280000,
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
   "priorities": [
     {
-      "id": "P7",
-      "title": "Fix login button validation and make AWT field optional",
-      "status": "in_progress",
+      "id": "1",
+      "title": "Rebuild System with Proper Error Handling",
+      "type": "feature",
+      "status": "completed",
       "pdr_approved": true,
-      "phase": "EXECUTE",
-      "checkpoint_commit": null
+      "turns": 1,
+      "estimated_tokens": 15000,
+      "model_used": "sonnet",
+      "checkpoint_commit": "24a60aa"
+    },
+    {
+      "id": "2",
+      "title": "Fix Approval Redirect and Complete Flow",
+      "type": "bugfix",
+      "status": "completed",
+      "pdr_approved": true,
+      "turns": 1,
+      "estimated_tokens": 3000,
+      "model_used": "haiku",
+      "checkpoint_commit": "2d2c83d"
     }
   ],
   "totals": {
-    "turns": 10,
-    "estimated_tokens": 12500,
-    "budget_remaining": 240000,
+    "turns": 2,
+    "estimated_tokens": 18000,
+    "budget_remaining": 262000,
     "budget_status": "GREEN"
   }
 }
