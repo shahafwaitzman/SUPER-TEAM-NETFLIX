@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academy - Super Team</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Heebo', sans-serif;
+  background: #0a0a0a;
+  color: #fff;
+  padding-top: 60px;
+}
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(229,9,20,0.1);
+}
+
+.nav-logo {
+  font-size: 24px;
+  font-weight: 900;
+  color: #e50914;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 30px;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+nav a:hover {
+  color: #e50914;
+}
+
+.nav-user {
+  font-size: 12px;
+  color: #aaa;
+  padding: 8px 16px;
+  background: rgba(229,9,20,0.1);
+  border-radius: 4px;
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 60px 40px 40px;
+}
+
+/* Header */
+.header {
+  margin-bottom: 50px;
+}
+
+.header-title {
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.header-subtitle {
+  font-size: 16px;
+  color: #aaa;
+}
+
+/* Content Sections */
+.section {
+  margin-bottom: 60px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #fff;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.course-card {
+  background: rgba(229,9,20,0.05);
+  border: 1px solid rgba(229,9,20,0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.course-card:hover {
+  border-color: #e50914;
+  background: rgba(229,9,20,0.1);
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(229,9,20,0.2);
+}
+
+.course-image {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #0a0e27 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  color: #e50914;
+}
+
+.course-content {
+  padding: 20px;
+}
+
+.course-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #e50914;
+}
+
+.course-desc {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.course-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+}
+
+.course-badge {
+  background: rgba(229,9,20,0.2);
+  color: #e50914;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav {
+    padding: 15px 20px;
+    flex-wrap: wrap;
+  }
+
+  nav ul {
+    gap: 15px;
+    order: 3;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .container {
+    padding: 50px 20px 20px;
+  }
+
+  .header-title {
+    font-size: 32px;
+  }
+
+  .courses-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+  }
+
+  .course-image {
+    height: 120px;
+    font-size: 40px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-logo">SUPER TEAM 🔴</div>
+  <ul>
+    <li><a href="academy-hub.html">בית</a></li>
+    <li><a href="#courses">קורסים</a></li>
+    <li><a href="#popular">פופולרי</a></li>
+    <li><a href="#new">חדש</a></li>
+  </ul>
+  <div class="nav-user" id="userInfo">משתמש</div>
+</nav>
+
+<!-- Main Content -->
+<div class="container">
+  <div class="header">
+    <h1 class="header-title">🎓 Academy Hub</h1>
+    <p class="header-subtitle">כל התוכניות והסדרות שלנו בקטגוריה אחת</p>
+  </div>
+
+  <!-- Featured Section -->
+  <section class="section" id="featured">
+    <h2 class="section-title">📺 קורסים מדומים (Placeholder)</h2>
+    <div class="courses-grid">
+      <div class="course-card">
+        <div class="course-image">📚</div>
+        <div class="course-content">
+          <div class="course-title">קורס 1</div>
+          <p class="course-desc">תיאור קורס ראשון - זה יתחדש עם Drive</p>
+          <div class="course-meta">
+            <span class="course-badge">חדש</span>
+            <span>5 שיעורים</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card">
+        <div class="course-image">🎯</div>
+        <div class="course-content">
+          <div class="course-title">קורס 2</div>
+          <p class="course-desc">תיאור קורס שני - מחכה לתוכן מ-Drive</p>
+          <div class="course-meta">
+            <span class="course-badge">חם</span>
+            <span>8 שיעורים</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card">
+        <div class="course-image">🚀</div>
+        <div class="course-content">
+          <div class="course-title">קורס 3</div>
+          <p class="course-desc">תיאור קורס שלישי - Drive integration הבא</p>
+          <div class="course-meta">
+            <span class="course-badge">פופולרי</span>
+            <span>12 שיעורים</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card">
+        <div class="course-image">💡</div>
+        <div class="course-content">
+          <div class="course-title">קורס 4</div>
+          <p class="course-desc">תיאור קורס רביעי - עוד כמה קורסים</p>
+          <div class="course-meta">
+            <span class="course-badge">מעודכן</span>
+            <span>6 שיעורים</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card">
+        <div class="course-image">⭐</div>
+        <div class="course-content">
+          <div class="course-title">קורס 5</div>
+          <p class="course-desc">תיאור קורס חמישי - סדרה פופולרית</p>
+          <div class="course-meta">
+            <span class="course-badge">מוקדש</span>
+            <span>10 שיעורים</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card">
+        <div class="course-image">🎬</div>
+        <div class="course-content">
+          <div class="course-title">קורס 6</div>
+          <p class="course-desc">תיאור קורס שישי - עוד קורסים בדרך</p>
+          <div class="course-meta">
+            <span class="course-badge">חדש</span>
+            <span>7 שיעורים</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info Section -->
+  <section class="section">
+    <div class="empty-state">
+      <div class="empty-icon">📁</div>
+      <h3>קורסים נוספים מתחזקים</h3>
+      <p>בקרוב נחבר את תיקיות הדרייב שלך ויופיעו כאן כל הסדרות והקורסים</p>
+    </div>
+  </section>
+</div>
+
+<script>
+// Get user info from URL parameter or localStorage
+const params = new URLSearchParams(window.location.search);
+const userEmail = params.get('user') || localStorage.getItem('userEmail');
+
+if (userEmail) {
+  document.getElementById('userInfo').textContent = userEmail.split('@')[0] + ' ✓';
+  localStorage.setItem('userEmail', userEmail);
+}
+
+// Logout function (placeholder)
+function logout() {
+  localStorage.removeItem('userEmail');
+  window.location.href = 'entry.html';
+}
+</script>
+
+</body>
+</html>
