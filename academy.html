@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Team Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #141414; color: #e5e5e5;
+  font-family: 'Heebo', sans-serif;
+  min-height: 100vh; padding: 20px;
+}
+.container {
+  max-width: 1200px; margin: 0 auto;
+}
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 40px; padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+h1 { font-size: 32px; }
+.user-info { font-size: 14px; color: #999; }
+.content {
+  background: #1a1a1a; border-radius: 10px;
+  padding: 40px; text-align: center;
+}
+.welcome { font-size: 28px; color: #46d369; margin-bottom: 20px; }
+.message { font-size: 16px; line-height: 1.8; color: #e5e5e5; margin-bottom: 30px; }
+.courses {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px; margin-top: 40px;
+}
+.course-card {
+  background: rgba(229,9,20,0.1); border: 1px solid #e50914;
+  border-radius: 8px; padding: 20px; text-align: center;
+  cursor: pointer; transition: all 0.3s;
+}
+.course-card:hover {
+  background: rgba(229,9,20,0.15); transform: translateY(-4px);
+}
+.course-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.course-desc { font-size: 13px; color: #999; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🎓 Academy</h1>
+    <div class="user-info">
+      מחובר כ: <span id="userEmail"></span>
+    </div>
+  </div>
+  
+  <div class="content">
+    <div class="welcome">🎉 ברוכה הבאה לAcademy!</div>
+    
+    <div class="message">
+      <p>אתה קיבלת גישה מלאה לכל הקורסים והחומרים שלנו.</p>
+      <p style="margin-top:12px;">בחר קורס כדי להתחיל</p>
+    </div>
+    
+    <div class="courses">
+      <div class="course-card">
+        <div class="course-title">קורס 1</div>
+        <div class="course-desc">יסודות Super Team</div>
+      </div>
+      <div class="course-card">
+        <div class="course-title">קורס 2</div>
+        <div class="course-desc">שיפור מיומנויות</div>
+      </div>
+      <div class="course-card">
+        <div class="course-title">קורס 3</div>
+        <div class="course-desc">מנהיגות והשראה</div>
+      </div>
+      <div class="course-card">
+        <div class="course-title">קורס 4</div>
+        <div class="course-desc">ניהול פרויקטים</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('userEmail').textContent = 
+  new URLSearchParams(window.location.search).get('user') || 'משתמש';
+</script>
+</body>
+</html>

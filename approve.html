@@ -29,6 +29,14 @@ p { font-size: 15px; color: #999; line-height: 1.6; margin-bottom: 12px; }
   cursor: pointer; border: none;
 }
 .btn:hover { background: #b20710; }
+.btn-whatsapp {
+  display: inline-block; margin-top: 16px;
+  padding: 12px 28px; background: #25d366; color: #fff;
+  border-radius: 4px; font-size: 15px; font-weight: 700;
+  text-decoration: none; font-family: inherit;
+  cursor: pointer; border: none; margin-left: 8px;
+}
+.btn-whatsapp:hover { background: #1eaa55; }
 .debug { font-size: 12px; color: #666; margin-top: 24px; padding: 12px; background: #0a0a0a; border-radius: 4px; }
 </style>
 </head>
@@ -105,19 +113,40 @@ async function approve() {
       : window.location.origin + '/';
     log('Return URL: ' + backUrl);
 
+    // Build WhatsApp message
+    const whatsappMsg = encodeURIComponent(
+      'היי ' + user.name + '! 🎉\n\n' +
+      'ברכות! אושרת בהצלחה לAcademy!\n\n' +
+      '📚 איך להכנס:\n' +
+      '1. כנסי לעמוד הבית\n' +
+      '2. לחצי "לקוחות קיימים"\n' +
+      '3. הזיני:\n' +
+      '   שם: ' + user.name + '\n' +
+      '   אימייל: ' + user.email + '\n' +
+      '   TAB: ' + user.tab + '\n' +
+      '4. בום! אתה פנימה 🚀\n\n' +
+      'אם יש שאלות - אני כאן! 💪'
+    );
+    
+    const whatsappLink = 'https://wa.me/' + (user.phone || '').replace(/\D/g, '') + '?text=' + whatsappMsg;
+
     box.innerHTML =
       '<div class="icon">✅</div>' +
       '<h1 style="color:#46d369">' + user.name + ' אושר!</h1>' +
       '<p>' + user.name + ' יכול כעת להיכנס לאקדמיה.</p>' +
-      '<p style="color:#999; font-size:12px; margin-top:20px;">מעבר לאקדמיה...</p>';
+      '<div style="margin-top:20px;">' +
+        '<a href="' + whatsappLink + '" class="btn-whatsapp" target="_blank">💬 שלח בוואטאפ</a>' +
+      '</div>' +
+      '<p style="color:#999; font-size:12px; margin-top:24px;">מעבר לעמוד הבית בעוד 3 שניות...</p>';
 
     log('🔄 Redirecting to: ' + backUrl);
     setTimeout(() => {
       window.location.href = backUrl;
-    }, 2000);
+    }, 3000);
 
   } catch(e) {
     log('❌ שגיאה: ' + e.message);
+    const box = document.getElementById('box');
     box.innerHTML = '<div class="icon">❌</div><h1 style="color:#e50914">שגיאה</h1><p>' + e.message + '</p><p>נסה שוב מאוחר יותר.</p>';
   }
 }

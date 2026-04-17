@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בקשת אישור - Super Team Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #141414; color: #e5e5e5;
+  font-family: 'Heebo', sans-serif;
+  min-height: 100vh; padding: 20px;
+}
+.container {
+  max-width: 500px; margin: 0 auto;
+  background: #1a1a1a; border-radius: 10px; padding: 40px;
+}
+h1 { font-size: 24px; margin-bottom: 20px; }
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: 600; }
+input, select {
+  width: 100%; padding: 10px; border: 1px solid #333;
+  border-radius: 4px; background: #0a0a0a; color: #e5e5e5;
+  font-size: 14px; font-family: inherit;
+}
+input:focus, select:focus { border-color: #e50914; outline: none; }
+button {
+  width: 100%; padding: 12px; background: #e50914; color: #fff;
+  border: none; border-radius: 4px; cursor: pointer; font-weight: 700;
+  margin-top: 15px; font-family: inherit;
+}
+button:hover { background: #b20710; }
+.status { margin-top: 15px; padding: 10px; background: #0a0a0a; border-radius: 4px; min-height: 20px; }
+.error { color: #e50914; }
+.success { color: #46d369; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 בקשת אישור חדשה</h1>
+  
+  <div class="form-group">
+    <label>שם מלא *</label>
+    <input type="text" id="name" placeholder="שם מלא">
+  </div>
+  
+  <div class="form-group">
+    <label>אימייל *</label>
+    <input type="email" id="email" placeholder="example@gmail.com">
+  </div>
+  
+  <div class="form-group">
+    <label>טלפון *</label>
+    <input type="tel" id="phone" placeholder="050-1234567">
+  </div>
+  
+  <div class="form-group">
+    <label>בחר TAB *</label>
+    <select id="tab">
+      <option value="">-- בחר TAB --</option>
+      <option value="shahafwai@gmail.com">שחף ויצמן</option>
+      <option value="other@example.com">אחר</option>
+    </select>
+  </div>
+  
+  <button onclick="submitForm()">שלח בקשה</button>
+  
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+emailjs.init('nhwKyEa3uJ8JjmxXQ');
+
+function log(msg) {
+  console.log('[register] ' + msg);
+  document.getElementById('status').innerHTML += msg + '<br>';
+}
+
+async function submitForm() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const tab = document.getElementById('tab').value;
+  
+  if (!name || !email || !phone || !tab) {
+    document.getElementById('status').innerHTML = '<span class="error">❌ יש למלא את כל השדות</span>';
+    return;
+  }
+  
+  log('שליחת בקשה...');
+  
+  try {
+    const response = await fetch(FIREBASE_URL + '/users.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, email, phone, tab,
+        status: 'pending',
+        registeredAt: new Date().toISOString()
+      })
+    });
+    
+    const result = await response.json();
+    const userKey = result.name;
+    log('✅ המשתמש נרשם: ' + userKey);
+    
+    const approvalUrl = 'https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/approve.html?key=' + userKey;
+    
+    await emailjs.send('service_etqui87', 'template_6bo4ai9', {
+      to_email: tab,
+      tab_name: tab,
+      user_name: name,
+      user_email: email,
+      approve_url: approvalUrl
+    });
+    
+    log('✅ מייל נשלח לטאב');
+    
+    setTimeout(() => {
+      window.location.href = 'confirmation.html?name=' + encodeURIComponent(name);
+    }, 1500);
+    
+  } catch(e) {
+    log('❌ שגיאה: ' + e.message);
+    document.getElementById('status').innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+  }
+}
+</script>
+</body>
+</html>

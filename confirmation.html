@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הרשמה אושרה - Super Team Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #141414; color: #e5e5e5;
+  font-family: 'Heebo', sans-serif;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.container {
+  max-width: 500px; width: 100%;
+  background: #1a1a1a; border-radius: 10px;
+  padding: 40px; text-align: center;
+}
+.icon { font-size: 64px; margin-bottom: 20px; }
+h1 { font-size: 28px; color: #46d369; margin-bottom: 16px; }
+.content {
+  background: rgba(70,211,105,0.1); border: 1px solid #46d369;
+  border-radius: 6px; padding: 20px; margin-bottom: 20px;
+}
+.content p { font-size: 15px; line-height: 1.8; color: #e5e5e5; margin-bottom: 12px; }
+.highlight { color: #f5c518; font-weight: 700; }
+.info {
+  background: #0a0a0a; border-radius: 6px;
+  padding: 16px; margin-bottom: 20px;
+  font-size: 13px; color: #999;
+}
+.info div { margin-bottom: 8px; }
+.buttons {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.btn {
+  padding: 12px 24px; border: none; border-radius: 4px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: inherit; text-decoration: none; display: block;
+}
+.btn-primary {
+  background: #e50914; color: #fff;
+}
+.btn-primary:hover { background: #b20710; }
+.btn-secondary {
+  background: transparent; color: #e5e5e5;
+  border: 1px solid #e50914;
+}
+.btn-secondary:hover { background: rgba(229,9,20,0.1); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="icon">✅</div>
+  <h1>הרשמה בוצעה בהצלחה!</h1>
+  
+  <div class="content">
+    <p>💌 שלחנו מייל לטאב שלך</p>
+    <p>הטאב יסקור את הבקשה שלך</p>
+    <p>⏱️ <span class="highlight">בעוד עד 24 שעות</span></p>
+    <p>💬 לאחר אישור, תקבלי הודעה בוואטאפ עם הוראות כניסה</p>
+  </div>
+  
+  <div class="info">
+    <div>🔔 <strong>הודעה חשובה:</strong></div>
+    <div>אם לא קיבלת הודעה בעוד יום -</div>
+    <div>בדוק שוב בעמוד הלקוחות הקיימים</div>
+    <div>או צור קשר לטאב שלך</div>
+  </div>
+  
+  <div class="buttons">
+    <a href="home.html" class="btn btn-primary">
+      ← חזור לעמוד הבית
+    </a>
+    <a href="access.html" class="btn btn-secondary">
+      בדוק אם אושרתי
+    </a>
+  </div>
+</div>
+</body>
+</html>
