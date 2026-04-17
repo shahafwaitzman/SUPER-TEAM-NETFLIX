@@ -25,12 +25,23 @@
       "estimated_tokens": 3000,
       "model_used": "haiku",
       "checkpoint_commit": "2d2c83d"
+    },
+    {
+      "id": "3",
+      "title": "Add Bulk Delete Functionality to Admin Panel",
+      "type": "feature",
+      "status": "completed",
+      "pdr_approved": true,
+      "turns": 1,
+      "estimated_tokens": 2000,
+      "model_used": "haiku",
+      "checkpoint_commit": "cb0d3c3"
     }
   ],
   "totals": {
-    "turns": 2,
-    "estimated_tokens": 18000,
-    "budget_remaining": 262000,
+    "turns": 3,
+    "estimated_tokens": 20000,
+    "budget_remaining": 260000,
     "budget_status": "GREEN"
   }
 }

@@ -9,3 +9,5 @@
 
 - P2 #completed: Auto-redirect fix verified and deployed. Tested approval flow end-to-end: user registration → Firebase status update → auto-redirect after 2s. Redirect logic handles both already-approved and newly-approved users. Dynamic URL detection works correctly for GitHub Pages vs custom domain deployments. Commit 2d2c83d pushed to GitHub.
 - SESSION #meta: Priority 2 complete. Full approval workflow tested and verified working. System ready for production use. Budget used: ~18K/280K (GREEN). No further priorities defined at this time.
+
+- P3 #completed: Bulk delete feature implemented in admin panel. Added checkboxes for multi-select, "Select All" toggle, bulk action bar with delete confirmation, and Firebase deletion. Visual feedback shows selected users. Tested workflow: select user → see selection → delete → Firebase updated. Commit cb0d3c3.
