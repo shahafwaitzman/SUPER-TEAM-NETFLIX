@@ -96,17 +96,16 @@ nav a:hover::after {
   box-shadow: 0 10px 30px rgba(229,9,20,0.15);
 }
 
-/* Hero Section */
+/* Hero Section - With Real Background Image */
 .hero {
   position: relative;
   width: 100%;
-  height: 120vh;
+  height: 100vh;
   margin-top: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding-right: 80px;
+  justify-content: center;
   padding-top: 60px;
 }
 
@@ -117,77 +116,61 @@ nav a:hover::after {
   right: 0;
   bottom: 0;
   left: 0;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #0f0f1e 100%);
+  background: url('https://drive.google.com/uc?id=13JtFgrLuWvQGhmDA79FiTKpaUbY0xAvb') center/cover;
+  background-size: cover;
+  background-position: center;
   z-index: 0;
+  object-fit: cover;
 }
 
 .hero::after {
   content: '';
   position: absolute;
-  top: -10%;
-  right: -10%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(229,9,20,0.15) 0%, transparent 70%);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%);
   z-index: 1;
-  border-radius: 50%;
 }
 
 .hero-content {
   position: relative;
   z-index: 10;
-  max-width: 600px;
+  text-align: center;
+  max-width: 700px;
   animation: slideUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(229,9,20,0.2);
-  border: 1.5px solid rgba(229,9,20,0.5);
-  color: #e50914;
-  padding: 12px 24px;
-  border-radius: 50px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  margin-bottom: 30px;
-  text-transform: uppercase;
-}
-
-.hero-badge::before {
-  content: '●';
-  animation: pulse 2s infinite;
-}
-
 .hero-title {
-  font-size: 84px;
+  font-size: 96px;
   font-weight: 900;
-  margin-bottom: 25px;
-  line-height: 1.05;
-  color: #fff;
-  text-shadow: 0 10px 40px rgba(229,9,20,0.4);
+  margin-bottom: 20px;
+  line-height: 1;
+  color: #e50914;
+  text-shadow: 0 10px 40px rgba(0,0,0,0.8);
   letter-spacing: -2px;
 }
 
 .hero-subtitle {
-  font-size: 20px;
-  color: #ccc;
+  font-size: 24px;
+  color: #fff;
   margin-bottom: 50px;
-  line-height: 1.8;
-  font-weight: 300;
-  max-width: 500px;
+  line-height: 1.6;
+  font-weight: 400;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.7);
 }
 
 .hero-buttons {
   display: flex;
   gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn {
-  padding: 16px 40px;
-  font-size: 15px;
+  padding: 16px 48px;
+  font-size: 16px;
   font-weight: 800;
   border: none;
   border-radius: 10px;
@@ -197,6 +180,7 @@ nav a:hover::after {
   letter-spacing: 1px;
   position: relative;
   overflow: hidden;
+  text-transform: none;
 }
 
 .btn::before {
@@ -231,19 +215,19 @@ nav a:hover::after {
 }
 
 .btn-secondary {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.15);
   color: #fff;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
   position: relative;
   z-index: 1;
 }
 
 .btn-secondary:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: #e50914;
+  background: rgba(255,255,255,0.25);
+  border-color: #fff;
   transform: translateY(-4px);
-  color: #e50914;
-  box-shadow: 0 20px 50px rgba(229,9,20,0.3);
+  color: #fff;
+  box-shadow: 0 20px 50px rgba(255,255,255,0.2);
 }
 
 /* Container */
@@ -253,6 +237,7 @@ nav a:hover::after {
   padding: 100px 60px;
   position: relative;
   z-index: 10;
+  background: #000;
 }
 
 /* Sections */
@@ -278,7 +263,7 @@ nav a:hover::after {
   max-width: 600px;
 }
 
-/* Premium Grid - Modern Layout */
+/* Premium Grid */
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -291,7 +276,6 @@ nav a:hover::after {
   border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  group: 'card';
   background: #000;
   border: 1px solid rgba(229,9,20,0.1);
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -303,7 +287,6 @@ nav a:hover::after {
   box-shadow: 0 40px 80px rgba(229,9,20,0.3);
 }
 
-/* Course Image - Premium Gradient */
 .course-image {
   width: 100%;
   height: 100%;
@@ -414,15 +397,6 @@ nav a:hover::after {
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
 /* Info Section */
 .info-section {
   text-align: center;
@@ -451,16 +425,12 @@ nav a:hover::after {
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .hero {
-    padding-right: 40px;
-  }
-
   .container {
     padding: 80px 40px;
   }
 
   .hero-title {
-    font-size: 60px;
+    font-size: 72px;
   }
 
   .courses-grid {
@@ -481,16 +451,14 @@ nav a:hover::after {
   .hero {
     padding-right: 20px;
     padding-left: 20px;
-    justify-content: center;
-    height: 100vh;
   }
 
   .hero-title {
-    font-size: 42px;
+    font-size: 48px;
   }
 
   .hero-subtitle {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .container {
@@ -534,12 +502,11 @@ nav a:hover::after {
 <!-- Hero Section -->
 <section class="hero" id="home">
   <div class="hero-content">
-    <div class="hero-badge">🎓 ברוכים הבאים</div>
-    <h1 class="hero-title">Academy Hub</h1>
-    <p class="hero-subtitle">מקום שבו הצוות שלנו נפגש ללמוד וגדל ביחד. כל הקורסים והסדרות שלנו בקטגוריה אחת</p>
+    <h1 class="hero-title">SUPER TEAM<br>ACADEMY</h1>
+    <p class="hero-subtitle">מקום שבו הצוות שלנו נפגש ללמוד וגדל ביחד</p>
     <div class="hero-buttons">
-      <button class="btn btn-primary">צפה בכל הקורסים</button>
-      <button class="btn btn-secondary">למד עוד</button>
+      <button class="btn btn-primary" onclick="document.getElementById('featured').scrollIntoView({behavior: 'smooth'})">צפייה</button>
+      <button class="btn btn-secondary" onclick="alert('מידע נוסף בקרוב!')">מידע נוסף</button>
     </div>
   </div>
 </section>
@@ -550,7 +517,7 @@ nav a:hover::after {
   <section class="section" id="featured">
     <div class="section-header">
       <h2 class="section-title">🎬 קורסים וסדרות</h2>
-      <p class="section-desc">סדרה מלאה של תוכניות לימודיות מדומות - בקרוב יחובר עם הדרייב שלך</p>
+      <p class="section-desc">סדרה מלאה של תוכניות לימודיות - בקרוב יחובר עם הדרייב שלך</p>
     </div>
     <div class="courses-grid">
       <div class="course-card">
@@ -654,17 +621,6 @@ function logout() {
     window.location.href = 'entry.html';
   }
 }
-
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function(e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  });
-});
 </script>
 
 </body>
