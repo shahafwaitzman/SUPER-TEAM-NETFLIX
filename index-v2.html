@@ -5,23 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Team Academy v2</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/build/index.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { 
-  background: #141414; 
-  color: #e5e5e5; 
-  font-family: 'Heebo', sans-serif; 
-  min-height: 100vh; 
-  padding: 20px;
-}
-.container { 
-  max-width: 500px; 
-  margin: 0 auto; 
-  background: #1a1a1a; 
-  border-radius: 10px; 
-  padding: 40px;
-}
+body { background: #141414; color: #e5e5e5; font-family: 'Heebo', sans-serif; min-height: 100vh; padding: 20px; }
+.container { max-width: 500px; margin: 0 auto; background: #1a1a1a; border-radius: 10px; padding: 40px; }
 h1 { font-size: 24px; margin-bottom: 20px; }
 .form-group { margin-bottom: 15px; }
 label { display: block; margin-bottom: 5px; font-weight: 600; }
@@ -38,7 +26,6 @@ button:hover { background: #b20710; }
 
 <div class="container">
 
-<!-- Screen 1: Register -->
 <div id="registerScreen" class="screen active">
 <h1>🎓 Super Team Academy v2</h1>
 
@@ -86,7 +73,6 @@ button:hover { background: #b20710; }
 <div id="registerLog" class="log"></div>
 </div>
 
-<!-- Screen 2: Pending -->
 <div id="pendingScreen" class="screen">
 <h1>⏳ בהמתנה לאישור</h1>
 <p id="pendingMsg" style="margin: 15px 0; font-size: 16px;"></p>
@@ -99,19 +85,15 @@ button:hover { background: #b20710; }
 </div>
 
 <script>
-// Config
 const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
 const EMAILJS_PUBLIC_KEY = 'nhwKyEa3uJ8JjmxXQ';
 const EMAILJS_SERVICE = 'service_etqui87';
 const EMAILJS_TEMPLATE = 'template_6bo4ai9';
 
 // Init EmailJS
-(function() {
-  emailjs.init(EMAILJS_PUBLIC_KEY);
-  console.log('✅ EmailJS initialized');
-})();
+emailjs.init(EMAILJS_PUBLIC_KEY);
+console.log('✅ EmailJS initialized');
 
-// Logging
 function log(screen, msg) {
   console.log(`[${screen}] ${msg}`);
   const logEl = document.getElementById(`${screen}Log`);
@@ -128,7 +110,6 @@ function setStatus(screen, msg) {
   }
 }
 
-// Register
 async function doRegister() {
   const name = document.getElementById('name').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -137,7 +118,6 @@ async function doRegister() {
 
   log('register', `📝 Registration: ${name}, ${email}, ${tabEmail}`);
 
-  // Validate
   if (!name || !email || !phone || !tabEmail) {
     log('register', '❌ Missing fields');
     setStatus('register', '❌ יש למלא את כל השדות');
@@ -145,7 +125,6 @@ async function doRegister() {
   }
 
   try {
-    // Step 1: Firebase
     log('register', '📝 Writing to Firebase...');
     const userKey = Math.random().toString(36).substring(2, 20);
 
@@ -166,7 +145,6 @@ async function doRegister() {
 
     log('register', `✅ User created: ${userKey}`);
 
-    // Step 2: Send Email
     log('register', `📧 Sending email to ${tabEmail}...`);
     const approveUrl = `https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/approve-v2.html?key=${userKey}`;
 
@@ -181,7 +159,6 @@ async function doRegister() {
     log('register', `✅ Email sent successfully: ${emailRes.status}`);
     setStatus('register', `✅ הרישום בוצע! מייל אישור נשלח.`);
 
-    // Save and show pending
     localStorage.setItem('pending_key', userKey);
     setTimeout(() => {
       document.getElementById('registerScreen').classList.remove('active');
@@ -195,7 +172,6 @@ async function doRegister() {
   }
 }
 
-// Check Status
 async function doCheck() {
   const userKey = localStorage.getItem('pending_key');
   if (!userKey) {
@@ -233,21 +209,18 @@ async function doCheck() {
   }
 }
 
-// Back
 function doBack() {
   localStorage.removeItem('pending_key');
   document.getElementById('pendingScreen').classList.remove('active');
   document.getElementById('registerScreen').classList.add('active');
 }
 
-// Auto-check every 5 seconds
 setInterval(() => {
   if (document.getElementById('pendingScreen').classList.contains('active')) {
     doCheck();
   }
 }, 5000);
 
-// Init
 console.log('✅ Page loaded');
 </script>
 
