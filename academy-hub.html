@@ -8,177 +8,410 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-  font-family: 'Heebo', sans-serif;
-  background: #0a0a0a;
-  color: #fff;
-  padding-top: 60px;
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
-/* Navigation */
+body {
+  font-family: 'Heebo', sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+/* Navigation - Apple TV style */
 nav {
   position: fixed;
   top: 0;
   right: 0;
   left: 0;
   z-index: 1000;
-  background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
-  padding: 20px 40px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 100%);
+  padding: 20px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(229,9,20,0.1);
+  border-bottom: 1px solid rgba(229,9,20,0.15);
+  backdrop-filter: blur(10px);
 }
 
 .nav-logo {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 900;
   color: #e50914;
+  letter-spacing: 3px;
 }
 
 nav ul {
   display: flex;
   list-style: none;
-  gap: 30px;
+  gap: 40px;
 }
 
 nav a {
   color: #fff;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  transition: color 0.3s;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  position: relative;
+}
+
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  right: 0;
+  width: 0;
+  height: 2px;
+  background: #e50914;
+  transition: width 0.3s ease;
 }
 
 nav a:hover {
   color: #e50914;
 }
 
+nav a:hover::after {
+  width: 100%;
+}
+
 .nav-user {
-  font-size: 12px;
+  font-size: 13px;
   color: #aaa;
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: rgba(229,9,20,0.1);
-  border-radius: 4px;
+  border: 1px solid rgba(229,9,20,0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-user:hover {
+  background: rgba(229,9,20,0.2);
+  border-color: #e50914;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  margin-top: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 50px;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: url('https://images.unsplash.com/photo-1489599849228-bed96c3f8db0?w=1400&h=900&fit=crop') center/cover;
+  object-fit: cover;
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.3) 100%);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 500px;
+  animation: slideUp 0.8s ease-out;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(229,9,20,0.25);
+  border: 2px solid #e50914;
+  color: #e50914;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-size: 72px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: #ddd;
+  margin-bottom: 40px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Heebo', sans-serif;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: #e50914;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #b20710;
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(229,9,20,0.5);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: #fff;
+  transform: translateY(-3px);
 }
 
 /* Container */
 .container {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 60px 40px 40px;
+  padding: 80px 50px 60px;
 }
 
-/* Header */
-.header {
-  margin-bottom: 50px;
-}
-
-.header-title {
-  font-size: 48px;
-  font-weight: 900;
-  margin-bottom: 10px;
-}
-
-.header-subtitle {
-  font-size: 16px;
-  color: #aaa;
-}
-
-/* Content Sections */
+/* Sections */
 .section {
-  margin-bottom: 60px;
+  margin-bottom: 80px;
+}
+
+.section-header {
+  margin-bottom: 40px;
 }
 
 .section-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 30px;
-  color: #fff;
+  font-size: 36px;
+  font-weight: 900;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
 }
 
+.section-desc {
+  font-size: 15px;
+  color: #aaa;
+  font-weight: 300;
+}
+
+/* Courses Grid - Premium Design */
 .courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
 }
 
 .course-card {
-  background: rgba(229,9,20,0.05);
-  border: 1px solid rgba(229,9,20,0.2);
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(229,9,20,0.1) 0%, rgba(229,9,20,0.02) 100%);
+  border: 1px solid rgba(229,9,20,0.15);
+  border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
   cursor: pointer;
+  position: relative;
+}
+
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, transparent 0%, rgba(229,9,20,0.2) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 5;
 }
 
 .course-card:hover {
   border-color: #e50914;
-  background: rgba(229,9,20,0.1);
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(229,9,20,0.2);
+  background: linear-gradient(135deg, rgba(229,9,20,0.15) 0%, rgba(229,9,20,0.05) 100%);
+  transform: translateY(-12px);
+  box-shadow: 0 30px 60px rgba(229,9,20,0.25);
+}
+
+.course-card:hover::before {
+  opacity: 1;
 }
 
 .course-image {
   width: 100%;
-  height: 180px;
+  height: 160px;
   background: linear-gradient(135deg, #1a1a2e 0%, #0a0e27 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 60px;
-  color: #e50914;
+  font-size: 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+.course-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 30% 30%, rgba(229,9,20,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.course-card:hover .course-image::after {
+  opacity: 1;
 }
 
 .course-content {
-  padding: 20px;
+  padding: 25px;
+  position: relative;
+  z-index: 10;
 }
 
 .course-title {
   font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-weight: 800;
+  margin-bottom: 10px;
   color: #e50914;
 }
 
 .course-desc {
   font-size: 13px;
-  color: #aaa;
-  line-height: 1.5;
-  margin-bottom: 15px;
+  color: #bbb;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  font-weight: 300;
 }
 
 .course-meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 12px;
-  color: #666;
 }
 
 .course-badge {
-  background: rgba(229,9,20,0.2);
+  background: rgba(229,9,20,0.25);
   color: #e50914;
-  padding: 4px 8px;
-  border-radius: 3px;
-  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #666;
+.course-episodes {
+  color: #888;
+  font-size: 12px;
 }
 
-.empty-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
+/* Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   nav {
-    padding: 15px 20px;
+    padding: 15px 30px;
+  }
+
+  nav ul {
+    gap: 25px;
+  }
+
+  .hero {
+    padding-right: 30px;
+  }
+
+  .hero-title {
+    font-size: 48px;
+  }
+
+  .container {
+    padding: 60px 30px;
+  }
+
+  .courses-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  nav {
+    padding: 12px 15px;
     flex-wrap: wrap;
   }
 
@@ -189,22 +422,34 @@ nav a:hover {
     margin-top: 10px;
   }
 
-  .container {
-    padding: 50px 20px 20px;
+  .hero {
+    padding-right: 20px;
+    padding-left: 20px;
+    justify-content: center;
   }
 
-  .header-title {
-    font-size: 32px;
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .container {
+    padding: 40px 20px;
   }
 
   .courses-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr;
   }
 
-  .course-image {
-    height: 120px;
-    font-size: 40px;
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
   }
 }
 </style>
@@ -215,33 +460,44 @@ nav a:hover {
 <nav>
   <div class="nav-logo">SUPER TEAM 🔴</div>
   <ul>
-    <li><a href="academy-hub.html">בית</a></li>
+    <li><a href="#home">בית</a></li>
     <li><a href="#courses">קורסים</a></li>
     <li><a href="#popular">פופולרי</a></li>
     <li><a href="#new">חדש</a></li>
   </ul>
-  <div class="nav-user" id="userInfo">משתמש</div>
+  <div class="nav-user" id="userInfo" onclick="logout()">😊 משתמש</div>
 </nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="hero-badge">🎓 ברוכים הבאים לאקדמיה</div>
+    <h1 class="hero-title">Super Team Academy</h1>
+    <p class="hero-subtitle">מקום שבו הצוות שלנו נפגש ללמוד וגדל ביחד</p>
+    <div class="hero-buttons">
+      <button class="btn btn-primary">צפה בעמודי הבית</button>
+      <button class="btn btn-secondary">תוכניות</button>
+    </div>
+  </div>
+</section>
 
 <!-- Main Content -->
 <div class="container">
-  <div class="header">
-    <h1 class="header-title">🎓 Academy Hub</h1>
-    <p class="header-subtitle">כל התוכניות והסדרות שלנו בקטגוריה אחת</p>
-  </div>
-
   <!-- Featured Section -->
-  <section class="section" id="featured">
-    <h2 class="section-title">📺 קורסים מדומים (Placeholder)</h2>
+  <section class="section" id="courses">
+    <div class="section-header">
+      <h2 class="section-title">🎬 סדרות ותוכניות מדומות</h2>
+      <p class="section-desc">כל התוכניות יופיעו כאן עם התחברות לדרייב שלך</p>
+    </div>
     <div class="courses-grid">
       <div class="course-card">
         <div class="course-image">📚</div>
         <div class="course-content">
-          <div class="course-title">קורס 1</div>
-          <p class="course-desc">תיאור קורס ראשון - זה יתחדש עם Drive</p>
+          <div class="course-title">קורס התחלה</div>
+          <p class="course-desc">תוכנית ראשונה - בסיסים ויסודות</p>
           <div class="course-meta">
             <span class="course-badge">חדש</span>
-            <span>5 שיעורים</span>
+            <span class="course-episodes">5 שיעורים</span>
           </div>
         </div>
       </div>
@@ -249,11 +505,11 @@ nav a:hover {
       <div class="course-card">
         <div class="course-image">🎯</div>
         <div class="course-content">
-          <div class="course-title">קורס 2</div>
-          <p class="course-desc">תיאור קורס שני - מחכה לתוכן מ-Drive</p>
+          <div class="course-title">קורס מתקדם</div>
+          <p class="course-desc">תוכנית שניה - קונספטים וגדילה</p>
           <div class="course-meta">
             <span class="course-badge">חם</span>
-            <span>8 שיעורים</span>
+            <span class="course-episodes">8 שיעורים</span>
           </div>
         </div>
       </div>
@@ -261,11 +517,11 @@ nav a:hover {
       <div class="course-card">
         <div class="course-image">🚀</div>
         <div class="course-content">
-          <div class="course-title">קורס 3</div>
-          <p class="course-desc">תיאור קורס שלישי - Drive integration הבא</p>
+          <div class="course-title">קורס מנהיגות</div>
+          <p class="course-desc">תוכנית שלישית - הנהיגה ותוקף</p>
           <div class="course-meta">
             <span class="course-badge">פופולרי</span>
-            <span>12 שיעורים</span>
+            <span class="course-episodes">12 שיעורים</span>
           </div>
         </div>
       </div>
@@ -273,11 +529,11 @@ nav a:hover {
       <div class="course-card">
         <div class="course-image">💡</div>
         <div class="course-content">
-          <div class="course-title">קורס 4</div>
-          <p class="course-desc">תיאור קורס רביעי - עוד כמה קורסים</p>
+          <div class="course-title">קורס חדשנות</div>
+          <p class="course-desc">תוכנית רביעית - יצירתיות וחשיבה</p>
           <div class="course-meta">
-            <span class="course-badge">מעודכן</span>
-            <span>6 שיעורים</span>
+            <span class="course-badge">מוקדש</span>
+            <span class="course-episodes">6 שיעורים</span>
           </div>
         </div>
       </div>
@@ -285,11 +541,11 @@ nav a:hover {
       <div class="course-card">
         <div class="course-image">⭐</div>
         <div class="course-content">
-          <div class="course-title">קורס 5</div>
-          <p class="course-desc">תיאור קורס חמישי - סדרה פופולרית</p>
+          <div class="course-title">קורס סדרה</div>
+          <p class="course-desc">תוכנית חמישית - סדרה פופולרית</p>
           <div class="course-meta">
-            <span class="course-badge">מוקדש</span>
-            <span>10 שיעורים</span>
+            <span class="course-badge">מעודכן</span>
+            <span class="course-episodes">10 שיעורים</span>
           </div>
         </div>
       </div>
@@ -297,11 +553,11 @@ nav a:hover {
       <div class="course-card">
         <div class="course-image">🎬</div>
         <div class="course-content">
-          <div class="course-title">קורס 6</div>
-          <p class="course-desc">תיאור קורס שישי - עוד קורסים בדרך</p>
+          <div class="course-title">קורס סטודיו</div>
+          <p class="course-desc">תוכנית שישית - ייצור וקיום</p>
           <div class="course-meta">
             <span class="course-badge">חדש</span>
-            <span>7 שיעורים</span>
+            <span class="course-episodes">7 שיעורים</span>
           </div>
         </div>
       </div>
@@ -310,29 +566,40 @@ nav a:hover {
 
   <!-- Info Section -->
   <section class="section">
-    <div class="empty-state">
-      <div class="empty-icon">📁</div>
-      <h3>קורסים נוספים מתחזקים</h3>
-      <p>בקרוב נחבר את תיקיות הדרייב שלך ויופיעו כאן כל הסדרות והקורסים</p>
+    <div class="section-header">
+      <h2 class="section-title">📁 קורסים נוספים בהפצה</h2>
+      <p class="section-desc">בקרוב נחבר את תיקיות הדרייב שלך והקורסים החדשים יופיעו כאן</p>
     </div>
   </section>
 </div>
 
 <script>
-// Get user info from URL parameter or localStorage
+// User info
 const params = new URLSearchParams(window.location.search);
 const userEmail = params.get('user') || localStorage.getItem('userEmail');
 
 if (userEmail) {
-  document.getElementById('userInfo').textContent = userEmail.split('@')[0] + ' ✓';
+  const userName = userEmail.split('@')[0];
+  document.getElementById('userInfo').textContent = '😊 ' + userName;
   localStorage.setItem('userEmail', userEmail);
 }
 
-// Logout function (placeholder)
 function logout() {
-  localStorage.removeItem('userEmail');
-  window.location.href = 'entry.html';
+  if (confirm('בטוח שאתה רוצה להתנתק?')) {
+    localStorage.removeItem('userEmail');
+    window.location.href = 'entry.html';
+  }
 }
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
 </script>
 
 </body>
