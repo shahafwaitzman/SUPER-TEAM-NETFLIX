@@ -41,18 +41,18 @@
       "id": "4",
       "title": "Build Complete User Access System",
       "type": "feature",
-      "status": "in_progress",
+      "status": "completed",
       "pdr_approved": true,
-      "turns": 0,
-      "estimated_tokens": 6000,
+      "turns": 1,
+      "estimated_tokens": 5500,
       "model_used": "haiku",
-      "checkpoint_commit": null
+      "checkpoint_commit": "4125db6"
     }
   ],
   "totals": {
-    "turns": 3,
-    "estimated_tokens": 20000,
-    "budget_remaining": 260000,
+    "turns": 4,
+    "estimated_tokens": 25500,
+    "budget_remaining": 254500,
     "budget_status": "GREEN"
   }
 }
