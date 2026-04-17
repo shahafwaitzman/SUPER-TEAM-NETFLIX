@@ -3,131 +3,410 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>בקשת אישור - Super Team Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<title>Super Team Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  background: #141414; color: #e5e5e5;
   font-family: 'Heebo', sans-serif;
-  min-height: 100vh; padding: 20px;
+  color: #fff;
+  background: #000;
+  overflow-x: hidden;
 }
-.container {
-  max-width: 500px; margin: 0 auto;
-  background: #1a1a1a; border-radius: 10px; padding: 40px;
+
+/* Navigation Bar */
+nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-h1 { font-size: 24px; margin-bottom: 20px; }
-.form-group { margin-bottom: 15px; }
-label { display: block; margin-bottom: 5px; font-weight: 600; }
-input, select {
-  width: 100%; padding: 10px; border: 1px solid #333;
-  border-radius: 4px; background: #0a0a0a; color: #e5e5e5;
-  font-size: 14px; font-family: inherit;
+
+.logo {
+  font-size: 24px;
+  font-weight: 900;
+  color: #e50914;
+  letter-spacing: 2px;
 }
-input:focus, select:focus { border-color: #e50914; outline: none; }
-button {
-  width: 100%; padding: 12px; background: #e50914; color: #fff;
-  border: none; border-radius: 4px; cursor: pointer; font-weight: 700;
-  margin-top: 15px; font-family: inherit;
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 30px;
 }
-button:hover { background: #b20710; }
-.status { margin-top: 15px; padding: 10px; background: #0a0a0a; border-radius: 4px; min-height: 20px; }
-.error { color: #e50914; }
-.success { color: #46d369; }
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+nav a:hover {
+  color: #e50914;
+  background: rgba(229,9,20,0.1);
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><radialGradient id="g"><stop offset="0%25" style="stop-color:rgb(229,9,20);stop-opacity:0.15" /><stop offset="100%25" style="stop-color:rgb(0,0,0);stop-opacity:0" /></radialGradient></defs><circle cx="200" cy="150" r="200" fill="url(%23g)"/><circle cx="1000" cy="400" r="300" fill="url(%23g)"/></svg>');
+  background-size: cover;
+  opacity: 0.3;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 800px;
+  animation: fadeInUp 1s ease-out;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(229,9,20,0.2);
+  border: 2px solid #e50914;
+  color: #e50914;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 900;
+  margin-bottom: 20px;
+  line-height: 1.2;
+  text-shadow: 0 10px 30px rgba(229,9,20,0.5);
+  animation: scaleIn 0.8s ease-out;
+}
+
+.hero-title .red {
+  color: #e50914;
+}
+
+.hero-subtitle {
+  font-size: clamp(16px, 2vw, 24px);
+  color: #aaa;
+  margin-bottom: 50px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 16px 48px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Heebo', sans-serif;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  background: rgba(255,255,255,0.1);
+  transition: width 0.3s ease;
+  z-index: -1;
+}
+
+.btn:hover::before {
+  width: 100%;
+  right: auto;
+  left: 0;
+}
+
+.btn-primary {
+  background: #e50914;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #b20710;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(229,9,20,0.4);
+}
+
+.btn-secondary {
+  background: rgba(229,9,20,0.15);
+  color: #e50914;
+  border: 2px solid #e50914;
+}
+
+.btn-secondary:hover {
+  background: #e50914;
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(229,9,20,0.4);
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+}
+
+/* Features Section */
+.features {
+  position: relative;
+  z-index: 10;
+  padding: 40px 20px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(229,9,20,0.2);
+}
+
+.features-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: rgba(229,9,20,0.05);
+  border: 1px solid rgba(229,9,20,0.2);
+  padding: 30px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.feature-card:hover {
+  background: rgba(229,9,20,0.1);
+  border-color: #e50914;
+  transform: translateY(-5px);
+}
+
+.feature-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.feature-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #e50914;
+}
+
+.feature-text {
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav {
+    padding: 15px 20px;
+  }
+
+  nav ul {
+    gap: 15px;
+  }
+
+  nav a {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .features {
+    padding: 30px 15px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #000;
+  }
+
+  nav {
+    background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+  }
+}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>📝 בקשת אישור חדשה</h1>
-  
-  <div class="form-group">
-    <label>שם מלא *</label>
-    <input type="text" id="name" placeholder="שם מלא">
+
+<!-- Navigation -->
+<nav>
+  <div class="logo">SUPER TEAM 🔴</div>
+  <ul>
+    <li><a href="#home">בית</a></li>
+    <li><a href="#academy">אקדמיה</a></li>
+    <li><a href="#programs">תכניות</a></li>
+    <li><a href="#about">אודות</a></li>
+  </ul>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="hero-badge">🎓 כניסה לתוכנית הלימודים</div>
+    
+    <h1 class="hero-title">
+      Super Team <span class="red">Academy</span>
+    </h1>
+    
+    <p class="hero-subtitle">
+      הצטרף לתוכנית הלימודים המובילה בתחום<br>
+      תעשה צעד הבא בקריירה שלך
+    </p>
+
+    <div class="hero-buttons">
+      <button class="btn btn-primary btn-icon" onclick="location.href='access.html'">
+        <span>צפייה בתכניות</span>
+        <span>▶</span>
+      </button>
+      <button class="btn btn-secondary btn-icon" onclick="location.href='index.html'">
+        <span>בקשה חדשה</span>
+        <span>+</span>
+      </button>
+    </div>
   </div>
-  
-  <div class="form-group">
-    <label>אימייל *</label>
-    <input type="email" id="email" placeholder="example@gmail.com">
+</section>
+
+<!-- Features Section -->
+<section class="features">
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📚</div>
+      <h3 class="feature-title">תכניות מובילות</h3>
+      <p class="feature-text">חומר לימודי מקצועי וממוגדר על ידי אנשי התחום</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">👨‍🏫</div>
+      <h3 class="feature-title">מנטורים מנוסים</h3>
+      <p class="feature-text">למד מאנשים שהצליחו ויש להם ניסיון בתחום</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🚀</div>
+      <h3 class="feature-title">קריירה חזקה</h3>
+      <p class="feature-text">כלים ותמיכה לעלייה בעולם העבודה והביזנס</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3 class="feature-title">תוכנית מעשית</h3>
+      <p class="feature-text">לא רק תיאוריה - יישום מיד עם למידה</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🤝</div>
+      <h3 class="feature-title">קהילה חזקה</h3>
+      <p class="feature-text">התחבר עם אנשים שחולקים את אותן מטרות</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">⭐</div>
+      <h3 class="feature-title">הצטיינות</h3>
+      <p class="feature-text">תוכן איכותי שיביא אתך לרמה הגבוהה ביותר</p>
+    </div>
   </div>
-  
-  <div class="form-group">
-    <label>טלפון *</label>
-    <input type="tel" id="phone" placeholder="050-1234567">
-  </div>
-  
-  <div class="form-group">
-    <label>בחר TAB *</label>
-    <select id="tab">
-      <option value="">-- בחר TAB --</option>
-      <option value="shahafwai@gmail.com">שחף ויצמן</option>
-      <option value="other@example.com">אחר</option>
-    </select>
-  </div>
-  
-  <button onclick="submitForm()">שלח בקשה</button>
-  
-  <div class="status" id="status"></div>
-</div>
+</section>
 
 <script>
-const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
-emailjs.init('nhwKyEa3uJ8JjmxXQ');
-
-function log(msg) {
-  console.log('[register] ' + msg);
-  document.getElementById('status').innerHTML += msg + '<br>';
-}
-
-async function submitForm() {
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const tab = document.getElementById('tab').value;
-  
-  if (!name || !email || !phone || !tab) {
-    document.getElementById('status').innerHTML = '<span class="error">❌ יש למלא את כל השדות</span>';
-    return;
-  }
-  
-  log('שליחת בקשה...');
-  
-  try {
-    const response = await fetch(FIREBASE_URL + '/users.json', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name, email, phone, tab,
-        status: 'pending',
-        registeredAt: new Date().toISOString()
-      })
-    });
-    
-    const result = await response.json();
-    const userKey = result.name;
-    log('✅ המשתמש נרשם: ' + userKey);
-    
-    const approvalUrl = 'https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/approve.html?key=' + userKey;
-    
-    await emailjs.send('service_etqui87', 'template_6bo4ai9', {
-      to_email: tab,
-      tab_name: tab,
-      user_name: name,
-      user_email: email,
-      approve_url: approvalUrl
-    });
-    
-    log('✅ מייל נשלח לטאב');
-    
-    setTimeout(() => {
-      window.location.href = 'confirmation.html?name=' + encodeURIComponent(name);
-    }, 1500);
-    
-  } catch(e) {
-    log('❌ שגיאה: ' + e.message);
-    document.getElementById('status').innerHTML = '<span class="error">❌ ' + e.message + '</span>';
-  }
-}
+// Smooth scroll for navigation
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
 </script>
+
 </body>
 </html>
