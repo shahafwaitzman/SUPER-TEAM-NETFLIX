@@ -3,82 +3,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>הרשמה אושרה - Super Team Academy</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<title>הרשמה אושרה — Super Team Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --nflx-bg: #141414;
+  --nflx-red: #E50914;
+  --nflx-red-dark: #B9090B;
+  --nflx-green: #46d369;
+  --nflx-text: #FFFFFF;
+  --nflx-text-muted: #AAAAAA;
+  --nflx-header-height: 70px;
+  --stadium-img: url('hero.jpg');
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; min-height: 100vh; overflow-x: hidden; }
 body {
-  background: #141414; color: #e5e5e5;
-  font-family: 'Heebo', sans-serif;
+  font-family: 'Heebo', 'Helvetica Neue', sans-serif;
+  background: var(--nflx-bg);
+  color: var(--nflx-text);
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+a { color: inherit; text-decoration: none; }
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: 0;
+  background-image: var(--stadium-img);
+  background-size: cover; background-position: center 30%;
+  filter: contrast(1.08) saturate(1.12) brightness(0.55);
+  transform: scale(1.02);
+}
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(20,20,20,0.6) 0%, rgba(20,20,20,0.85) 50%, rgba(20,20,20,0.95) 100%);
+}
+
+.main-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nflx-header-height);
+  display: flex; align-items: center;
+  padding: 0 48px; z-index: 100;
+  background: linear-gradient(rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+}
+.logo {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin-left: 32px; text-transform: uppercase;
+  user-select: none; line-height: 1;
+}
+.logo-super {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 11px;
+  color: #fff; letter-spacing: 2px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+.logo-line {
+  width: 44px; height: 1.5px;
+  background: linear-gradient(to right, transparent 0%, #fff 50%, transparent 100%);
+  margin: 4px 0; border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
+.logo-academy {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 18px;
+  color: var(--nflx-red); letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px rgba(229,9,20,0.5), 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.page-container {
+  position: relative; z-index: 10;
   min-height: 100vh;
+  padding: calc(var(--nflx-header-height) + 40px) 20px 40px;
   display: flex; align-items: center; justify-content: center;
+}
+.success-card {
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(70,211,105,0.3);
+  border-radius: 8px;
+  padding: 48px 44px;
+  max-width: 520px; width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 40px rgba(70,211,105,0.1);
+  animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.success-icon {
+  font-size: 72px;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 12px rgba(70,211,105,0.4));
+  animation: pulseIcon 2s ease-in-out infinite;
+}
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.success-eyebrow {
+  font-size: 11px;
+  color: var(--nflx-green);
+  letter-spacing: 4px; font-weight: 700;
+  margin-bottom: 10px; text-transform: uppercase;
+}
+.success-title {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-size: 36px; font-weight: 900;
+  letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.info-block {
+  background: rgba(70,211,105,0.08);
+  border: 1px solid rgba(70,211,105,0.25);
+  border-radius: 6px;
   padding: 20px;
+  margin-bottom: 18px;
+  text-align: right;
 }
-.container {
-  max-width: 500px; width: 100%;
-  background: #1a1a1a; border-radius: 10px;
-  padding: 40px; text-align: center;
+.info-block p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
 }
-.icon { font-size: 64px; margin-bottom: 20px; }
-h1 { font-size: 28px; color: #46d369; margin-bottom: 16px; }
-.content {
-  background: rgba(70,211,105,0.1); border: 1px solid #46d369;
-  border-radius: 6px; padding: 20px; margin-bottom: 20px;
+.info-block p:last-child { margin-bottom: 0; }
+.info-block .highlight {
+  color: #f5c518;
+  font-weight: 700;
 }
-.content p { font-size: 15px; line-height: 1.8; color: #e5e5e5; margin-bottom: 12px; }
-.highlight { color: #f5c518; font-weight: 700; }
-.info {
-  background: #0a0a0a; border-radius: 6px;
-  padding: 16px; margin-bottom: 20px;
-  font-size: 13px; color: #999;
+
+.notice-block {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-right: 3px solid var(--nflx-red);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--nflx-text-muted);
+  line-height: 1.7;
 }
-.info div { margin-bottom: 8px; }
+.notice-block strong {
+  display: block;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
 .buttons {
-  display: flex; flex-direction: column; gap: 12px;
+  display: flex; flex-direction: column; gap: 10px;
 }
 .btn {
-  padding: 12px 24px; border: none; border-radius: 4px;
-  font-size: 15px; font-weight: 700; cursor: pointer;
-  font-family: inherit; text-decoration: none; display: block;
+  padding: 14px 24px;
+  border: none; border-radius: 4px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
 }
 .btn-primary {
-  background: #e50914; color: #fff;
+  background: var(--nflx-red);
+  color: #fff;
 }
-.btn-primary:hover { background: #b20710; }
+.btn-primary:hover {
+  background: var(--nflx-red-dark);
+  transform: translateY(-1px);
+}
 .btn-secondary {
-  background: transparent; color: #e5e5e5;
-  border: 1px solid #e50914;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
 }
-.btn-secondary:hover { background: rgba(229,9,20,0.1); }
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.6);
+}
+
+@media (max-width: 600px) {
+  .main-header { padding: 0 16px; }
+  .page-container { padding: calc(var(--nflx-header-height) + 20px) 16px 20px; }
+  .success-card { padding: 32px 24px; }
+  .success-title { font-size: 28px; }
+  .success-icon { font-size: 56px; }
+}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="icon">✅</div>
-  <h1>הרשמה בוצעה בהצלחה!</h1>
-  
-  <div class="content">
-    <p>💌 שלחנו מייל לטאב שלך</p>
-    <p>הטאב יסקור את הבקשה שלך</p>
-    <p>⏱️ <span class="highlight">בעוד עד 24 שעות</span></p>
-    <p>💬 לאחר אישור, תקבלי הודעה בוואטאפ עם הוראות כניסה</p>
-  </div>
-  
-  <div class="info">
-    <div>🔔 <strong>הודעה חשובה:</strong></div>
-    <div>אם לא קיבלת הודעה בעוד יום -</div>
-    <div>בדוק שוב בעמוד הלקוחות הקיימים</div>
-    <div>או צור קשר לטאב שלך</div>
-  </div>
-  
-  <div class="buttons">
-    <a href="home.html" class="btn btn-primary">
-      ← חזור לעמוד הבית
-    </a>
-    <a href="access.html" class="btn btn-secondary">
-      בדוק אם אושרתי
-    </a>
-  </div>
+
+<div class="main-header">
+  <a href="entry.html" class="logo" aria-label="Academy">
+    <span class="logo-super">SUPER TEAM</span>
+    <span class="logo-line"></span>
+    <span class="logo-academy">ACADEMY</span>
+  </a>
 </div>
+
+<main class="page-container">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <div class="success-eyebrow">הרשמה בוצעה</div>
+    <h1 class="success-title">הבקשה נשלחה בהצלחה</h1>
+
+    <div class="info-block">
+      <p>💌 שלחנו מייל לטאב שלך</p>
+      <p>👀 הטאב יסקור את הבקשה</p>
+      <p>⏱️ <span class="highlight">תוך עד 24 שעות</span></p>
+      <p>💬 לאחר אישור — תקבל הודעת WhatsApp עם פרטי כניסה</p>
+    </div>
+
+    <div class="notice-block">
+      <strong>🔔 הודעה חשובה</strong>
+      לא קיבלת הודעה תוך יום? בדוק שוב בעמוד המשתמשים הקיימים או פנה לטאב שלך.
+    </div>
+
+    <div class="buttons">
+      <a href="entry.html" class="btn btn-primary">
+        ← חזור לעמוד הבית
+      </a>
+      <a href="access.html" class="btn btn-secondary">
+        בדוק אם אושרתי
+      </a>
+    </div>
+  </div>
+</main>
+
 </body>
 </html>
