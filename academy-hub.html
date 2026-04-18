@@ -20,7 +20,7 @@
   --nflx-rating-bg: rgba(51,51,51,0.6);
   --nflx-header-height: 70px;
   --nflx-ease: cubic-bezier(0.5, 0, 0.1, 1);
-  --stadium-img: url('https://drive.google.com/uc?id=13JtFgrLuWvQGhmDA79FiTKpaUbY0xAvb');
+  --stadium-img: url('hero.jpg');
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,22 +51,19 @@ img { display: block; max-width: 100%; }
 
 .logo {
   font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-weight: 900; font-size: 32px;
+  font-weight: 900;
+  font-size: 38px;
   color: var(--nflx-red);
-  letter-spacing: -0.5px; line-height: 1;
+  letter-spacing: 1px;
+  line-height: 1;
   margin-left: 25px;
   text-transform: uppercase;
-  display: flex; align-items: baseline; gap: 8px;
-  cursor: pointer; user-select: none;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  cursor: pointer;
+  user-select: none;
+  text-shadow: 0 2px 8px rgba(229,9,20,0.4), 0 1px 2px rgba(0,0,0,0.6);
+  transition: transform 0.2s;
 }
-.logo-brand {
-  font-size: 12px; font-weight: 500;
-  color: var(--nflx-text);
-  letter-spacing: 2px;
-  opacity: 0.85;
-  font-family: 'Heebo', sans-serif;
-}
+.logo:hover { transform: scale(1.02); }
 
 .tabbed-primary-navigation {
   display: flex; list-style: none; gap: 18px; align-items: center;
@@ -417,13 +414,11 @@ img { display: block; max-width: 100%; }
 @media (max-width: 950px) {
   .main-header { padding: 0 16px; }
   .tabbed-primary-navigation { display: none; }
-  .logo { font-size: 26px; margin-left: 12px; }
-  .logo-brand { font-size: 10px; }
+  .logo { font-size: 30px; margin-left: 12px; }
   .secondary-navigation { gap: 12px; }
   .nflx-btn { font-size: 14px; padding: 6px 18px 6px 14px; }
 }
 @media (max-width: 500px) {
-  .logo-brand { display: none; }
   .secondary-navigation .nav-icon-btn:first-child { display: none; }
   .meta-layer { bottom: 20%; }
   .billboard-links { flex-wrap: wrap; }
@@ -438,10 +433,7 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
 <body>
 
 <div class="main-header" id="mainHeader" role="navigation">
-  <a href="#" class="logo" aria-label="Academy">
-    <span class="logo-brand">SUPER TEAM</span>
-    <span>ACADEMY</span>
-  </a>
+  <a href="#" class="logo" aria-label="Academy">ACADEMY</a>
 
   <ul class="tabbed-primary-navigation">
     <li class="navigation-tab"><a href="#" class="current">דף הבית</a></li>
