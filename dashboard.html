@@ -192,19 +192,21 @@ body::after {
   position: absolute; inset: 0;
   background-size: cover;
   background-position: center;
-  opacity: 0.5;
+  opacity: 0.95;
   transition: opacity 0.4s, transform 0.6s;
 }
 .choice-card:hover .choice-bg {
-  opacity: 0.7;
+  opacity: 1;
   transform: scale(1.05);
 }
 
 .choice-card:nth-child(1) .choice-bg {
-  background-image: linear-gradient(135deg, #B9090B 0%, #5a0000 60%, #2a0000 100%);
+  background-image: url('previews/preview-academy.jpg');
+  filter: brightness(0.6) saturate(1.1);
 }
 .choice-card:nth-child(2) .choice-bg {
-  background-image: linear-gradient(135deg, #1a3a5c 0%, #0f2040 50%, #050a1f 100%);
+  background-image: url('previews/preview-flow.jpg');
+  filter: brightness(0.6) saturate(1.1);
 }
 
 .choice-card::before {
@@ -308,16 +310,41 @@ body::after {
   .choice-icon { font-size: 80px; top: 38%; }
   .choice-title { font-size: 26px; }
 }
+
+.nav-back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  margin-right: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  font-family: inherit;
+}
+.nav-back-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.3);
+}
+.nav-back-btn svg { width: 14px; height: 14px; }
+@media (max-width: 600px) {
+  .nav-back-btn { padding: 6px 10px; font-size: 11px; margin-right: 12px; }
+  .nav-back-btn .back-label { display: none; }
+}
 </style>
 </head>
 <body>
 
 <div class="main-header">
-  <a href="#" class="logo" aria-label="Academy">
+  <a href="entry.html" class="logo" aria-label="Academy">
     <span class="logo-super">SUPER TEAM</span>
     <span class="logo-line"></span>
     <span class="logo-academy">ACADEMY</span>
   </a>
+  <a href="entry.html" class="nav-back-btn" aria-label="יציאה"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg><span class="back-label">יציאה</span></a>
   <div class="user-badge">
     <span id="userName"></span>
     <div class="user-avatar" id="userAvatar">S</div>
@@ -338,7 +365,7 @@ body::after {
     <!-- ACADEMY CARD -->
     <a href="academy-hub.html" class="choice-card" id="academyCard">
       <div class="choice-bg"></div>
-      <div class="choice-icon">🎬</div>
+      
       <div class="choice-content">
         <span class="choice-badge">⭐ מומלץ</span>
         <h2 class="choice-title">אקדמיה</h2>
@@ -355,7 +382,7 @@ body::after {
     <!-- FLOW CARD -->
     <a href="https://flow-argoni.netlify.app" class="choice-card" id="flowCard">
       <div class="choice-bg"></div>
-      <div class="choice-icon">💬</div>
+      
       <div class="choice-content">
         <span class="choice-badge" style="background:rgba(30,120,200,0.9);">🚀 מקצועי</span>
         <h2 class="choice-title">פלואו עסקי ופגישות</h2>

@@ -1,25 +1,22 @@
 {
-  "session_start": "2026-04-18T00:00:00Z",
+  "session_start": "2026-04-18T08:25:24Z",
   "budget_total": 280000,
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
   "priorities": [
     {
-      "id": "5",
-      "title": "Implement Hybrid Apple TV Design (Blended)",
-      "type": "implementation",
-      "status": "in_progress",
+      "id": 1,
+      "name": "Netflix-accurate redesign of academy-hub.html",
+      "status": "completed",
       "pdr_approved": true,
-      "turns": 1,
-      "estimated_tokens": 9000,
-      "model_used": "haiku",
-      "checkpoint_commit": null
+      "estimated_tokens": 45000,
+      "checkpoint_commit": "d29cbf5"
     }
   ],
   "totals": {
-    "turns": 1,
-    "estimated_tokens": 9000,
-    "budget_remaining": 256000,
+    "turns": 14,
+    "estimated_tokens": 45000,
+    "budget_remaining": 235000,
     "budget_status": "GREEN"
   }
 }

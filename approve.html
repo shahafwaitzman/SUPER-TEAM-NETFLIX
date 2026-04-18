@@ -167,17 +167,19 @@ async function approve() {
       : window.location.origin + '/';
     log('Return URL: ' + backUrl);
 
+    const accessUrl = backUrl + 'access.html';
     const whatsappMsg = encodeURIComponent(
       'היי ' + user.name + '! 🎉\n\n' +
-      'ברכות! אושרת בהצלחה לAcademy!\n\n' +
-      '📚 איך להכנס:\n' +
-      '1. כנסי לעמוד הבית\n' +
-      '2. לחצי "לקוחות קיימים"\n' +
-      '3. הזיני:\n' +
+      'ברכות! אושרת בהצלחה ל-Super Team Academy 🏆\n\n' +
+      '🎬 קישור ישיר לכניסה:\n' +
+      accessUrl + '\n\n' +
+      '📝 פרטי הכניסה שלך:\n' +
       '   שם: ' + user.name + '\n' +
       '   אימייל: ' + user.email + '\n' +
-      '   TAB: ' + user.tab + '\n' +
-      '4. בום! אתה פנימה 🚀\n\n' +
+      '   TAB: ' + user.tab + '\n\n' +
+      '👆 לחצי על הקישור — הזיני את הפרטים — ואת בפנים! 🚀\n\n' +
+      '📚 תוכלי לצפות בכל הקורסים, הסדרות והזומים.\n' +
+      '💬 וגם גישה לפלואו העסקי והפגישות.\n\n' +
       'אם יש שאלות - אני כאן! 💪'
     );
     

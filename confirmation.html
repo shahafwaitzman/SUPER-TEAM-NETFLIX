@@ -198,6 +198,30 @@ body::after {
   .success-title { font-size: 28px; }
   .success-icon { font-size: 56px; }
 }
+
+.nav-back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  margin-right: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  font-family: inherit;
+}
+.nav-back-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.3);
+}
+.nav-back-btn svg { width: 14px; height: 14px; }
+@media (max-width: 600px) {
+  .nav-back-btn { padding: 6px 10px; font-size: 11px; margin-right: 12px; }
+  .nav-back-btn .back-label { display: none; }
+}
 </style>
 </head>
 <body>
@@ -208,6 +232,7 @@ body::after {
     <span class="logo-line"></span>
     <span class="logo-academy">ACADEMY</span>
   </a>
+  <a href="entry.html" class="nav-back-btn" aria-label="לעמוד הבית"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg><span class="back-label">לעמוד הבית</span></a>
 </div>
 
 <main class="page-container">

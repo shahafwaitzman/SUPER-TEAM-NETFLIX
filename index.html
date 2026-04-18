@@ -181,17 +181,19 @@ body::after {
 .choice-bg {
   position: absolute; inset: 0;
   background-size: cover; background-position: center;
-  opacity: 0.6; transition: opacity 0.4s, transform 0.6s;
+  opacity: 0.95; transition: opacity 0.4s, transform 0.6s;
 }
 .choice-card:hover .choice-bg {
-  opacity: 0.8;
+  opacity: 1;
   transform: scale(1.05);
 }
 .card-new .choice-bg {
-  background-image: linear-gradient(135deg, #E50914 0%, #B9090B 40%, #5a0000 80%, #2a0000 100%);
+  background-image: url('previews/preview-register.jpg');
+  filter: brightness(0.6) saturate(1.1);
 }
 .card-existing .choice-bg {
-  background-image: linear-gradient(135deg, #2a5ab8 0%, #1a3a78 50%, #0a1a3a 100%);
+  background-image: url('previews/preview-access.jpg');
+  filter: brightness(0.55) saturate(1.1);
 }
 
 .choice-card::before {
@@ -317,7 +319,7 @@ body::after {
     <!-- NEW USER CARD -->
     <a href="register.html" class="choice-card card-new">
       <div class="choice-bg"></div>
-      <div class="choice-icon">✨</div>
+      
       <div class="choice-content">
         <span class="choice-badge">🌟 חדש</span>
         <h2 class="choice-title">הצטרפות חדשה</h2>
@@ -334,7 +336,7 @@ body::after {
     <!-- EXISTING USER CARD -->
     <a href="access.html" class="choice-card card-existing">
       <div class="choice-bg"></div>
-      <div class="choice-icon">👤</div>
+      
       <div class="choice-content">
         <span class="choice-badge">🔑 משתמש קיים</span>
         <h2 class="choice-title">כניסה לחשבון</h2>
