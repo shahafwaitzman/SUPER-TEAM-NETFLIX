@@ -4,483 +4,638 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Academy - Super Team</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
+:root {
+  --nflx-bg: #141414;
+  --nflx-red: #E50914;
+  --nflx-red-dark: #B9090B;
+  --nflx-text: #FFFFFF;
+  --nflx-text-secondary: #E5E5E5;
+  --nflx-text-muted: #AAAAAA;
+  --nflx-btn-secondary-bg: rgba(109,109,110,0.7);
+  --nflx-handle-bg: rgba(20,20,20,0.5);
+  --nflx-rating-bg: rgba(51,51,51,0.6);
+  --nflx-header-height: 70px;
+  --nflx-ease: cubic-bezier(0.5, 0, 0.1, 1);
+  --stadium-img: url('https://drive.google.com/uc?id=13JtFgrLuWvQGhmDA79FiTKpaUbY0xAvb');
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-}
-
+html { scroll-behavior: smooth; }
+html, body { width: 100%; min-height: 100vh; overflow-x: hidden; }
 body {
+  font-family: 'Heebo', 'Helvetica Neue', 'Segoe UI', Roboto, sans-serif;
+  background: var(--nflx-bg);
+  color: var(--nflx-text);
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { border: none; background: none; cursor: pointer; font-family: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* NAVBAR */
+.main-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nflx-header-height);
+  display: flex; align-items: center;
+  padding: 0 48px;
+  z-index: 100;
+  background: linear-gradient(rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+  transition: background-color 0.4s;
+}
+.main-header.scrolled { background: var(--nflx-bg); }
+
+.logo {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 32px;
+  color: var(--nflx-red);
+  letter-spacing: -0.5px; line-height: 1;
+  margin-left: 25px;
+  text-transform: uppercase;
+  display: flex; align-items: baseline; gap: 8px;
+  cursor: pointer; user-select: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.logo-brand {
+  font-size: 12px; font-weight: 500;
+  color: var(--nflx-text);
+  letter-spacing: 2px;
+  opacity: 0.85;
   font-family: 'Heebo', sans-serif;
-  background: #000;
-  color: #fff;
-  background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.2) 100%), url('https://drive.google.com/uc?id=13JtFgrLuWvQGhmDA79FiTKpaUbY0xAvb') center/cover;
-  background-attachment: fixed;
-  min-height: 100vh;
 }
 
-/* Logo Section */
-.logo-section {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  text-align: right;
+.tabbed-primary-navigation {
+  display: flex; list-style: none; gap: 18px; align-items: center;
 }
-
-.logo-title {
-  font-size: 36px;
-  font-weight: 900;
-  color: #e50914;
-  margin-bottom: 0;
-  line-height: 1;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.8);
-  letter-spacing: -1px;
+.navigation-tab a {
+  font-size: 14px; font-weight: 500;
+  color: var(--nflx-text);
+  transition: color 0.3s;
+  display: block; padding: 4px 0;
 }
+.navigation-tab a:hover { color: var(--nflx-text-muted); }
+.navigation-tab a.current { font-weight: 700; }
 
-.logo-accent {
-  width: 40px;
-  height: 2px;
-  background: #e50914;
-  margin: 8px auto 0;
+.secondary-navigation {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 22px;
+  list-style: none;
 }
-
-.logo-subtitle {
-  font-size: 14px;
-  color: #fff;
-  margin-top: 4px;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.7);
-  letter-spacing: -0.5px;
+.nav-icon-btn {
+  color: var(--nflx-text);
+  padding: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.2s;
 }
+.nav-icon-btn:hover { opacity: 0.7; }
+.nav-icon-btn svg { width: 24px; height: 24px; }
 
-/* Hero Section */
-.hero {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 10;
-  text-align: center;
-  animation: slideUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: 14px 40px;
-  font-size: 15px;
-  font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 6px;
+.profile-icon {
+  width: 32px; height: 32px; border-radius: 4px;
+  background: linear-gradient(135deg, var(--nflx-red) 0%, var(--nflx-red-dark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: #fff;
   cursor: pointer;
-  font-family: 'Heebo', sans-serif;
-  letter-spacing: 0.5px;
-  color: #ffffff;
-  background: transparent;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
 }
 
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-  z-index: 0;
-}
-
-.btn:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.btn:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: #ffffff;
-  transform: translateY(-2px);
-  position: relative;
-  z-index: 1;
-}
-
-/* Container */
-.container {
-  max-width: 1700px;
-  margin: 0 auto;
-  padding: 100px 60px;
-  position: relative;
-  z-index: 10;
-}
-
-.section {
-  margin-bottom: 100px;
-}
-
-.section-title {
-  font-size: 48px;
-  font-weight: 900;
-  margin-bottom: 15px;
-  letter-spacing: -1px;
-}
-
-.section-desc {
-  font-size: 16px;
-  color: #aaa;
-  font-weight: 300;
-  max-width: 600px;
-  line-height: 1.6;
-}
-
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 40px;
-  grid-auto-rows: 400px;
-  margin-top: 50px;
-}
-
-.course-card {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
+/* BILLBOARD HERO */
+.billboard-row {
+  position: relative; width: 100%;
+  padding-top: 56.25%;
+  max-height: 90vh; min-height: 560px;
+  margin-bottom: 20px;
   background: #000;
-  border: 1px solid rgba(229,9,20,0.1);
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-.course-card:hover {
-  transform: translateY(-20px);
-  border-color: #e50914;
-  box-shadow: 0 40px 80px rgba(229,9,20,0.3);
-}
-
-.course-image {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #0a0e27 50%, #0a0a1a 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 80px;
-  position: relative;
   overflow: hidden;
 }
+@media (min-width: 950px) {
+  .billboard-row { padding-top: 42%; }
+}
 
-.course-image::before {
-  content: '';
+.hero-image-wrapper { position: absolute; inset: 0; z-index: 0; }
+.hero-image {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  background-image: var(--stadium-img);
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-vignette {
+  position: absolute; inset: 0; z-index: 7;
+  background: linear-gradient(
+    rgba(20,20,20,0) 0px,
+    rgba(20,20,20,0.15) 15%,
+    rgba(20,20,20,0.35) 29%,
+    rgba(20,20,20,0.58) 44%,
+    rgb(20,20,20) 68%,
+    rgb(20,20,20)
+  );
+}
+.trailer-vignette {
+  position: absolute; inset: 0; z-index: 8;
+  background: linear-gradient(-77deg, rgba(0,0,0,0.6), rgba(0,0,0,0) 85%);
+  transition: opacity 0.5s;
+}
+
+.meta-layer {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 30% 30%, rgba(229,9,20,0.3) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  z-index: 2;
+  bottom: 35%; right: 60px;
+  z-index: 10;
+  max-width: 36vw; min-width: 380px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+@media (max-width: 950px) {
+  .meta-layer {
+    right: 24px; left: 24px;
+    max-width: none; min-width: 0;
+    bottom: 30%;
+  }
 }
 
-.course-card:hover .course-image::before {
-  opacity: 1;
-}
+.logo-and-text { display: flex; flex-direction: column; gap: 12px; }
 
-.course-image::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
-  z-index: 3;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.course-card:hover .course-image::after {
-  opacity: 1;
-}
-
-.course-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 30px;
-  z-index: 5;
-  transform: translateY(40px);
-  opacity: 0;
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.course-card:hover .course-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.course-title {
-  font-size: 24px;
+.billboard-title {
+  font-family: 'Heebo', 'Impact', sans-serif;
   font-weight: 900;
-  margin-bottom: 10px;
-  color: #e50914;
-  letter-spacing: -0.5px;
+  font-size: clamp(40px, 5vw, 80px);
+  color: var(--nflx-text);
+  line-height: 0.95;
+  letter-spacing: -2px;
+  text-shadow: 2px 4px 8px rgba(0,0,0,0.6);
+  margin-bottom: 8px;
+}
+.billboard-title .title-academy {
+  color: var(--nflx-red);
+  display: inline-block;
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  letter-spacing: -1px;
+  text-shadow: 2px 4px 12px rgba(229,9,20,0.3), 2px 4px 8px rgba(0,0,0,0.6);
 }
 
-.course-desc {
+.maturity-rating {
+  display: inline-flex; align-items: center;
+  background: var(--nflx-rating-bg);
+  font-size: 13.2px; color: #fff;
+  padding: 6px 10px 6px 42px;
+  position: relative;
+  margin-bottom: 8px;
+  width: fit-content;
+  border-right: 3px solid rgba(220,220,220,0.7);
+}
+.maturity-rating::before {
+  content: "⭐";
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%);
   font-size: 14px;
-  color: #ddd;
-  line-height: 1.6;
-  margin-bottom: 15px;
+}
+.maturity-rating .maturity-number { font-size: 13.2px; font-weight: 500; }
+
+.synopsis {
+  font-size: clamp(14px, 1.3vw, 18px);
+  line-height: 1.45;
+  color: var(--nflx-text);
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+  max-width: 560px;
   font-weight: 400;
 }
 
-.course-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.billboard-links {
+  display: flex; gap: 10px; margin-top: 18px;
 }
 
-.course-badge {
-  background: rgba(229,9,20,0.4);
+.nflx-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 8px 24px 8px 20px;
+  border-radius: 4px;
+  font-size: 16px; font-weight: 500;
+  line-height: 1.5;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+.nflx-btn svg { width: 24px; height: 24px; }
+.color-primary { background: #fff; color: #000; }
+.color-primary:hover { background: rgba(255,255,255,0.75); }
+.color-secondary { background: var(--nflx-btn-secondary-bg); color: #fff; }
+.color-secondary:hover { background: rgba(109,109,110,0.4); }
+
+/* ROWS / CAROUSEL */
+.lolomo {
+  position: relative; z-index: 5;
+  margin-top: -80px;
+}
+@media (max-width: 950px) { .lolomo { margin-top: -40px; } }
+
+.lolomoRow {
+  position: relative;
+  margin: 36px 0;
+  padding: 0 48px;
+}
+@media (max-width: 600px) {
+  .lolomoRow { padding: 0 16px; margin: 28px 0; }
+}
+
+.row-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+.rowTitle {
+  font-size: clamp(14px, 1.4vw, 20px);
+  font-weight: 700;
+  color: var(--nflx-text-secondary);
+  letter-spacing: -0.2px;
+}
+
+.pagination-indicator {
+  display: flex; gap: 1px;
+  margin-right: auto;
+  padding-bottom: 4px;
+}
+.pagination-indicator .dot {
+  width: 12px; height: 2px;
+  background: rgba(79,79,79,1);
+  transition: background 0.3s;
+}
+.pagination-indicator .dot.active { background: rgb(170,170,170); }
+
+.row-container { position: relative; }
+
+.rowContent {
+  display: flex; gap: 4px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 20px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.rowContent::-webkit-scrollbar { display: none; }
+
+.handle {
+  position: absolute;
+  top: 0; bottom: 20px;
+  width: 48px;
+  background: var(--nflx-handle-bg);
+  z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
   color: #fff;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-weight: 800;
-  font-size: 12px;
-  letter-spacing: 1px;
+}
+.row-container:hover .handle { opacity: 1; }
+.handlePrev { right: 0; border-radius: 4px 0 0 4px; }
+.handleNext { left: 0; border-radius: 0 4px 4px 0; }
+.handle:hover { background: rgba(20,20,20,0.8); }
+.handle:hover svg { transform: scale(1.25); }
+.handle svg { width: 28px; height: 28px; transition: transform 0.2s; }
+
+/* TITLE CARD */
+.slider-item {
+  flex: 0 0 calc((100% - 20px) / 6);
+  scroll-snap-align: start;
+  position: relative;
+  padding: 0 0 0 2.4px;
+}
+@media (max-width: 1400px) { .slider-item { flex: 0 0 calc((100% - 16px) / 5); } }
+@media (max-width: 1100px) { .slider-item { flex: 0 0 calc((100% - 12px) / 4); } }
+@media (max-width: 800px)  { .slider-item { flex: 0 0 calc((100% - 8px) / 3); } }
+@media (max-width: 500px)  { .slider-item { flex: 0 0 calc((100% - 4px) / 2); } }
+
+.title-card-container {
+  position: relative;
+  transition: transform 0.4s var(--nflx-ease), z-index 0s 0.4s;
+  cursor: pointer;
+}
+.title-card-container:hover {
+  transform: scale(1.12);
+  z-index: 10;
+  transition-delay: 0.2s, 0s;
 }
 
-.course-episodes {
-  color: #aaa;
-  font-size: 13px;
-  font-weight: 600;
+.title-card {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #2a2a2a;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  transition: box-shadow 0.3s;
+}
+.title-card-container:hover .title-card {
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9);
 }
 
-.info-section {
-  text-align: center;
-  padding: 60px 40px;
-  background: linear-gradient(135deg, rgba(229,9,20,0.05) 0%, rgba(0,0,0,0) 100%);
-  border-radius: 12px;
-  border: 1px solid rgba(229,9,20,0.1);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+.boxart-container { border-radius: 4px; overflow: hidden; width: 100%; height: 100%; }
+.boxart-image {
+  width: 100%; height: 100%;
+  background-size: cover; background-position: center;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
 }
 
-.info-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
+.card-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, transparent 70%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.title-card-container:hover .card-overlay { opacity: 1; }
+
+.card-title {
+  font-size: 14px; font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+.card-meta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #E5E5E5;
+}
+.card-badge {
+  background: var(--nflx-red); color: #fff;
+  padding: 1px 5px; border-radius: 2px;
+  font-weight: 700; font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.5px;
 }
 
-.info-title {
-  font-size: 32px;
+.progress {
+  position: absolute;
+  bottom: 8px; left: 8px; right: 8px;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px; overflow: hidden;
+  z-index: 3;
+}
+.progress-completed {
+  height: 100%;
+  background: var(--nflx-red);
+  transition: width 0.3s;
+}
+
+.boxart-1 { background: linear-gradient(135deg, #1a3a5c 0%, #0f1f33 100%); }
+.boxart-2 { background: linear-gradient(135deg, #5c1a3a 0%, #330f1f 100%); }
+.boxart-3 { background: linear-gradient(135deg, #3a5c1a 0%, #1f330f 100%); }
+.boxart-4 { background: linear-gradient(135deg, #5c3a1a 0%, #331f0f 100%); }
+.boxart-5 { background: linear-gradient(135deg, #3a1a5c 0%, #1f0f33 100%); }
+.boxart-6 { background: linear-gradient(135deg, #1a5c5c 0%, #0f3333 100%); }
+.boxart-7 { background: linear-gradient(135deg, #5c5c1a 0%, #33330f 100%); }
+.boxart-8 { background: linear-gradient(135deg, #5c1a1a 0%, #330f0f 100%); }
+.boxart-9 { background: linear-gradient(135deg, #2a2a5c 0%, #151533 100%); }
+.boxart-10 { background: linear-gradient(135deg, #5c2a5c 0%, #331533 100%); }
+
+.boxart-image::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08), transparent 70%);
+}
+.boxart-label {
+  position: relative; z-index: 2;
+  font-size: clamp(14px, 1.6vw, 22px);
   font-weight: 900;
-  margin-bottom: 15px;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+  padding: 12px;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
-.info-text {
-  font-size: 16px;
-  color: #aaa;
-  line-height: 1.8;
+.user-indicator {
+  position: fixed; bottom: 20px; left: 20px;
+  background: rgba(0,0,0,0.7);
+  padding: 8px 16px; border-radius: 4px;
+  color: var(--nflx-text-muted);
+  font-size: 12px; z-index: 50;
+  backdrop-filter: blur(10px);
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@media (max-width: 950px) {
+  .main-header { padding: 0 16px; }
+  .tabbed-primary-navigation { display: none; }
+  .logo { font-size: 26px; margin-left: 12px; }
+  .logo-brand { font-size: 10px; }
+  .secondary-navigation { gap: 12px; }
+  .nflx-btn { font-size: 14px; padding: 6px 18px 6px 14px; }
+}
+@media (max-width: 500px) {
+  .logo-brand { display: none; }
+  .secondary-navigation .nav-icon-btn:first-child { display: none; }
+  .meta-layer { bottom: 20%; }
+  .billboard-links { flex-wrap: wrap; }
 }
 
-@media (max-width: 1200px) {
-  .container {
-    padding: 80px 40px;
-  }
-
-  .courses-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 30px;
-  }
-}
-
-@media (max-width: 768px) {
-  .logo-section {
-    top: 10px;
-    right: 10px;
-  }
-
-  .logo-title {
-    font-size: 24px;
-  }
-
-  .logo-subtitle {
-    font-size: 12px;
-  }
-
-  .container {
-    padding: 60px 20px;
-  }
-
-  .section-title {
-    font-size: 32px;
-  }
-
-  .courses-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    grid-auto-rows: 300px;
-  }
-
-  .hero-buttons {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-  }
-}
+body::-webkit-scrollbar { width: 8px; }
+body::-webkit-scrollbar-track { background: var(--nflx-bg); }
+body::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+body::-webkit-scrollbar-thumb:hover { background: #555; }
 </style>
 </head>
 <body>
 
-<!-- Logo Section -->
-<div class="logo-section">
-  <div class="logo-title">SUPER TEAM</div>
-  <div class="logo-accent"></div>
-  <div class="logo-subtitle">ACADEMY</div>
+<div class="main-header" id="mainHeader" role="navigation">
+  <a href="#" class="logo" aria-label="Academy">
+    <span class="logo-brand">SUPER TEAM</span>
+    <span>ACADEMY</span>
+  </a>
+
+  <ul class="tabbed-primary-navigation">
+    <li class="navigation-tab"><a href="#" class="current">דף הבית</a></li>
+    <li class="navigation-tab"><a href="#">קורסים</a></li>
+    <li class="navigation-tab"><a href="#">חדשים</a></li>
+    <li class="navigation-tab"><a href="#">הרשימה שלי</a></li>
+    <li class="navigation-tab"><a href="#">חיפוש לפי נושא</a></li>
+  </ul>
+
+  <ul class="secondary-navigation">
+    <li><button class="nav-icon-btn" aria-label="חיפוש">
+      <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0m-1.38 7.03a9 9 0 1 1 1.41-1.41l5.68 5.67-1.42 1.42z" clip-rule="evenodd"/></svg>
+    </button></li>
+    <li><button class="nav-icon-btn" aria-label="התראות">
+      <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M13 4.07A7 7 0 0 1 19 11v4.25q1.58.12 3.1.28l-.2 2a93 93 0 0 0-19.8 0l-.2-2q1.52-.15 3.1-.28V11a7 7 0 0 1 6-6.93V2h2zm4 11.06V11a5 5 0 0 0-10 0v4.13a97 97 0 0 1 10 0m-8.37 4.24C8.66 20.52 10.15 22 12 22s3.34-1.48 3.37-2.63c.01-.22-.2-.37-.42-.37h-5.9c-.23 0-.43.15-.42.37" clip-rule="evenodd"/></svg>
+    </button></li>
+    <li><div class="profile-icon" id="profileIcon">S</div></li>
+  </ul>
 </div>
 
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-content">
-    <div class="hero-buttons">
-      <button class="btn" onclick="document.querySelector('.section').scrollIntoView({behavior: 'smooth'})">צפייה</button>
-      <button class="btn" onclick="alert('מידע נוסף בקרוב!')">מידע נוסף</button>
+<section class="billboard-row">
+  <div class="hero-image-wrapper">
+    <div class="hero-image"></div>
+    <div class="trailer-vignette"></div>
+    <div class="hero-vignette"></div>
+  </div>
+
+  <div class="meta-layer">
+    <div class="logo-and-text">
+      <h1 class="billboard-title">
+        SUPER TEAM<br>
+        <span class="title-academy">ACADEMY</span>
+      </h1>
+      <div class="maturity-rating">
+        <span class="maturity-number">ALL</span>
+      </div>
+      <p class="synopsis">
+        אקדמיה מקצועית לקבוצות פיטנס — סדרות וקורסים פרימיום שיקחו את הצוות שלך לרמה הבאה. כל התוכן במקום אחד, בכל זמן, לכל מכשיר.
+      </p>
+    </div>
+
+    <div class="billboard-links">
+      <button class="nflx-btn color-primary" onclick="scrollToRows()">
+        <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+        <span>הפעל</span>
+      </button>
+      <button class="nflx-btn color-secondary">
+        <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2M0 12C0 5.373 5.373 0 12 0s12 5.373 12 12-5.373 12-12 12S0 18.627 0 12m13-2v8h-2v-8zm-1-1.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" clip-rule="evenodd"/></svg>
+        <span>מידע נוסף</span>
+      </button>
     </div>
   </div>
 </section>
 
-<!-- Main Content -->
-<div class="container">
-  <!-- Featured Courses -->
-  <section class="section">
-    <h2 class="section-title">🎬 קורסים וסדרות</h2>
-    <p class="section-desc">סדרה מלאה של תוכניות לימודיות - בקרוב יחובר עם הדרייב שלך</p>
-    <div class="courses-grid">
-      <div class="course-card">
-        <div class="course-image">📚</div>
-        <div class="course-content">
-          <div class="course-title">קורס התחלה</div>
-          <p class="course-desc">תוכנית ראשונה עם יסודות וכללים</p>
-          <div class="course-meta">
-            <span class="course-badge">חדש</span>
-            <span class="course-episodes">5 שיעורים</span>
-          </div>
-        </div>
-      </div>
+<main class="lolomo" id="rowsContainer">
 
-      <div class="course-card">
-        <div class="course-image">🎯</div>
-        <div class="course-content">
-          <div class="course-title">קורס מתקדם</div>
-          <p class="course-desc">קונספטים מתקדמים וטכניקות חדשות</p>
-          <div class="course-meta">
-            <span class="course-badge">פופולרי</span>
-            <span class="course-episodes">8 שיעורים</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="course-card">
-        <div class="course-image">🚀</div>
-        <div class="course-content">
-          <div class="course-title">קורס מנהיגות</div>
-          <p class="course-desc">הנהיגה אפקטיבית וניהול קבוצות</p>
-          <div class="course-meta">
-            <span class="course-badge">חם</span>
-            <span class="course-episodes">12 שיעורים</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="course-card">
-        <div class="course-image">💡</div>
-        <div class="course-content">
-          <div class="course-title">קורס חדשנות</div>
-          <p class="course-desc">יצירתיות חשיבה וחדשנות עסקית</p>
-          <div class="course-meta">
-            <span class="course-badge">מעודכן</span>
-            <span class="course-episodes">6 שיעורים</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="course-card">
-        <div class="course-image">⭐</div>
-        <div class="course-content">
-          <div class="course-title">סדרה בעלת דירוג גבוה</div>
-          <p class="course-desc">סדרה פופולרית עם תוכן עשיר</p>
-          <div class="course-meta">
-            <span class="course-badge">מדורג</span>
-            <span class="course-episodes">10 שיעורים</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="course-card">
-        <div class="course-image">🎬</div>
-        <div class="course-content">
-          <div class="course-title">סדרת וידיאו</div>
-          <p class="course-desc">ייצור וידיאו וקיום מעברים</p>
-          <div class="course-meta">
-            <span class="course-badge">חדש</span>
-            <span class="course-episodes">7 שיעורים</span>
-          </div>
-        </div>
-      </div>
+  <div class="lolomoRow">
+    <div class="row-header">
+      <h2 class="rowTitle">המשך הצפייה של SUPER TEAM</h2>
+      <div class="pagination-indicator"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
     </div>
-  </section>
-
-  <!-- Info Section -->
-  <section class="section">
-    <div class="info-section">
-      <div class="info-icon">📁</div>
-      <h3 class="info-title">תוכן עוד בדרך</h3>
-      <p class="info-text">בקרוב נחבר את תיקיות Google Drive שלך וכל הסדרות והקורסים החדשים יופיעו כאן בעיצוב זה</p>
+    <div class="row-container">
+      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
+      <div class="rowContent">
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-1"><span class="boxart-label">פתיחה ויסודות</span><div class="progress"><div class="progress-completed" style="width:65%"></div></div></div></div><div class="card-overlay"><div class="card-title">פתיחה ויסודות</div><div class="card-meta"><span class="card-badge">מומלץ</span><span>פרק 3 מתוך 5</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-2"><span class="boxart-label">טכניקות מתקדמות</span><div class="progress"><div class="progress-completed" style="width:42%"></div></div></div></div><div class="card-overlay"><div class="card-title">טכניקות מתקדמות</div><div class="card-meta"><span>פרק 4 מתוך 8</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-3"><span class="boxart-label">מנהיגות קבוצה</span><div class="progress"><div class="progress-completed" style="width:78%"></div></div></div></div><div class="card-overlay"><div class="card-title">מנהיגות קבוצה</div><div class="card-meta"><span>פרק 10 מתוך 12</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-4"><span class="boxart-label">תזונה ותוספים</span><div class="progress"><div class="progress-completed" style="width:15%"></div></div></div></div><div class="card-overlay"><div class="card-title">תזונה ותוספים</div><div class="card-meta"><span>פרק 1 מתוך 6</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-5"><span class="boxart-label">פסיכולוגיה</span><div class="progress"><div class="progress-completed" style="width:90%"></div></div></div></div><div class="card-overlay"><div class="card-title">פסיכולוגיה</div><div class="card-meta"><span>פרק 9 מתוך 10</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-6"><span class="boxart-label">אסטרטגיה</span><div class="progress"><div class="progress-completed" style="width:30%"></div></div></div></div><div class="card-overlay"><div class="card-title">אסטרטגיה</div><div class="card-meta"><span>פרק 2 מתוך 7</span></div></div></div></div></div>
+      </div>
+      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
     </div>
-  </section>
+  </div>
+
+  <div class="lolomoRow">
+    <div class="row-header">
+      <h2 class="rowTitle">הפופולריים ביותר באקדמיה</h2>
+      <div class="pagination-indicator"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+    </div>
+    <div class="row-container">
+      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
+      <div class="rowContent">
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-7"><span class="boxart-label">קורס השקעות</span></div></div><div class="card-overlay"><div class="card-title">קורס השקעות</div><div class="card-meta"><span class="card-badge">TOP 10</span><span>12 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-8"><span class="boxart-label">ניהול זמן</span></div></div><div class="card-overlay"><div class="card-title">ניהול זמן</div><div class="card-meta"><span class="card-badge">חדש</span><span>6 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-9"><span class="boxart-label">משא ומתן</span></div></div><div class="card-overlay"><div class="card-title">משא ומתן</div><div class="card-meta"><span>8 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-10"><span class="boxart-label">מכירות</span></div></div><div class="card-overlay"><div class="card-title">מכירות</div><div class="card-meta"><span>10 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-1"><span class="boxart-label">שיווק דיגיטלי</span></div></div><div class="card-overlay"><div class="card-title">שיווק דיגיטלי</div><div class="card-meta"><span class="card-badge">חם</span><span>15 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-2"><span class="boxart-label">תקשורת</span></div></div><div class="card-overlay"><div class="card-title">תקשורת</div><div class="card-meta"><span>7 פרקים</span></div></div></div></div></div>
+      </div>
+      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
+    </div>
+  </div>
+
+  <div class="lolomoRow">
+    <div class="row-header">
+      <h2 class="rowTitle">נוסף לאחרונה</h2>
+      <div class="pagination-indicator"><span class="dot"></span><span class="dot active"></span><span class="dot"></span></div>
+    </div>
+    <div class="row-container">
+      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
+      <div class="rowContent">
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-3"><span class="boxart-label">AI ועסקים</span></div></div><div class="card-overlay"><div class="card-title">AI ועסקים</div><div class="card-meta"><span class="card-badge">חדש</span><span>9 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-4"><span class="boxart-label">מותג אישי</span></div></div><div class="card-overlay"><div class="card-title">מותג אישי</div><div class="card-meta"><span class="card-badge">חדש</span><span>5 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-5"><span class="boxart-label">Networking</span></div></div><div class="card-overlay"><div class="card-title">Networking</div><div class="card-meta"><span class="card-badge">חדש</span><span>7 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-6"><span class="boxart-label">Public Speaking</span></div></div><div class="card-overlay"><div class="card-title">Public Speaking</div><div class="card-meta"><span class="card-badge">חדש</span><span>8 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-7"><span class="boxart-label">קריירה 360°</span></div></div><div class="card-overlay"><div class="card-title">קריירה 360°</div><div class="card-meta"><span class="card-badge">חדש</span><span>12 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-8"><span class="boxart-label">כלכלת החיים</span></div></div><div class="card-overlay"><div class="card-title">כלכלת החיים</div><div class="card-meta"><span class="card-badge">חדש</span><span>6 פרקים</span></div></div></div></div></div>
+      </div>
+      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
+    </div>
+  </div>
+
+  <div class="lolomoRow">
+    <div class="row-header">
+      <h2 class="rowTitle">סדרת מנהיגות ומוטיבציה</h2>
+      <div class="pagination-indicator"><span class="dot active"></span><span class="dot"></span></div>
+    </div>
+    <div class="row-container">
+      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
+      <div class="rowContent">
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-9"><span class="boxart-label">המנהיג בתוכך</span></div></div><div class="card-overlay"><div class="card-title">המנהיג בתוכך</div><div class="card-meta"><span>14 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-10"><span class="boxart-label">חזון משותף</span></div></div><div class="card-overlay"><div class="card-title">חזון משותף</div><div class="card-meta"><span>8 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-1"><span class="boxart-label">צמיחה אישית</span></div></div><div class="card-overlay"><div class="card-title">צמיחה אישית</div><div class="card-meta"><span>10 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-2"><span class="boxart-label">סיעור מוחות</span></div></div><div class="card-overlay"><div class="card-title">סיעור מוחות</div><div class="card-meta"><span>5 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-3"><span class="boxart-label">החלטות נכונות</span></div></div><div class="card-overlay"><div class="card-title">החלטות נכונות</div><div class="card-meta"><span>7 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-4"><span class="boxart-label">ניהול משברים</span></div></div><div class="card-overlay"><div class="card-title">ניהול משברים</div><div class="card-meta"><span>9 פרקים</span></div></div></div></div></div>
+      </div>
+      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
+    </div>
+  </div>
+
+  <div class="lolomoRow">
+    <div class="row-header">
+      <h2 class="rowTitle">אסטרטגיית עסקים ויזמות</h2>
+      <div class="pagination-indicator"><span class="dot"></span><span class="dot active"></span></div>
+    </div>
+    <div class="row-container">
+      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
+      <div class="rowContent">
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-5"><span class="boxart-label">Startup 101</span></div></div><div class="card-overlay"><div class="card-title">Startup 101</div><div class="card-meta"><span class="card-badge">חם</span><span>20 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-6"><span class="boxart-label">גיוס משקיעים</span></div></div><div class="card-overlay"><div class="card-title">גיוס משקיעים</div><div class="card-meta"><span>11 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-7"><span class="boxart-label">מודל עסקי</span></div></div><div class="card-overlay"><div class="card-title">מודל עסקי</div><div class="card-meta"><span>7 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-8"><span class="boxart-label">צמיחה מואצת</span></div></div><div class="card-overlay"><div class="card-title">צמיחה מואצת</div><div class="card-meta"><span>13 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-9"><span class="boxart-label">Exit Strategy</span></div></div><div class="card-overlay"><div class="card-title">Exit Strategy</div><div class="card-meta"><span>6 פרקים</span></div></div></div></div></div>
+        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-10"><span class="boxart-label">בניית צוות</span></div></div><div class="card-overlay"><div class="card-title">בניית צוות</div><div class="card-meta"><span>9 פרקים</span></div></div></div></div></div>
+      </div>
+      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
+    </div>
+  </div>
+
+</main>
+
+<div class="user-indicator" id="userIndicator" style="display:none;">
+  <span>😊 </span><span id="userNameDisplay"></span>
 </div>
 
 <script>
+const header = document.getElementById('mainHeader');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 80) header.classList.add('scrolled');
+  else header.classList.remove('scrolled');
+});
+
+document.querySelectorAll('.row-container').forEach(container => {
+  const content = container.querySelector('.rowContent');
+  const prevBtn = container.querySelector('.handlePrev');
+  const nextBtn = container.querySelector('.handleNext');
+  const scrollAmount = () => content.clientWidth * 0.9;
+  if (prevBtn) prevBtn.addEventListener('click', () => content.scrollBy({ left: scrollAmount(), behavior: 'smooth' }));
+  if (nextBtn) nextBtn.addEventListener('click', () => content.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
+});
+
+function scrollToRows() {
+  document.getElementById('rowsContainer').scrollIntoView({ behavior: 'smooth' });
+}
+
 const params = new URLSearchParams(window.location.search);
 const userEmail = params.get('user') || localStorage.getItem('userEmail');
-
 if (userEmail) {
   const userName = userEmail.split('@')[0];
-  document.body.innerHTML += '<div style="position: fixed; bottom: 20px; left: 20px; z-index: 1001; color: #aaa; font-size: 12px;">😊 ' + userName + '</div>';
+  const indicator = document.getElementById('userIndicator');
+  document.getElementById('userNameDisplay').textContent = userName;
+  indicator.style.display = 'block';
+  document.getElementById('profileIcon').textContent = userName.charAt(0).toUpperCase();
   localStorage.setItem('userEmail', userEmail);
 }
+
+document.querySelectorAll('.title-card-container').forEach(card => {
+  card.addEventListener('click', () => {
+    const title = card.querySelector('.card-title')?.textContent || 'קורס';
+    console.log('Card clicked:', title);
+  });
+});
 </script>
 
 </body>
