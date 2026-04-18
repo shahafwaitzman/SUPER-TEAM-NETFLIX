@@ -190,16 +190,18 @@ img { display: block; max-width: 100%; }
 .billboard-title::after {
   content: "";
   display: block;
-  width: 72px;
+  width: 100px;
   height: 3px;
-  background: linear-gradient(to left, #fff 0%, rgba(255,255,255,0.3) 100%);
-  margin: 10px 0;
+  background: linear-gradient(to right, transparent 0%, #fff 50%, transparent 100%);
+  margin: 10px auto;
   border-radius: 2px;
   box-shadow: 0 0 12px rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.6);
 }
 .billboard-title .title-academy {
   color: var(--nflx-red);
   display: block;
+  text-align: center;
+  width: 100%;
   font-family: 'Bebas Neue', 'Heebo', sans-serif;
   letter-spacing: 2px;
   font-size: 0.65em;
