@@ -18,80 +18,43 @@ body {
   font-family: 'Heebo', sans-serif;
   background: #000;
   color: #fff;
+  background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.2) 100%), url('https://drive.google.com/uc?id=13JtFgrLuWvQGhmDA79FiTKpaUbY0xAvb') center/cover;
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
-/* Navigation */
-nav {
+/* Logo Section */
+.logo-section {
   position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+  top: 20px;
+  right: 20px;
   z-index: 1000;
-  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
-  padding: 20px 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  backdrop-filter: blur(10px);
+  text-align: right;
 }
 
-.nav-logo {
-  font-size: 28px;
+.logo-title {
+  font-size: 36px;
   font-weight: 900;
   color: #e50914;
-  letter-spacing: 3px;
+  margin-bottom: 0;
+  line-height: 1;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+  letter-spacing: -1px;
 }
 
-nav ul {
-  display: flex;
-  list-style: none;
-  gap: 50px;
-}
-
-nav a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 15px;
-  transition: all 0.3s ease;
-  padding: 8px 0;
-  position: relative;
-}
-
-nav a::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  right: 0;
-  width: 0;
-  height: 3px;
+.logo-accent {
+  width: 40px;
+  height: 2px;
   background: #e50914;
-  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  margin: 8px auto 0;
 }
 
-nav a:hover {
-  color: #e50914;
-}
-
-nav a:hover::after {
-  width: 100%;
-}
-
-.nav-user {
+.logo-subtitle {
   font-size: 14px;
   color: #fff;
-  padding: 10px 24px;
-  background: rgba(229,9,20,0.2);
-  border: 1px solid rgba(229,9,20,0.3);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
-}
-
-.nav-user:hover {
-  background: rgba(229,9,20,0.3);
-  border-color: #e50914;
+  margin-top: 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+  letter-spacing: -0.5px;
 }
 
 /* Hero Section */
@@ -99,72 +62,17 @@ nav a:hover::after {
   position: relative;
   width: 100%;
   height: 100vh;
-  margin-top: 0;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 60px;
-}
-
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: url('https://drive.google.com/uc?id=13JtFgrLuWvQGhmDA79FiTKpaUbY0xAvb') center/cover;
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-  object-fit: cover;
-}
-
-.hero::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.15) 100%);
-  z-index: 1;
+  overflow: hidden;
 }
 
 .hero-content {
   position: relative;
   z-index: 10;
   text-align: center;
-  max-width: 700px;
   animation: slideUp 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.hero-title {
-  font-size: 96px;
-  font-weight: 900;
-  margin-bottom: 0;
-  line-height: 1;
-  color: #e50914;
-  text-shadow: 0 10px 40px rgba(0,0,0,0.8);
-  letter-spacing: -2px;
-}
-
-.hero-accent {
-  width: 60px;
-  height: 3px;
-  background: #e50914;
-  margin: 20px auto;
-}
-
-.hero-subtitle {
-  font-size: 32px;
-  color: #fff;
-  margin-bottom: 50px;
-  line-height: 1.2;
-  font-weight: 400;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.7);
-  letter-spacing: -0.5px;
 }
 
 .hero-buttons {
@@ -181,13 +89,13 @@ nav a:hover::after {
   border: 1px solid rgba(255,255,255,0.4);
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
   font-family: 'Heebo', sans-serif;
   letter-spacing: 0.5px;
+  color: #ffffff;
+  background: transparent;
   position: relative;
   overflow: hidden;
-  background: transparent;
-  color: #ffffff;
+  transition: all 0.3s ease;
 }
 
 .btn::before {
@@ -209,28 +117,12 @@ nav a:hover::after {
   height: 300px;
 }
 
-.btn-primary {
-  border-color: rgba(255,255,255,0.5);
-  position: relative;
-  z-index: 1;
-}
-
-.btn-primary:hover {
+.btn:hover {
   background: rgba(255,255,255,0.1);
-  border-color: #fff;
+  border-color: #ffffff;
   transform: translateY(-2px);
-}
-
-.btn-secondary {
-  border-color: rgba(255,255,255,0.3);
   position: relative;
   z-index: 1;
-}
-
-.btn-secondary:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.5);
-  transform: translateY(-2px);
 }
 
 /* Container */
@@ -240,16 +132,10 @@ nav a:hover::after {
   padding: 100px 60px;
   position: relative;
   z-index: 10;
-  background: #000;
 }
 
-/* Sections */
 .section {
   margin-bottom: 100px;
-}
-
-.section-header {
-  margin-bottom: 50px;
 }
 
 .section-title {
@@ -264,14 +150,15 @@ nav a:hover::after {
   color: #aaa;
   font-weight: 300;
   max-width: 600px;
+  line-height: 1.6;
 }
 
-/* Grid */
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 40px;
   grid-auto-rows: 400px;
+  margin-top: 50px;
 }
 
 .course-card {
@@ -389,19 +276,6 @@ nav a:hover::after {
   font-weight: 600;
 }
 
-/* Animations */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Info Section */
 .info-section {
   text-align: center;
   padding: 60px 40px;
@@ -428,14 +302,20 @@ nav a:hover::after {
   line-height: 1.8;
 }
 
-/* Responsive */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 1200px) {
   .container {
     padding: 80px 40px;
-  }
-
-  .hero-title {
-    font-size: 72px;
   }
 
   .courses-grid {
@@ -445,25 +325,17 @@ nav a:hover::after {
 }
 
 @media (max-width: 768px) {
-  nav {
-    padding: 15px 20px;
+  .logo-section {
+    top: 10px;
+    right: 10px;
   }
 
-  nav ul {
-    gap: 25px;
+  .logo-title {
+    font-size: 24px;
   }
 
-  .hero {
-    padding-right: 20px;
-    padding-left: 20px;
-  }
-
-  .hero-title {
-    font-size: 48px;
-  }
-
-  .hero-subtitle {
-    font-size: 20px;
+  .logo-subtitle {
+    font-size: 12px;
   }
 
   .container {
@@ -492,27 +364,19 @@ nav a:hover::after {
 </head>
 <body>
 
-<!-- Navigation -->
-<nav>
-  <div class="nav-logo">SUPER TEAM 🔴</div>
-  <ul>
-    <li><a href="#home">בית</a></li>
-    <li><a href="#featured">קורסים</a></li>
-    <li><a href="#explore">בחקור</a></li>
-    <li><a href="#trending">חם</a></li>
-  </ul>
-  <div class="nav-user" id="userInfo" onclick="logout()">😊 משתמש</div>
-</nav>
+<!-- Logo Section -->
+<div class="logo-section">
+  <div class="logo-title">SUPER TEAM</div>
+  <div class="logo-accent"></div>
+  <div class="logo-subtitle">ACADEMY</div>
+</div>
 
 <!-- Hero Section -->
-<section class="hero" id="home">
+<section class="hero">
   <div class="hero-content">
-    <h1 class="hero-title">SUPER TEAM</h1>
-    <div class="hero-accent"></div>
-    <p class="hero-subtitle">ACADEMY</p>
     <div class="hero-buttons">
-      <button class="btn btn-primary" onclick="document.getElementById('featured').scrollIntoView({behavior: 'smooth'})">צפייה</button>
-      <button class="btn btn-secondary" onclick="alert('מידע נוסף בקרוב!')">מידע נוסף</button>
+      <button class="btn" onclick="document.querySelector('.section').scrollIntoView({behavior: 'smooth'})">צפייה</button>
+      <button class="btn" onclick="alert('מידע נוסף בקרוב!')">מידע נוסף</button>
     </div>
   </div>
 </section>
@@ -520,11 +384,9 @@ nav a:hover::after {
 <!-- Main Content -->
 <div class="container">
   <!-- Featured Courses -->
-  <section class="section" id="featured">
-    <div class="section-header">
-      <h2 class="section-title">🎬 קורסים וסדרות</h2>
-      <p class="section-desc">סדרה מלאה של תוכניות לימודיות - בקרוב יחובר עם הדרייב שלך</p>
-    </div>
+  <section class="section">
+    <h2 class="section-title">🎬 קורסים וסדרות</h2>
+    <p class="section-desc">סדרה מלאה של תוכניות לימודיות - בקרוב יחובר עם הדרייב שלך</p>
     <div class="courses-grid">
       <div class="course-card">
         <div class="course-image">📚</div>
@@ -611,21 +473,13 @@ nav a:hover::after {
 </div>
 
 <script>
-// User info
 const params = new URLSearchParams(window.location.search);
 const userEmail = params.get('user') || localStorage.getItem('userEmail');
 
 if (userEmail) {
   const userName = userEmail.split('@')[0];
-  document.getElementById('userInfo').textContent = '😊 ' + userName;
+  document.body.innerHTML += '<div style="position: fixed; bottom: 20px; left: 20px; z-index: 1001; color: #aaa; font-size: 12px;">😊 ' + userName + '</div>';
   localStorage.setItem('userEmail', userEmail);
-}
-
-function logout() {
-  if (confirm('בטוח שאתה רוצה להתנתק?')) {
-    localStorage.removeItem('userEmail');
-    window.location.href = 'entry.html';
-  }
 }
 </script>
 
