@@ -503,6 +503,106 @@ body::-webkit-scrollbar { width: 8px; }
 body::-webkit-scrollbar-track { background: var(--nflx-bg); }
 body::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 body::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* ═══════════════════════════════════════════
+   DRIVE LOADING + VIDEO MODAL
+   ═══════════════════════════════════════════ */
+.drive-loading {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 80px 20px;
+  color: var(--nflx-text-muted);
+  font-size: 14px;
+  gap: 20px;
+}
+.drive-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(229,9,20,0.2);
+  border-top-color: var(--nflx-red);
+  border-radius: 50%;
+  animation: drive-spin 0.8s linear infinite;
+}
+@keyframes drive-spin {
+  to { transform: rotate(360deg); }
+}
+
+.drive-error {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 60px 20px; color: #ff5757;
+  font-size: 14px; gap: 12px;
+}
+
+.video-modal {
+  position: fixed; inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.video-modal.active { display: flex; }
+
+.video-modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.video-modal-content {
+  position: relative; z-index: 2;
+  width: min(90vw, 1200px);
+  max-height: 90vh;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes scaleIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.video-modal-title {
+  padding: 16px 24px;
+  background: #141414;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  border-bottom: 1px solid #222;
+}
+
+.video-close {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 18px;
+  border: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer;
+  z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.video-close:hover { background: var(--nflx-red); }
+
+.video-frame-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  background: #000;
+}
+#videoFrame {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
 </style>
 </head>
 <body>
@@ -568,103 +668,26 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
 </section>
 
 <main class="lolomo" id="rowsContainer">
-
-  <div class="lolomoRow">
-    <div class="row-header">
-      <h2 class="rowTitle">המשך הצפייה של SUPER TEAM</h2>
-      <div class="pagination-indicator"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-    </div>
-    <div class="row-container">
-      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
-      <div class="rowContent">
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-1"><span class="boxart-label">פתיחה ויסודות</span><div class="progress"><div class="progress-completed" style="width:65%"></div></div></div></div><div class="card-overlay"><div class="card-title">פתיחה ויסודות</div><div class="card-meta"><span class="card-badge">מומלץ</span><span>פרק 3 מתוך 5</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-2"><span class="boxart-label">טכניקות מתקדמות</span><div class="progress"><div class="progress-completed" style="width:42%"></div></div></div></div><div class="card-overlay"><div class="card-title">טכניקות מתקדמות</div><div class="card-meta"><span>פרק 4 מתוך 8</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-3"><span class="boxart-label">מנהיגות קבוצה</span><div class="progress"><div class="progress-completed" style="width:78%"></div></div></div></div><div class="card-overlay"><div class="card-title">מנהיגות קבוצה</div><div class="card-meta"><span>פרק 10 מתוך 12</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-4"><span class="boxart-label">תזונה ותוספים</span><div class="progress"><div class="progress-completed" style="width:15%"></div></div></div></div><div class="card-overlay"><div class="card-title">תזונה ותוספים</div><div class="card-meta"><span>פרק 1 מתוך 6</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-5"><span class="boxart-label">פסיכולוגיה</span><div class="progress"><div class="progress-completed" style="width:90%"></div></div></div></div><div class="card-overlay"><div class="card-title">פסיכולוגיה</div><div class="card-meta"><span>פרק 9 מתוך 10</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-6"><span class="boxart-label">אסטרטגיה</span><div class="progress"><div class="progress-completed" style="width:30%"></div></div></div></div><div class="card-overlay"><div class="card-title">אסטרטגיה</div><div class="card-meta"><span>פרק 2 מתוך 7</span></div></div></div></div></div>
-      </div>
-      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
-    </div>
+  <!-- Dynamically populated from Google Drive -->
+  <div id="loadingState" class="drive-loading">
+    <div class="drive-spinner"></div>
+    <p>טוען תוכן מהדרייב...</p>
   </div>
-
-  <div class="lolomoRow">
-    <div class="row-header">
-      <h2 class="rowTitle">הפופולריים ביותר באקדמיה</h2>
-      <div class="pagination-indicator"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-    </div>
-    <div class="row-container">
-      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
-      <div class="rowContent">
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-7"><span class="boxart-label">קורס השקעות</span></div></div><div class="card-overlay"><div class="card-title">קורס השקעות</div><div class="card-meta"><span class="card-badge">TOP 10</span><span>12 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-8"><span class="boxart-label">ניהול זמן</span></div></div><div class="card-overlay"><div class="card-title">ניהול זמן</div><div class="card-meta"><span class="card-badge">חדש</span><span>6 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-9"><span class="boxart-label">משא ומתן</span></div></div><div class="card-overlay"><div class="card-title">משא ומתן</div><div class="card-meta"><span>8 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-10"><span class="boxart-label">מכירות</span></div></div><div class="card-overlay"><div class="card-title">מכירות</div><div class="card-meta"><span>10 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-1"><span class="boxart-label">שיווק דיגיטלי</span></div></div><div class="card-overlay"><div class="card-title">שיווק דיגיטלי</div><div class="card-meta"><span class="card-badge">חם</span><span>15 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-2"><span class="boxart-label">תקשורת</span></div></div><div class="card-overlay"><div class="card-title">תקשורת</div><div class="card-meta"><span>7 פרקים</span></div></div></div></div></div>
-      </div>
-      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
-    </div>
-  </div>
-
-  <div class="lolomoRow">
-    <div class="row-header">
-      <h2 class="rowTitle">נוסף לאחרונה</h2>
-      <div class="pagination-indicator"><span class="dot"></span><span class="dot active"></span><span class="dot"></span></div>
-    </div>
-    <div class="row-container">
-      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
-      <div class="rowContent">
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-3"><span class="boxart-label">AI ועסקים</span></div></div><div class="card-overlay"><div class="card-title">AI ועסקים</div><div class="card-meta"><span class="card-badge">חדש</span><span>9 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-4"><span class="boxart-label">מותג אישי</span></div></div><div class="card-overlay"><div class="card-title">מותג אישי</div><div class="card-meta"><span class="card-badge">חדש</span><span>5 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-5"><span class="boxart-label">Networking</span></div></div><div class="card-overlay"><div class="card-title">Networking</div><div class="card-meta"><span class="card-badge">חדש</span><span>7 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-6"><span class="boxart-label">Public Speaking</span></div></div><div class="card-overlay"><div class="card-title">Public Speaking</div><div class="card-meta"><span class="card-badge">חדש</span><span>8 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-7"><span class="boxart-label">קריירה 360°</span></div></div><div class="card-overlay"><div class="card-title">קריירה 360°</div><div class="card-meta"><span class="card-badge">חדש</span><span>12 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-8"><span class="boxart-label">כלכלת החיים</span></div></div><div class="card-overlay"><div class="card-title">כלכלת החיים</div><div class="card-meta"><span class="card-badge">חדש</span><span>6 פרקים</span></div></div></div></div></div>
-      </div>
-      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
-    </div>
-  </div>
-
-  <div class="lolomoRow">
-    <div class="row-header">
-      <h2 class="rowTitle">סדרת מנהיגות ומוטיבציה</h2>
-      <div class="pagination-indicator"><span class="dot active"></span><span class="dot"></span></div>
-    </div>
-    <div class="row-container">
-      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
-      <div class="rowContent">
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-9"><span class="boxart-label">המנהיג בתוכך</span></div></div><div class="card-overlay"><div class="card-title">המנהיג בתוכך</div><div class="card-meta"><span>14 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-10"><span class="boxart-label">חזון משותף</span></div></div><div class="card-overlay"><div class="card-title">חזון משותף</div><div class="card-meta"><span>8 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-1"><span class="boxart-label">צמיחה אישית</span></div></div><div class="card-overlay"><div class="card-title">צמיחה אישית</div><div class="card-meta"><span>10 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-2"><span class="boxart-label">סיעור מוחות</span></div></div><div class="card-overlay"><div class="card-title">סיעור מוחות</div><div class="card-meta"><span>5 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-3"><span class="boxart-label">החלטות נכונות</span></div></div><div class="card-overlay"><div class="card-title">החלטות נכונות</div><div class="card-meta"><span>7 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-4"><span class="boxart-label">ניהול משברים</span></div></div><div class="card-overlay"><div class="card-title">ניהול משברים</div><div class="card-meta"><span>9 פרקים</span></div></div></div></div></div>
-      </div>
-      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
-    </div>
-  </div>
-
-  <div class="lolomoRow">
-    <div class="row-header">
-      <h2 class="rowTitle">אסטרטגיית עסקים ויזמות</h2>
-      <div class="pagination-indicator"><span class="dot"></span><span class="dot active"></span></div>
-    </div>
-    <div class="row-container">
-      <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
-      <div class="rowContent">
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-5"><span class="boxart-label">Startup 101</span></div></div><div class="card-overlay"><div class="card-title">Startup 101</div><div class="card-meta"><span class="card-badge">חם</span><span>20 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-6"><span class="boxart-label">גיוס משקיעים</span></div></div><div class="card-overlay"><div class="card-title">גיוס משקיעים</div><div class="card-meta"><span>11 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-7"><span class="boxart-label">מודל עסקי</span></div></div><div class="card-overlay"><div class="card-title">מודל עסקי</div><div class="card-meta"><span>7 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-8"><span class="boxart-label">צמיחה מואצת</span></div></div><div class="card-overlay"><div class="card-title">צמיחה מואצת</div><div class="card-meta"><span>13 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-9"><span class="boxart-label">Exit Strategy</span></div></div><div class="card-overlay"><div class="card-title">Exit Strategy</div><div class="card-meta"><span>6 פרקים</span></div></div></div></div></div>
-        <div class="slider-item"><div class="title-card-container"><div class="title-card"><div class="boxart-container"><div class="boxart-image boxart-10"><span class="boxart-label">בניית צוות</span></div></div><div class="card-overlay"><div class="card-title">בניית צוות</div><div class="card-meta"><span>9 פרקים</span></div></div></div></div></div>
-      </div>
-      <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
-    </div>
-  </div>
-
 </main>
+
+<!-- ═══════════════════════════════════════════
+     VIDEO MODAL (plays Drive iframe)
+     ═══════════════════════════════════════════ -->
+<div class="video-modal" id="videoModal" aria-hidden="true">
+  <div class="video-modal-backdrop" onclick="closeVideo()"></div>
+  <div class="video-modal-content">
+    <button class="video-close" onclick="closeVideo()" aria-label="סגור">✕</button>
+    <div class="video-modal-title" id="videoModalTitle"></div>
+    <div class="video-frame-wrapper">
+      <iframe id="videoFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
 
 <div class="user-indicator" id="userIndicator" style="display:none;">
   <span>😊 </span><span id="userNameDisplay"></span>
@@ -701,12 +724,182 @@ if (userEmail) {
   localStorage.setItem('userEmail', userEmail);
 }
 
-document.querySelectorAll('.title-card-container').forEach(card => {
-  card.addEventListener('click', () => {
-    const title = card.querySelector('.card-title')?.textContent || 'קורס';
-    console.log('Card clicked:', title);
+/* ═══════════════════════════════════════════
+   GOOGLE DRIVE INTEGRATION
+   ═══════════════════════════════════════════ */
+const DRIVE_CONFIG = {
+  API_KEY: 'AIzaSyB1hH50REJm_hu71AjYO8e4m3BdQC6GQ0g',
+  ROOT_FOLDER_ID: '1UZ_MhVFkQvkLbFdUYpH3Mw_N92-bJoOd'
+};
+
+// Drive API: fetch folder contents
+async function fetchDriveFolder(folderId) {
+  const q = `'${folderId}' in parents and trashed=false`;
+  const fields = 'files(id,name,mimeType,thumbnailLink,videoMediaMetadata,size,modifiedTime)';
+  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&key=${DRIVE_CONFIG.API_KEY}&fields=${encodeURIComponent(fields)}&pageSize=200&orderBy=name`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.files || [];
+  } catch (e) {
+    console.error('Drive fetch error:', e);
+    return [];
+  }
+}
+
+// Clean folder name (remove English suffix)
+function cleanFolderName(name) {
+  return name
+    .replace(/\s*-\s*Zoom sessions.*$/i, '')
+    .replace(/\s*-\s*.*English.*$/i, '')
+    .trim();
+}
+
+// Gradient palette for card backgrounds (cycled)
+const boxartPalette = ['boxart-1','boxart-2','boxart-3','boxart-4','boxart-5','boxart-6','boxart-7','boxart-8','boxart-9','boxart-10'];
+
+// Render a single row with files
+function renderRow(folderName, files) {
+  const videos = files.filter(f => f.mimeType && f.mimeType.startsWith('video/'));
+  if (videos.length === 0) return '';
+
+  const cleanTitle = cleanFolderName(folderName);
+  const cards = videos.map((f, i) => {
+    const boxartClass = boxartPalette[i % boxartPalette.length];
+    const title = f.name.replace(/\.(mp4|mov|avi|mkv)$/i, '').replace(/^Copy of\s*/i, '').trim();
+    const thumbnail = f.thumbnailLink
+      ? f.thumbnailLink.replace(/=s\d+$/, '=s1280')
+      : '';
+    const thumbStyle = thumbnail
+      ? `background-image: url('${thumbnail}'); background-size: cover; background-position: center;`
+      : '';
+
+    return `
+      <div class="slider-item">
+        <div class="title-card-container" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}">
+          <div class="title-card">
+            <div class="boxart-container">
+              <div class="boxart-image ${thumbnail ? '' : boxartClass}" style="${thumbStyle}">
+                ${thumbnail ? '' : `<span class="boxart-label">${escapeHtml(title)}</span>`}
+              </div>
+            </div>
+            <div class="card-overlay">
+              <div class="card-title">${escapeHtml(title)}</div>
+              <div class="card-meta">
+                <span class="card-badge">HD</span>
+                <span>▶️ Drive</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="lolomoRow">
+      <div class="row-header">
+        <h2 class="rowTitle">${escapeHtml(cleanTitle)}</h2>
+        <div class="pagination-indicator">
+          <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+      <div class="row-container">
+        <button class="handle handlePrev" aria-label="הקודם"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M15.54 21.71a1 1 0 0 1-1.42 0L5.59 13.18a1.67 1.67 0 0 1 0-2.36l8.53-8.53a1 1 0 1 1 1.42 1.42L7.41 12l8.13 8.29a1 1 0 0 1 0 1.42"/></svg></button>
+        <div class="rowContent">${cards}</div>
+        <button class="handle handleNext" aria-label="הבא"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg></button>
+      </div>
+    </div>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Main loader
+async function loadAcademy() {
+  const container = document.getElementById('rowsContainer');
+  const loading = document.getElementById('loadingState');
+
+  try {
+    // 1. Fetch root folder contents
+    const rootItems = await fetchDriveFolder(DRIVE_CONFIG.ROOT_FOLDER_ID);
+    const folders = rootItems.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+
+    if (folders.length === 0) {
+      loading.innerHTML = '<p>לא נמצאו תיקיות. ודא שה-Folder ID נכון ושהתיקייה משותפת לצפייה.</p>';
+      return;
+    }
+
+    // 2. Fetch each folder's contents in parallel
+    const folderResults = await Promise.all(
+      folders.map(async f => ({ folder: f, files: await fetchDriveFolder(f.id) }))
+    );
+
+    // 3. Render rows
+    const rowsHtml = folderResults
+      .map(({ folder, files }) => renderRow(folder.name, files))
+      .filter(html => html.length > 0)
+      .join('');
+
+    container.innerHTML = rowsHtml || '<p style="padding:60px;text-align:center;color:#aaa;">אין סרטונים בתיקיות.</p>';
+
+    // 4. Attach handlers to new cards + carousel arrows
+    attachHandlers();
+
+  } catch (err) {
+    loading.innerHTML = `<div class="drive-error">❌ שגיאה בטעינה מהדרייב:<br><small>${escapeHtml(err.message)}</small></div>`;
+  }
+}
+
+function attachHandlers() {
+  // Carousel scroll arrows
+  document.querySelectorAll('.row-container').forEach(container => {
+    const content = container.querySelector('.rowContent');
+    const prevBtn = container.querySelector('.handlePrev');
+    const nextBtn = container.querySelector('.handleNext');
+    const scrollAmount = () => content.clientWidth * 0.9;
+    if (prevBtn) prevBtn.addEventListener('click', () => content.scrollBy({ left: scrollAmount(), behavior: 'smooth' }));
+    if (nextBtn) nextBtn.addEventListener('click', () => content.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
   });
+
+  // Card click → open video modal
+  document.querySelectorAll('.title-card-container[data-video-id]').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.videoId;
+      const title = decodeURIComponent(card.dataset.videoTitle || '');
+      openVideo(id, title);
+    });
+  });
+}
+
+function openVideo(fileId, title) {
+  const modal = document.getElementById('videoModal');
+  const frame = document.getElementById('videoFrame');
+  const titleEl = document.getElementById('videoModalTitle');
+  frame.src = `https://drive.google.com/file/d/${fileId}/preview`;
+  titleEl.textContent = title;
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVideo() {
+  const modal = document.getElementById('videoModal');
+  const frame = document.getElementById('videoFrame');
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+  frame.src = '';
+  document.body.style.overflow = '';
+}
+
+// Keyboard: Escape closes modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeVideo();
 });
+
+// Start loading on page ready
+loadAcademy();
 </script>
 
 </body>
