@@ -3,134 +3,354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Super Team Academy - כניסה</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<title>Super Team Academy — כניסה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
+:root {
+  --nflx-bg: #141414;
+  --nflx-red: #E50914;
+  --nflx-red-dark: #B9090B;
+  --nflx-text: #FFFFFF;
+  --nflx-text-muted: #AAAAAA;
+  --nflx-header-height: 70px;
+  --stadium-img: url('hero.jpg');
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
+html, body { width: 100%; min-height: 100vh; overflow-x: hidden; }
 body {
-  font-family: 'Heebo', sans-serif;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  padding: 20px;
+  font-family: 'Heebo', 'Helvetica Neue', sans-serif;
+  background: var(--nflx-bg);
+  color: var(--nflx-text);
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+a { color: inherit; text-decoration: none; }
+button { border: none; background: none; cursor: pointer; font-family: inherit; color: inherit; }
+
+/* Stadium bg with vignette */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0;
+  background-image: var(--stadium-img);
+  background-size: cover;
+  background-position: center 30%;
+  filter: contrast(1.08) saturate(1.12) brightness(0.75);
+  transform: scale(1.02);
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(20,20,20,0.4) 0%,
+    rgba(20,20,20,0.7) 50%,
+    rgba(20,20,20,0.95) 100%);
 }
 
-.container {
-  max-width: 600px;
-  width: 100%;
-  text-align: center;
+/* NAVBAR */
+.main-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nflx-header-height);
+  display: flex; align-items: center;
+  padding: 0 48px;
+  z-index: 100;
+  background: linear-gradient(rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
 }
-
 .logo {
-  font-size: 120px;
-  font-weight: 900;
-  margin-bottom: 30px;
-  color: #ffffff;
-  letter-spacing: -3px;
-  text-shadow: 0 0 15px rgba(204,51,51,0.2);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin-left: 32px;
+  text-transform: uppercase;
+  user-select: none; line-height: 1;
+}
+.logo-super {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 11px;
+  color: #fff; letter-spacing: 2px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+.logo-line {
+  width: 44px; height: 1.5px;
+  background: linear-gradient(to right, transparent 0%, #fff 50%, transparent 100%);
+  margin: 4px 0; border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
+.logo-academy {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 18px;
+  color: var(--nflx-red); letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px rgba(229,9,20,0.5), 0 1px 3px rgba(0,0,0,0.8);
 }
 
-.subtitle {
-  font-size: 22px;
-  color: #ffffff;
-  margin-bottom: 80px;
-  font-weight: 300;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+/* Container */
+.entry-container {
+  position: relative; z-index: 10;
+  min-height: 100vh;
+  padding: calc(var(--nflx-header-height) + 40px) 48px 60px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 48px;
 }
 
-.options {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.hero-section {
+  text-align: center;
+  max-width: 780px;
+  animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
-.option-btn {
-  padding: 40px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 12px;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Heebo', sans-serif;
-  text-decoration: none;
-  display: block;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-}
-
-.option-btn:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.6);
-  transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
-}
-
-.option-icon {
-  font-size: 48px;
-  margin-bottom: 15px;
-  display: block;
-}
-
-.option-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #ffffff;
-}
-
-.option-desc {
+.eyebrow {
   font-size: 14px;
-  color: rgba(255,255,255,0.7);
+  color: var(--nflx-red);
+  letter-spacing: 5px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(229,9,20,0.4);
+}
+.hero-title {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-size: clamp(42px, 6vw, 80px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 24px rgba(0,0,0,0.95), 2px 2px 8px rgba(0,0,0,1);
+}
+.hero-title-academy {
+  display: block;
+  color: var(--nflx-red);
+  font-size: 0.65em;
+  margin-top: 6px;
+  text-shadow: 0 0 20px rgba(229,9,20,0.6), 2px 2px 8px rgba(0,0,0,1);
+}
+.hero-divider {
+  width: 100px; height: 3px;
+  margin: 16px auto;
+  background: linear-gradient(to right, transparent 0%, #fff 50%, transparent 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(255,255,255,0.6);
+}
+.hero-subtitle {
+  font-size: clamp(14px, 1.4vw, 18px);
+  color: rgba(255,255,255,0.9);
+  margin-top: 20px;
   line-height: 1.6;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.9);
 }
 
-.divider {
-  margin: 30px 0;
-  color: #444;
-  font-size: 12px;
+/* Choice grid (matches dashboard) */
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 28px;
+  max-width: 980px;
+  width: 100%;
+  animation: fadeInUp 1s 0.2s both cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@media (max-width: 600px) {
-  .logo {
-    font-size: 80px;
-  }
+.choice-card {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: 460px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s, border-color 0.3s;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  text-decoration: none;
+  color: inherit;
+}
+.choice-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--nflx-red);
+}
+.choice-card:hover.card-new {
+  box-shadow: 0 24px 60px rgba(229,9,20,0.35), 0 12px 32px rgba(0,0,0,0.8);
+}
+.choice-card:hover.card-existing {
+  box-shadow: 0 24px 60px rgba(30,90,180,0.35), 0 12px 32px rgba(0,0,0,0.8);
+}
 
-  .option-btn {
-    padding: 30px 20px;
-  }
+.choice-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0.6; transition: opacity 0.4s, transform 0.6s;
+}
+.choice-card:hover .choice-bg {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+.card-new .choice-bg {
+  background-image: linear-gradient(135deg, #E50914 0%, #B9090B 40%, #5a0000 80%, #2a0000 100%);
+}
+.card-existing .choice-bg {
+  background-image: linear-gradient(135deg, #2a5ab8 0%, #1a3a78 50%, #0a1a3a 100%);
+}
 
-  .option-title {
-    font-size: 20px;
-  }
+.choice-card::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.6) 40%,
+    rgba(0,0,0,0.1) 80%,
+    transparent 100%);
+  z-index: 2;
+}
+
+.choice-icon {
+  position: absolute;
+  top: 38%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 110px;
+  z-index: 2;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.8));
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.choice-card:hover .choice-icon {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.choice-content {
+  position: relative; z-index: 3;
+  padding: 28px 26px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.choice-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: rgba(229,9,20,0.9);
+  color: #fff;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  width: fit-content;
+}
+.card-existing .choice-badge {
+  background: rgba(30,120,200,0.9);
+}
+
+.choice-title {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-size: 28px; font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+.choice-description {
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5;
+  margin-bottom: 4px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+.choice-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px;
+  background: #fff; color: #000;
+  border-radius: 4px;
+  font-size: 14px; font-weight: 700;
+  width: fit-content;
+  transition: background 0.2s, color 0.2s;
+  margin-top: 4px;
+}
+.choice-card:hover.card-new .choice-cta {
+  background: var(--nflx-red); color: #fff;
+}
+.choice-card:hover.card-existing .choice-cta {
+  background: #2a5ab8; color: #fff;
+}
+.choice-cta svg { width: 14px; height: 14px; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .main-header { padding: 0 16px; }
+  .entry-container { padding: calc(var(--nflx-header-height) + 20px) 16px 40px; gap: 32px; }
+  .choice-grid { grid-template-columns: 1fr; gap: 18px; }
+  .choice-card { aspect-ratio: 16/10; max-height: 280px; }
+  .choice-icon { font-size: 76px; top: 38%; }
+  .choice-title { font-size: 22px; }
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="logo">SUPER TEAM</div>
-  <p class="subtitle">בחר כיצד תרצה להמשיך</p>
-
-  <div class="options">
-    <a href="register.html" class="option-btn">
-      <span class="option-icon">➕</span>
-      <div class="option-title">בקשה להצטרפות חדשה</div>
-      <div class="option-desc">אם אתה משתמש חדש, מלא את הטופס וקבל אישור מהטאב שלך</div>
-    </a>
-
-    <div class="divider">או</div>
-
-    <a href="access.html" class="option-btn">
-      <span class="option-icon">👤</span>
-      <div class="option-title">כניסה משתמש קיים</div>
-      <div class="option-desc">אם כבר אושרת, הכנסי את הפרטים שלך כדי להיכנס לאקדמיה</div>
-    </a>
-  </div>
+<div class="main-header">
+  <a href="#" class="logo" aria-label="Academy">
+    <span class="logo-super">SUPER TEAM</span>
+    <span class="logo-line"></span>
+    <span class="logo-academy">ACADEMY</span>
+  </a>
 </div>
+
+<main class="entry-container">
+
+  <section class="hero-section">
+    <div class="eyebrow">ברוכים הבאים</div>
+    <h1 class="hero-title">
+      SUPER TEAM
+      <span class="hero-title-academy">ACADEMY</span>
+    </h1>
+    <div class="hero-divider"></div>
+    <p class="hero-subtitle">
+      סדרות, קורסים ופלואו עסקי — הכל במקום אחד.<br>
+      בחר את המסלול שלך כדי להתחיל.
+    </p>
+  </section>
+
+  <div class="choice-grid">
+
+    <!-- NEW USER CARD -->
+    <a href="register.html" class="choice-card card-new">
+      <div class="choice-bg"></div>
+      <div class="choice-icon">✨</div>
+      <div class="choice-content">
+        <span class="choice-badge">🌟 חדש</span>
+        <h2 class="choice-title">הצטרפות חדשה</h2>
+        <p class="choice-description">
+          מלא את הטופס וקבל גישה מלאה לאחר אישור המנהל.
+        </p>
+        <span class="choice-cta">
+          <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+          התחל הרשמה
+        </span>
+      </div>
+    </a>
+
+    <!-- EXISTING USER CARD -->
+    <a href="access.html" class="choice-card card-existing">
+      <div class="choice-bg"></div>
+      <div class="choice-icon">👤</div>
+      <div class="choice-content">
+        <span class="choice-badge">🔑 משתמש קיים</span>
+        <h2 class="choice-title">כניסה לחשבון</h2>
+        <p class="choice-description">
+          כבר אושרת? הכנס פרטים וקבל גישה לאקדמיה ולפלואו.
+        </p>
+        <span class="choice-cta">
+          <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+          כניסה לחשבון
+        </span>
+      </div>
+    </a>
+
+  </div>
+
+</main>
 
 </body>
 </html>
