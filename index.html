@@ -152,8 +152,8 @@ body::after {
 
 .choice-card {
   position: relative;
-  aspect-ratio: 4 / 5;
-  max-height: 460px;
+  aspect-ratio: 16 / 10;
+  max-height: 380px;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -180,8 +180,8 @@ body::after {
 
 .choice-bg {
   position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  opacity: 0.95; transition: opacity 0.4s, transform 0.6s;
+  background-size: cover; background-position: center top;
+  opacity: 1; transition: opacity 0.4s, transform 0.6s;
 }
 .choice-card:hover .choice-bg {
   opacity: 1;
@@ -189,21 +189,22 @@ body::after {
 }
 .card-new .choice-bg {
   background-image: url('previews/preview-register.jpg');
-  filter: brightness(0.6) saturate(1.1);
+  background-position: center top;
+  filter: brightness(0.85) saturate(1.15);
 }
 .card-existing .choice-bg {
   background-image: url('previews/preview-access.jpg');
-  filter: brightness(0.55) saturate(1.1);
+  background-position: center top;
+  filter: brightness(0.85) saturate(1.15);
 }
 
 .choice-card::before {
   content: "";
   position: absolute; inset: 0;
   background: linear-gradient(to top,
-    rgba(0,0,0,0.95) 0%,
-    rgba(0,0,0,0.6) 40%,
-    rgba(0,0,0,0.1) 80%,
-    transparent 100%);
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.4) 35%,
+    rgba(0,0,0,0) 65%);
   z-index: 2;
 }
 

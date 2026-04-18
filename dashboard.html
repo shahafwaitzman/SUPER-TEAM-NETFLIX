@@ -156,7 +156,7 @@ body::after {
 /* Choice cards */
 .choice-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   gap: 32px;
   max-width: 1200px;
   width: 100%;
@@ -166,8 +166,8 @@ body::after {
 
 .choice-card {
   position: relative;
-  aspect-ratio: 3 / 4;
-  max-height: 560px;
+  aspect-ratio: 16 / 10;
+  max-height: 420px;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -191,8 +191,8 @@ body::after {
 .choice-bg {
   position: absolute; inset: 0;
   background-size: cover;
-  background-position: center;
-  opacity: 0.95;
+  background-position: center top;
+  opacity: 1;
   transition: opacity 0.4s, transform 0.6s;
 }
 .choice-card:hover .choice-bg {
@@ -202,21 +202,22 @@ body::after {
 
 .choice-card:nth-child(1) .choice-bg {
   background-image: url('previews/preview-academy.jpg');
-  filter: brightness(0.6) saturate(1.1);
+  background-position: center top;
+  filter: brightness(0.85) saturate(1.15);
 }
 .choice-card:nth-child(2) .choice-bg {
   background-image: url('previews/preview-flow.jpg');
-  filter: brightness(0.6) saturate(1.1);
+  background-position: center top;
+  filter: brightness(0.85) saturate(1.15);
 }
 
 .choice-card::before {
   content: "";
   position: absolute; inset: 0;
   background: linear-gradient(to top,
-    rgba(0,0,0,0.95) 0%,
-    rgba(0,0,0,0.6) 40%,
-    rgba(0,0,0,0.1) 80%,
-    transparent 100%);
+    rgba(0,0,0,0.92) 0%,
+    rgba(0,0,0,0.4) 35%,
+    rgba(0,0,0,0) 65%);
   z-index: 2;
 }
 
