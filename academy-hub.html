@@ -52,16 +52,16 @@ img { display: block; max-width: 100%; }
 .logo {
   font-family: 'Bebas Neue', 'Heebo', sans-serif;
   font-weight: 900;
-  font-size: 38px;
+  font-size: 30px;
   color: var(--nflx-red);
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   line-height: 1;
-  margin-left: 25px;
+  margin-left: 32px;
   text-transform: uppercase;
   cursor: pointer;
   user-select: none;
-  text-shadow: 0 2px 8px rgba(229,9,20,0.4), 0 1px 2px rgba(0,0,0,0.6);
-  transition: transform 0.2s;
+  text-shadow: 0 2px 12px rgba(229,9,20,0.5), 0 1px 3px rgba(0,0,0,0.7);
+  transition: transform 0.2s, opacity 0.2s;
 }
 .logo:hover { transform: scale(1.02); }
 
@@ -102,14 +102,14 @@ img { display: block; max-width: 100%; }
 /* BILLBOARD HERO */
 .billboard-row {
   position: relative; width: 100%;
-  padding-top: 56.25%;
-  max-height: 90vh; min-height: 560px;
-  margin-bottom: 20px;
+  padding-top: 60%;
+  max-height: 92vh; min-height: 620px;
+  margin-bottom: 40px;
   background: #000;
   overflow: hidden;
 }
 @media (min-width: 950px) {
-  .billboard-row { padding-top: 42%; }
+  .billboard-row { padding-top: 46%; }
 }
 
 .hero-image-wrapper { position: absolute; inset: 0; z-index: 0; }
@@ -125,52 +125,60 @@ img { display: block; max-width: 100%; }
   position: absolute; inset: 0; z-index: 7;
   background: linear-gradient(
     rgba(20,20,20,0) 0px,
-    rgba(20,20,20,0.15) 15%,
-    rgba(20,20,20,0.35) 29%,
-    rgba(20,20,20,0.58) 44%,
-    rgb(20,20,20) 68%,
-    rgb(20,20,20)
+    rgba(20,20,20,0) 35%,
+    rgba(20,20,20,0.2) 55%,
+    rgba(20,20,20,0.6) 80%,
+    rgb(20,20,20) 100%
   );
 }
 .trailer-vignette {
   position: absolute; inset: 0; z-index: 8;
-  background: linear-gradient(-77deg, rgba(0,0,0,0.6), rgba(0,0,0,0) 85%);
+  background: linear-gradient(-77deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 70%);
   transition: opacity 0.5s;
 }
 
 .meta-layer {
   position: absolute;
-  bottom: 35%; right: 60px;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
-  max-width: 36vw; min-width: 380px;
-  display: flex; flex-direction: column; gap: 16px;
+  width: min(92%, 720px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
 }
 @media (max-width: 950px) {
   .meta-layer {
-    right: 24px; left: 24px;
-    max-width: none; min-width: 0;
-    bottom: 30%;
+    bottom: 14%;
+    width: 92%;
+    gap: 18px;
   }
 }
 
-.logo-and-text { display: flex; flex-direction: column; gap: 12px; }
+.logo-and-text { display: flex; flex-direction: column; gap: 18px; align-items: center; }
 
 .billboard-title {
-  font-family: 'Heebo', 'Impact', sans-serif;
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
   font-weight: 900;
-  font-size: clamp(40px, 5vw, 80px);
+  font-size: clamp(32px, 3.6vw, 56px);
   color: var(--nflx-text);
-  line-height: 0.95;
-  letter-spacing: -2px;
-  text-shadow: 2px 4px 8px rgba(0,0,0,0.6);
-  margin-bottom: 8px;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-shadow: 2px 4px 16px rgba(0,0,0,0.8);
+  margin-bottom: 0;
+  text-transform: uppercase;
 }
 .billboard-title .title-academy {
   color: var(--nflx-red);
-  display: inline-block;
+  display: block;
   font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  letter-spacing: -1px;
-  text-shadow: 2px 4px 12px rgba(229,9,20,0.3), 2px 4px 8px rgba(0,0,0,0.6);
+  letter-spacing: 3px;
+  font-size: 1.35em;
+  margin-top: 4px;
+  text-shadow: 2px 4px 20px rgba(229,9,20,0.4), 2px 4px 12px rgba(0,0,0,0.8);
 }
 
 .maturity-rating {
@@ -179,9 +187,9 @@ img { display: block; max-width: 100%; }
   font-size: 13.2px; color: #fff;
   padding: 6px 10px 6px 42px;
   position: relative;
-  margin-bottom: 8px;
   width: fit-content;
   border-right: 3px solid rgba(220,220,220,0.7);
+  backdrop-filter: blur(8px);
 }
 .maturity-rating::before {
   content: "⭐";
@@ -192,16 +200,21 @@ img { display: block; max-width: 100%; }
 .maturity-rating .maturity-number { font-size: 13.2px; font-weight: 500; }
 
 .synopsis {
-  font-size: clamp(14px, 1.3vw, 18px);
-  line-height: 1.45;
+  font-size: clamp(14px, 1.25vw, 17px);
+  line-height: 1.55;
   color: var(--nflx-text);
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-  max-width: 560px;
+  text-shadow: 1px 1px 8px rgba(0,0,0,0.8);
+  max-width: 580px;
   font-weight: 400;
+  margin: 0 auto;
 }
 
 .billboard-links {
-  display: flex; gap: 10px; margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .nflx-btn {
