@@ -169,18 +169,22 @@ async function approve() {
 
     const accessUrl = backUrl + 'access.html';
     const whatsappMsg = encodeURIComponent(
-      'היי ' + user.name + '! 🎉\n\n' +
-      'ברכות! אושרת בהצלחה ל-Super Team Academy 🏆\n\n' +
-      '🎬 קישור ישיר לכניסה:\n' +
-      accessUrl + '\n\n' +
-      '📝 פרטי הכניסה שלך:\n' +
-      '   שם: ' + user.name + '\n' +
-      '   אימייל: ' + user.email + '\n' +
-      '   TAB: ' + user.tab + '\n\n' +
-      '👆 לחצי על הקישור — הזיני את הפרטים — ואת בפנים! 🚀\n\n' +
-      '📚 תוכלי לצפות בכל הקורסים, הסדרות והזומים.\n' +
-      '💬 וגם גישה לפלואו העסקי והפגישות.\n\n' +
-      'אם יש שאלות - אני כאן! 💪'
+      'היי ' + user.name + '! 🎉\n' +
+      'ברוכ/ה הבא/ה ל-Super Team Academy ✨\n' +
+      '\n' +
+      '🔑 לחצ/י לכניסה ישירה:\n' +
+      accessUrl + '\n' +
+      '\n' +
+      '📝 הפרטים שלך:\n' +
+      '• שם: ' + user.name + '\n' +
+      '• אימייל: ' + user.email + '\n' +
+      '• TAB: ' + user.tab + '\n' +
+      '\n' +
+      '💎 מה מחכה לך בפנים:\n' +
+      '🎬 קורסים, סדרות וזומים\n' +
+      '💼 פלואו עסקי לפגישות\n' +
+      '\n' +
+      'מחכים לך בפנים! 🚀'
     );
     
     let phoneDigits = (user.phone || '').replace(/\D/g, '');
