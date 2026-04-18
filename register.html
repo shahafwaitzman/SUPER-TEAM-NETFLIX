@@ -9,37 +9,118 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
-  background: #141414; color: #e5e5e5;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+  color: #e5e5e5;
   font-family: 'Heebo', sans-serif;
-  min-height: 100vh; padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 .container {
-  max-width: 500px; margin: 0 auto;
-  background: #1a1a1a; border-radius: 10px; padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  background: rgba(26,26,46,0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 50px 40px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
 }
-h1 { font-size: 24px; margin-bottom: 20px; }
-.form-group { margin-bottom: 15px; }
-label { display: block; margin-bottom: 5px; font-weight: 600; }
+h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #ffffff;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+.subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 40px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 14px;
+}
 input, select {
-  width: 100%; padding: 10px; border: 1px solid #333;
-  border-radius: 4px; background: #0a0a0a; color: #e5e5e5;
-  font-size: 14px; font-family: inherit;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.2);
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
 }
-input:focus, select:focus { border-color: #e50914; outline: none; }
+input:focus, select:focus {
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(0,0,0,0.3);
+  outline: none;
+  box-shadow: 0 0 10px rgba(204,51,51,0.2);
+}
 button {
-  width: 100%; padding: 12px; background: #e50914; color: #fff;
-  border: none; border-radius: 4px; cursor: pointer; font-weight: 700;
-  margin-top: 15px; font-family: inherit;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 20px;
+  font-family: inherit;
+  font-size: 15px;
+  transition: all 0.3s ease;
 }
-button:hover { background: #b20710; }
-.status { margin-top: 15px; padding: 10px; background: #0a0a0a; border-radius: 4px; min-height: 20px; }
-.error { color: #e50914; }
-.success { color: #46d369; }
+button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+  transform: translateY(-2px);
+}
+.status {
+  margin-top: 15px;
+  padding: 12px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  min-height: 20px;
+  font-size: 14px;
+  display: none;
+}
+.error {
+  color: #ff6b6b;
+}
+.success {
+  color: #46d369;
+}
+.back {
+  text-align: center;
+  margin-top: 24px;
+}
+.back a {
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+.back a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
 <div class="container">
   <h1>📝 בקשת אישור חדשה</h1>
+  <p class="subtitle">הזן את פרטיך כדי לבקש גישה</p>
   
   <div class="form-group">
     <label>שם מלא *</label>
@@ -68,6 +149,10 @@ button:hover { background: #b20710; }
   <button onclick="submitForm()">שלח בקשה</button>
   
   <div class="status" id="status"></div>
+
+  <div class="back">
+    <a href="entry.html">← חזור</a>
+  </div>
 </div>
 
 <script>
@@ -76,7 +161,9 @@ emailjs.init('nhwKyEa3uJ8JjmxXQ');
 
 function log(msg) {
   console.log('[register] ' + msg);
-  document.getElementById('status').innerHTML += msg + '<br>';
+  const status = document.getElementById('status');
+  status.style.display = 'block';
+  status.innerHTML += msg + '<br>';
 }
 
 async function submitForm() {
@@ -86,6 +173,7 @@ async function submitForm() {
   const tab = document.getElementById('tab').value;
   
   if (!name || !email || !phone || !tab) {
+    document.getElementById('status').style.display = 'block';
     document.getElementById('status').innerHTML = '<span class="error">❌ יש למלא את כל השדות</span>';
     return;
   }

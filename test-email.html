@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test EmailJS</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <h1>EmailJS Test</h1>
+    <button onclick="testEmail()">Send Test Email</button>
+    <div id="result"></div>
+
+    <script>
+        emailjs.init('nhwKyEa3uJ8JjmxXQ');
+
+        async function testEmail() {
+            const resultDiv = document.getElementById('result');
+            try {
+                console.log('Sending test email...');
+                resultDiv.innerHTML = '<p>שולח בדיקה...</p>';
+
+                const result = await emailjs.send('service_etqui87', 'template_6bo4ai9', {
+                    to_email: 'shahafwai@gmail.com',
+                    tab_name: 'שחף ויצמן',
+                    user_name: 'בדיקה',
+                    user_email: 'test@example.com',
+                    approve_url: 'https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/approve.html?key=test123'
+                });
+
+                console.log('Email sent:', result);
+                resultDiv.innerHTML = '<p style="color:green;">✅ המייל נשלח בהצלחה!</p>';
+            } catch(error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<p style="color:red;">❌ שגיאה: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

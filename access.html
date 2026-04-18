@@ -8,44 +8,113 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
-  background: #141414; color: #e5e5e5;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+  color: #e5e5e5;
   font-family: 'Heebo', sans-serif;
   min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px;
 }
 .container {
-  max-width: 500px; width: 100%;
-  background: #1a1a1a; border-radius: 10px;
-  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  background: rgba(26,26,46,0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 50px 40px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
 }
-h1 { font-size: 28px; margin-bottom: 10px; }
-.subtitle { font-size: 14px; color: #999; margin-bottom: 30px; }
-.form-group { margin-bottom: 15px; }
-label { display: block; margin-bottom: 5px; font-weight: 600; }
+h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #ffffff;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+.subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 40px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 14px;
+}
 input, select {
-  width: 100%; padding: 10px; border: 1px solid #333;
-  border-radius: 4px; background: #0a0a0a; color: #e5e5e5;
-  font-size: 14px; font-family: inherit;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.2);
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
 }
-input:focus, select:focus { border-color: #e50914; outline: none; }
+input:focus, select:focus {
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(0,0,0,0.3);
+  outline: none;
+  box-shadow: 0 0 10px rgba(204,51,51,0.2);
+}
 button {
-  width: 100%; padding: 12px; background: #e50914; color: #fff;
-  border: none; border-radius: 4px; cursor: pointer; font-weight: 700;
-  margin-top: 20px; font-family: inherit; font-size: 16px;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 20px;
+  font-family: inherit;
+  font-size: 15px;
+  transition: all 0.3s ease;
 }
-button:hover { background: #b20710; }
+button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+  transform: translateY(-2px);
+}
 .message {
-  margin-top: 16px; padding: 12px; border-radius: 4px;
-  text-align: center; font-size: 14px;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+  display: none;
 }
-.error { background: rgba(229,9,20,0.15); color: #ff6b6b; }
-.loading { background: rgba(245,197,24,0.15); color: #f5c518; }
-.back { text-align: center; margin-top: 20px; }
+.error {
+  background: rgba(255,107,107,0.15);
+  color: #ff6b6b;
+}
+.loading {
+  background: rgba(245,197,24,0.15);
+  color: #f5c518;
+}
+.back {
+  text-align: center;
+  margin-top: 24px;
+}
 .back a {
-  color: #e50914; text-decoration: none; font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
 }
-.back a:hover { text-decoration: underline; }
+.back a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
@@ -77,7 +146,7 @@ button:hover { background: #b20710; }
   <div class="message" id="message" style="display:none;"></div>
   
   <div class="back">
-    <a href="home.html">← חזור לעמוד הבית</a>
+    <a href="entry.html">← חזור</a>
   </div>
 </div>
 
@@ -106,7 +175,6 @@ async function verify() {
           user.email === email && 
           user.tab === tab && 
           user.status === 'approved') {
-        // Match found! Redirect to home page
         msgDiv.style.display = 'none';
         const homeUrl = window.location.origin.includes('github.io')
           ? window.location.origin + '/SUPER-TEAM-NETFLIX/'

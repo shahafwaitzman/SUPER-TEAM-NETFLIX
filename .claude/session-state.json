@@ -1,58 +1,25 @@
 {
-  "session_start": "2026-04-17T09:08:02Z",
+  "session_start": "2026-04-18T00:00:00Z",
   "budget_total": 280000,
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
   "priorities": [
     {
-      "id": "1",
-      "title": "Rebuild System with Proper Error Handling",
-      "type": "feature",
-      "status": "completed",
+      "id": "5",
+      "title": "Implement Hybrid Apple TV Design (Blended)",
+      "type": "implementation",
+      "status": "in_progress",
       "pdr_approved": true,
       "turns": 1,
-      "estimated_tokens": 15000,
-      "model_used": "sonnet",
-      "checkpoint_commit": "24a60aa"
-    },
-    {
-      "id": "2",
-      "title": "Fix Approval Redirect and Complete Flow",
-      "type": "bugfix",
-      "status": "completed",
-      "pdr_approved": true,
-      "turns": 1,
-      "estimated_tokens": 3000,
+      "estimated_tokens": 9000,
       "model_used": "haiku",
-      "checkpoint_commit": "2d2c83d"
-    },
-    {
-      "id": "3",
-      "title": "Add Bulk Delete Functionality to Admin Panel",
-      "type": "feature",
-      "status": "completed",
-      "pdr_approved": true,
-      "turns": 1,
-      "estimated_tokens": 2000,
-      "model_used": "haiku",
-      "checkpoint_commit": "cb0d3c3"
-    },
-    {
-      "id": "4",
-      "title": "Build Complete User Access System",
-      "type": "feature",
-      "status": "completed",
-      "pdr_approved": true,
-      "turns": 1,
-      "estimated_tokens": 5500,
-      "model_used": "haiku",
-      "checkpoint_commit": "4125db6"
+      "checkpoint_commit": null
     }
   ],
   "totals": {
-    "turns": 4,
-    "estimated_tokens": 25500,
-    "budget_remaining": 254500,
+    "turns": 1,
+    "estimated_tokens": 9000,
+    "budget_remaining": 256000,
     "budget_status": "GREEN"
   }
 }
