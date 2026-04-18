@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Super Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --nflx-bg: #141414;
+  --nflx-red: #E50914;
+  --nflx-red-dark: #B9090B;
+  --nflx-text: #FFFFFF;
+  --nflx-text-muted: #AAAAAA;
+  --nflx-header-height: 70px;
+  --stadium-img: url('hero.jpg');
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; min-height: 100vh; overflow-x: hidden; }
+body {
+  font-family: 'Heebo', 'Helvetica Neue', sans-serif;
+  background: var(--nflx-bg);
+  color: var(--nflx-text);
+  line-height: 1.2;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+a { color: inherit; text-decoration: none; }
+button { border: none; background: none; cursor: pointer; font-family: inherit; color: inherit; }
+
+/* Background stadium + vignette */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0;
+  background-image: var(--stadium-img);
+  background-size: cover;
+  background-position: center 30%;
+  filter: contrast(1.08) saturate(1.12) brightness(0.85);
+  transform: scale(1.02);
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(20,20,20,0.7) 0%,
+    rgba(20,20,20,0.85) 50%,
+    rgba(20,20,20,0.95) 100%);
+}
+
+/* NAVBAR */
+.main-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--nflx-header-height);
+  display: flex; align-items: center;
+  padding: 0 48px;
+  z-index: 100;
+  background: linear-gradient(rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+}
+
+.logo {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  margin-left: 32px;
+  text-transform: uppercase;
+  cursor: pointer; user-select: none;
+  line-height: 1;
+}
+.logo-super {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 11px;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+.logo-line {
+  width: 44px; height: 1.5px;
+  background: linear-gradient(to right, transparent 0%, #fff 50%, transparent 100%);
+  margin: 4px 0;
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
+.logo-academy {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 18px;
+  color: var(--nflx-red);
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px rgba(229,9,20,0.5), 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.user-badge {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 12px;
+  color: var(--nflx-text-muted);
+  font-size: 13px;
+}
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 4px;
+  background: linear-gradient(135deg, var(--nflx-red) 0%, var(--nflx-red-dark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: #fff;
+}
+.logout-btn {
+  background: transparent;
+  color: var(--nflx-text-muted);
+  font-size: 13px;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.logout-btn:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+/* Page container */
+.dashboard-container {
+  position: relative; z-index: 10;
+  padding: calc(var(--nflx-header-height) + 40px) 48px 60px;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 48px;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-top: 40px;
+  animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.welcome-eyebrow {
+  font-size: 14px;
+  color: var(--nflx-red);
+  letter-spacing: 4px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.welcome-title {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.8);
+  margin-bottom: 16px;
+}
+.welcome-subtitle {
+  font-size: clamp(14px, 1.4vw, 18px);
+  color: var(--nflx-text-muted);
+  max-width: 600px;
+  line-height: 1.6;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+}
+
+/* Choice cards */
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  width: 100%;
+  margin-top: 20px;
+  animation: fadeInUp 1s 0.2s both cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.choice-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  max-height: 560px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s,
+              border-color 0.3s;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  text-decoration: none;
+  color: inherit;
+}
+.choice-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 24px 60px rgba(229,9,20,0.3), 0 12px 32px rgba(0,0,0,0.8);
+  border-color: var(--nflx-red);
+}
+
+.choice-bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+  transition: opacity 0.4s, transform 0.6s;
+}
+.choice-card:hover .choice-bg {
+  opacity: 0.7;
+  transform: scale(1.05);
+}
+
+.choice-card:nth-child(1) .choice-bg {
+  background-image: linear-gradient(135deg, #B9090B 0%, #5a0000 60%, #2a0000 100%);
+}
+.choice-card:nth-child(2) .choice-bg {
+  background-image: linear-gradient(135deg, #1a3a5c 0%, #0f2040 50%, #050a1f 100%);
+}
+
+.choice-card::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.95) 0%,
+    rgba(0,0,0,0.6) 40%,
+    rgba(0,0,0,0.1) 80%,
+    transparent 100%);
+  z-index: 2;
+}
+
+.choice-icon {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 120px;
+  z-index: 2;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.8));
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.choice-card:hover .choice-icon {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.choice-content {
+  position: relative; z-index: 3;
+  padding: 32px 28px;
+  display: flex; flex-direction: column;
+  gap: 12px;
+}
+
+.choice-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: rgba(229,9,20,0.9);
+  color: #fff;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.choice-title {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.choice-description {
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+
+.choice-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px;
+  background: #fff;
+  color: #000;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  width: fit-content;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+.choice-card:hover .choice-cta {
+  background: var(--nflx-red);
+  color: #fff;
+}
+.choice-cta svg {
+  width: 16px; height: 16px;
+  transition: transform 0.2s;
+}
+.choice-card:hover .choice-cta svg {
+  transform: translateX(-4px);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-header { padding: 0 16px; }
+  .dashboard-container { padding: calc(var(--nflx-header-height) + 20px) 16px 40px; gap: 32px; }
+  .welcome-section { margin-top: 12px; }
+  .choice-grid { grid-template-columns: 1fr; gap: 20px; }
+  .choice-card { aspect-ratio: 16 / 10; max-height: 320px; }
+  .choice-icon { font-size: 80px; top: 38%; }
+  .choice-title { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+
+<div class="main-header">
+  <a href="#" class="logo" aria-label="Academy">
+    <span class="logo-super">SUPER TEAM</span>
+    <span class="logo-line"></span>
+    <span class="logo-academy">ACADEMY</span>
+  </a>
+  <div class="user-badge">
+    <span id="userName"></span>
+    <div class="user-avatar" id="userAvatar">S</div>
+    <button class="logout-btn" onclick="logout()">יציאה</button>
+  </div>
+</div>
+
+<main class="dashboard-container">
+  <div class="welcome-section">
+    <div class="welcome-eyebrow">ברוכים הבאים</div>
+    <h1 class="welcome-title" id="welcomeHeading">SUPER TEAM</h1>
+    <p class="welcome-subtitle">
+      בחר/י את היעד שלך. יש לך גישה מלאה לתוכן האקדמיה וגם לפלואו העסקי ופגישות.
+    </p>
+  </div>
+
+  <div class="choice-grid">
+    <!-- ACADEMY CARD -->
+    <a href="academy-hub.html" class="choice-card" id="academyCard">
+      <div class="choice-bg"></div>
+      <div class="choice-icon">🎬</div>
+      <div class="choice-content">
+        <span class="choice-badge">⭐ מומלץ</span>
+        <h2 class="choice-title">אקדמיה</h2>
+        <p class="choice-description">
+          סדרות וקורסים פרימיום — זומים, הדרכות, סימולציות וכל החומר הלימודי במקום אחד.
+        </p>
+        <span class="choice-cta">
+          <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+          כניסה לאקדמיה
+        </span>
+      </div>
+    </a>
+
+    <!-- FLOW CARD -->
+    <a href="https://flow-argoni.netlify.app" class="choice-card" id="flowCard">
+      <div class="choice-bg"></div>
+      <div class="choice-icon">💬</div>
+      <div class="choice-content">
+        <span class="choice-badge" style="background:rgba(30,120,200,0.9);">🚀 מקצועי</span>
+        <h2 class="choice-title">פלואו עסקי ופגישות</h2>
+        <p class="choice-description">
+          המערכת לניהול פלואו פגישות, שיחות ותהליכים עסקיים — כל הכלים לפגישה מוצלחת.
+        </p>
+        <span class="choice-cta">
+          <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+          כניסה לפלואו
+        </span>
+      </div>
+    </a>
+  </div>
+</main>
+
+<script>
+// Read user from URL or localStorage
+const params = new URLSearchParams(window.location.search);
+const userEmail = params.get('user') || localStorage.getItem('userEmail');
+
+if (userEmail) {
+  localStorage.setItem('userEmail', userEmail);
+  const name = userEmail.split('@')[0];
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('welcomeHeading').textContent = 'שלום, ' + name;
+
+  // Pass user param to academy link
+  const academyCard = document.getElementById('academyCard');
+  academyCard.href = 'academy-hub.html?user=' + encodeURIComponent(userEmail);
+} else {
+  // No user identified — send back to entry
+  // (commented out to allow direct access during dev)
+  // window.location.href = 'entry.html';
+}
+
+function logout() {
+  if (confirm('האם לצאת מהחשבון?')) {
+    localStorage.removeItem('userEmail');
+    const homeUrl = window.location.origin.includes('github.io')
+      ? window.location.origin + '/SUPER-TEAM-NETFLIX/'
+      : window.location.origin + '/';
+    window.location.href = homeUrl;
+  }
+}
+</script>
+
+</body>
+</html>
