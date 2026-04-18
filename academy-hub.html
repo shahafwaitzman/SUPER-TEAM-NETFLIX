@@ -732,11 +732,54 @@ const DRIVE_CONFIG = {
   ROOT_FOLDER_ID: '1UZ_MhVFkQvkLbFdUYpH3Mw_N92-bJoOd'
 };
 
+// Custom display order — folders matched by keyword (substring, case-insensitive)
+// Folders not in this list appear AFTER, sorted alphabetically
+const FOLDER_ORDER = [
+  'מפיצים חדשים',          // זומים למפיצים חדשים
+  'הזדמנות עסקית',          // הזדמנות עסקית - HOM
+  'תזונה ומוצרים',          // זומים בנושא תזונה ומוצרים
+  'שיטות עבודה',            // זומים בנושא שיטות עבודה (picks both "שיטות עבודה" variants)
+  'ניהול וארגון',           // זומים בנושא ניהול וארגון
+  'למפקחים',                // זומים למפקחים
+  'WT ומעלה',               // זומים ל WT ומעלה
+  'קבצים ארגוניים',
+  'TELEGRAM ARCHIVE'
+];
+
+// Natural sort comparator for video titles (handles "1.", "10.", "Copy of" etc.)
+function naturalCompare(a, b) {
+  // Strip "Copy of" prefix and file extension
+  const clean = s => s
+    .replace(/^Copy of\s*/i, '')
+    .replace(/\.(mp4|mov|avi|mkv|pdf|xlsx|docx)$/i, '')
+    .trim();
+  const ax = clean(a);
+  const bx = clean(b);
+  return ax.localeCompare(bx, 'he', { numeric: true, sensitivity: 'base' });
+}
+
+// Sort folders by custom order
+function sortFolders(folders) {
+  const getOrderIndex = folder => {
+    const name = folder.name || '';
+    for (let i = 0; i < FOLDER_ORDER.length; i++) {
+      if (name.includes(FOLDER_ORDER[i])) return i;
+    }
+    return 999; // unknown folders go last
+  };
+  return folders.slice().sort((a, b) => {
+    const ai = getOrderIndex(a);
+    const bi = getOrderIndex(b);
+    if (ai !== bi) return ai - bi;
+    return naturalCompare(a.name, b.name);
+  });
+}
+
 // Drive API: fetch folder contents
 async function fetchDriveFolder(folderId) {
   const q = `'${folderId}' in parents and trashed=false`;
   const fields = 'files(id,name,mimeType,thumbnailLink,videoMediaMetadata,size,modifiedTime)';
-  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&key=${DRIVE_CONFIG.API_KEY}&fields=${encodeURIComponent(fields)}&pageSize=200&orderBy=name`;
+  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&key=${DRIVE_CONFIG.API_KEY}&fields=${encodeURIComponent(fields)}&pageSize=200`;
   try {
     const res = await fetch(url);
     const data = await res.json();
@@ -761,7 +804,9 @@ const boxartPalette = ['boxart-1','boxart-2','boxart-3','boxart-4','boxart-5','b
 
 // Render a single row with files
 function renderRow(folderName, files) {
-  const videos = files.filter(f => f.mimeType && f.mimeType.startsWith('video/'));
+  const videos = files
+    .filter(f => f.mimeType && f.mimeType.startsWith('video/'))
+    .sort((a, b) => naturalCompare(a.name, b.name));
   if (videos.length === 0) return '';
 
   const cleanTitle = cleanFolderName(folderName);
@@ -824,7 +869,8 @@ async function loadAcademy() {
   try {
     // 1. Fetch root folder contents
     const rootItems = await fetchDriveFolder(DRIVE_CONFIG.ROOT_FOLDER_ID);
-    const folders = rootItems.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+    const rawFolders = rootItems.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+    const folders = sortFolders(rawFolders);
 
     if (folders.length === 0) {
       loading.innerHTML = '<p>לא נמצאו תיקיות. ודא שה-Folder ID נכון ושהתיקייה משותפת לצפייה.</p>';
