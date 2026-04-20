@@ -1241,7 +1241,7 @@ function renderRow(folderName, files) {
           <div class="title-card">
             <div class="boxart-container">
               <div class="boxart-image ${boxartClass} ${thumbnail ? '' : 'no-thumb'}">
-                ${thumbnail ? `<img src="${thumbnail}" alt="${escapeHtml(title)}" loading="lazy" onerror="this.closest('.boxart-image').classList.add('no-thumb')">` : ''}
+                ${thumbnail ? `<img src="${thumbnail}" alt="${escapeHtml(title)}" loading="lazy" onload="if(!this.naturalWidth||!this.naturalHeight)this.closest('.boxart-image').classList.add('no-thumb')" onerror="this.closest('.boxart-image').classList.add('no-thumb')">` : ''}
                 <div class="boxart-fallback" aria-hidden="true">
                   <span class="boxart-fallback-watermark">SUPER·TEAM</span>
                   <div class="boxart-fallback-play">
