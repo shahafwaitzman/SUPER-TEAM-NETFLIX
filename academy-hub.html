@@ -2645,15 +2645,7 @@ function rebuildHeroFromLatest() {
   const img = latest.querySelector('img');
   const thumb = img ? img.src : '';
 
-  // Update hero background if thumb available
-  if (thumb) {
-    const heroImage = document.querySelector('.hero-image');
-    if (heroImage) {
-      heroImage.classList.add('latest-video-bg');
-      heroImage.style.setProperty('--latest-video-bg', `url('${thumb}')`);
-    }
-  }
-
+  // KEEP original hero image (stadium + flag) — update only the text content below.
   // Update meta layer content
   const metaLayer = document.querySelector('.meta-layer .logo-and-text');
   if (!metaLayer) return;
