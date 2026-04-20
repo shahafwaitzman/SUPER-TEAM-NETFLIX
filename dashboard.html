@@ -228,23 +228,10 @@ body::after {
   filter: brightness(0.85) saturate(1.15);
 }
 .choice-card:nth-child(3) .choice-bg {
-  background:
-    radial-gradient(ellipse 120% 80% at 80% 20%, rgba(70,211,105,0.45), transparent 55%),
-    radial-gradient(ellipse 90% 70% at 20% 80%, rgba(30,120,200,0.3), transparent 60%),
-    linear-gradient(135deg, #0a1f2d 0%, #0d3820 50%, #041017 100%);
-  filter: brightness(0.98) saturate(1.1);
-}
-/* Decorative chart/dots pattern for retention card */
-.choice-card:nth-child(3) .choice-bg::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 70%, rgba(255,255,255,0.08) 1.5px, transparent 1.5px),
-    radial-gradient(circle at 40% 55%, rgba(255,255,255,0.08) 1.5px, transparent 1.5px),
-    radial-gradient(circle at 60% 45%, rgba(255,255,255,0.08) 1.5px, transparent 1.5px),
-    radial-gradient(circle at 80% 30%, rgba(255,255,255,0.08) 1.5px, transparent 1.5px);
-  background-size: 100% 100%;
-  opacity: 0.8;
+  background-image: url('previews/preview-retention.png');
+  background-size: cover;
+  background-position: center top;
+  filter: brightness(0.85) saturate(1.15);
 }
 
 .choice-card::before {
