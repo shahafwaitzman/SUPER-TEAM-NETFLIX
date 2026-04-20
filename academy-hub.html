@@ -970,6 +970,65 @@ if (userEmail) {
 }
 
 /* ═══════════════════════════════════════════
+   PHASE 2B · localStorage foundation (per-user scoped)
+   ═══════════════════════════════════════════ */
+const ST_NS = userEmail ? `sta_${userEmail}` : 'sta_guest';
+const ST_KEYS = {
+  PROGRESS:          `${ST_NS}_progress`,          // { [videoId]: 0..100 }
+  WATCHLIST:         `${ST_NS}_watchlist`,         // [videoId, ...]
+  LAST_WATCHED:      `${ST_NS}_lastWatched`,       // { [videoId]: ISO timestamp }
+  STREAK:            `${ST_NS}_streak`,            // { count: N, lastLogin: "YYYY-MM-DD" }
+  BADGES:            `${ST_NS}_badges`,            // ["badge_id", ...]
+  NOTIFICATIONS_SEEN:`${ST_NS}_notifsSeen`,        // [videoId, ...]
+};
+
+function stGet(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    console.warn('stGet parse failed for', key, e);
+    return fallback;
+  }
+}
+function stSet(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch (e) {
+    console.warn('stSet failed for', key, e);
+  }
+}
+function stPush(key, val) {
+  const arr = stGet(key, []);
+  if (!Array.isArray(arr)) return;
+  if (!arr.includes(val)) { arr.push(val); stSet(key, arr); }
+}
+function stRemove(key, val) {
+  const arr = stGet(key, []);
+  if (!Array.isArray(arr)) return;
+  const i = arr.indexOf(val);
+  if (i >= 0) { arr.splice(i, 1); stSet(key, arr); }
+}
+function stHas(key, val) {
+  const arr = stGet(key, []);
+  return Array.isArray(arr) && arr.includes(val);
+}
+
+/* Initialize missing keys with empty defaults — idempotent, safe on every load */
+(function stInit() {
+  if (stGet(ST_KEYS.PROGRESS, null) === null) stSet(ST_KEYS.PROGRESS, {});
+  if (stGet(ST_KEYS.WATCHLIST, null) === null) stSet(ST_KEYS.WATCHLIST, []);
+  if (stGet(ST_KEYS.LAST_WATCHED, null) === null) stSet(ST_KEYS.LAST_WATCHED, {});
+  if (stGet(ST_KEYS.STREAK, null) === null) stSet(ST_KEYS.STREAK, { count: 0, lastLogin: null });
+  if (stGet(ST_KEYS.BADGES, null) === null) stSet(ST_KEYS.BADGES, []);
+  if (stGet(ST_KEYS.NOTIFICATIONS_SEEN, null) === null) stSet(ST_KEYS.NOTIFICATIONS_SEEN, []);
+})();
+
+/* Exposed on window for console debugging during dev */
+window.__sta = { ST_NS, ST_KEYS, stGet, stSet, stPush, stRemove, stHas };
+
+/* ═══════════════════════════════════════════
    GOOGLE DRIVE INTEGRATION
    ═══════════════════════════════════════════ */
 const DRIVE_CONFIG = {
