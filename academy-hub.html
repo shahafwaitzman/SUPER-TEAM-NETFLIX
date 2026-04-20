@@ -184,6 +184,752 @@ img { display: block; max-width: 100%; }
   transition: opacity 0.5s;
 }
 
+/* ═══════════════════════════════════════════════
+   PHASE 2A · Bug fixes (hero legibility + card fallback)
+   ═══════════════════════════════════════════════ */
+
+/* 2A-2: RTL text legibility — dark scrim on right side (where text sits in RTL) */
+.hero-rtl-scrim {
+  position: absolute; inset: 0; z-index: 9;
+  background: linear-gradient(to left,
+    rgba(20,20,20,0.95) 0%,
+    rgba(20,20,20,0.6) 40%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+/* 2A-3: Bottom fade-to-black — smooth transition to row background */
+.hero-bottom-fade {
+  position: absolute; inset: 0; z-index: 9;
+  background: linear-gradient(to bottom,
+    transparent 70%,
+    #141414 100%);
+  pointer-events: none;
+}
+
+/* 2A-1: Card thumbnail with fallback placeholder (#141414 → #E50914 + S logo + title) */
+.boxart-image { position: relative; overflow: hidden; width: 100%; height: 100%; background: #141414; }
+.boxart-image img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 2;
+  background: #141414;
+}
+.boxart-fallback {
+  position: absolute; inset: 0; z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 12px 14px 14px;
+  color: #fff;
+  /* Dot-grid pattern overlay on top of card's gradient */
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+.boxart-image.no-thumb img { display: none; }
+.boxart-image.no-thumb .boxart-fallback { z-index: 3; }
+
+/* Watermark (top-right in LTR flow = visually "start" in RTL) */
+.boxart-fallback-watermark {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.42);
+  line-height: 1;
+  align-self: start; justify-self: start;
+  padding: 3px 7px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 3px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Central play icon — the focal element */
+.boxart-fallback-play {
+  align-self: center; justify-self: center;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,255,255,0.28);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.88);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  transition: transform 0.3s, background 0.3s;
+}
+.boxart-fallback-play svg { width: 22px; height: 22px; margin-inline-start: 3px; }
+.title-card-container:hover .boxart-fallback-play {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
+}
+
+/* Title at bottom */
+.boxart-fallback-title {
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,0.96);
+  line-height: 1.35;
+  max-height: 2.7em;
+  overflow: hidden;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  align-self: end;
+  text-align: start;
+}
+
+/* ═══════════════════════════════════════════
+   COMMIT 3 · Progress bar + Continue Watching
+   ═══════════════════════════════════════════ */
+.card-progress {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.2);
+  z-index: 5;
+  pointer-events: none;
+}
+.card-progress-fill {
+  height: 100%;
+  background: var(--nflx-red, #E50914);
+  box-shadow: 0 0 6px rgba(229,9,20,0.6);
+  transition: width 0.3s ease;
+}
+
+/* Continue Watching row gets a subtle accent badge */
+.row.continue-row .rowTitle::before {
+  content: '▶';
+  color: var(--nflx-red, #E50914);
+  margin-inline-end: 8px;
+  font-size: 0.85em;
+}
+
+/* ═══════════════════════════════════════════
+   COMMIT 4 · Overall progress / Watchlist / Nav filters
+   ═══════════════════════════════════════════ */
+
+/* Overall progress pill in header */
+.overall-progress-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.op-label {
+  font-size: 12px; font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.op-bar {
+  width: 80px; height: 5px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.op-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #E50914, #ff6b6b);
+  border-radius: 3px;
+  box-shadow: 0 0 6px rgba(229,9,20,0.55);
+  transition: width 0.6s cubic-bezier(0.2,0.8,0.2,1);
+}
+.op-caption {
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Watchlist + button on card */
+.watchlist-btn {
+  position: absolute;
+  top: 8px; inset-inline-end: 8px;
+  z-index: 6;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 18px; font-weight: 700; line-height: 1;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.2s, transform 0.2s, background 0.2s, border-color 0.2s;
+  padding: 0;
+}
+.title-card-container:hover .watchlist-btn {
+  opacity: 1; transform: scale(1);
+}
+.watchlist-btn:hover {
+  background: rgba(229,9,20,0.85);
+  border-color: #E50914;
+}
+.watchlist-btn.in-list {
+  opacity: 1; transform: scale(1);
+  background: rgba(229,9,20,0.85);
+  border-color: #E50914;
+}
+
+/* Toast notification */
+.sta-toast {
+  position: fixed;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 9999;
+  padding: 12px 22px;
+  border-radius: 30px;
+  background: rgba(20,20,20,0.95);
+  border: 1px solid rgba(229,9,20,0.45);
+  color: #fff;
+  font-size: 13px; font-weight: 700;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(229,9,20,0.2);
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
+  pointer-events: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  white-space: nowrap;
+}
+.sta-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Nav active state — red underline */
+.navigation-tab a {
+  position: relative;
+  padding-bottom: 4px;
+  transition: color 0.2s;
+}
+.navigation-tab a.current {
+  color: #fff;
+}
+.navigation-tab a.current::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: #E50914;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(229,9,20,0.6);
+}
+
+/* Filtering — hide rows/cards based on active filter */
+.row.filter-hidden,
+.slider-item.filter-hidden { display: none !important; }
+
+/* ═══════════════════════════════════════════
+   COMMIT 4 REFINE · Profile ring + Per-row progress
+   ═══════════════════════════════════════════ */
+
+/* Profile avatar with progress ring */
+.profile-wrap {
+  position: relative;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.profile-ring {
+  position: absolute; inset: 0;
+  width: 44px; height: 44px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.profile-ring circle {
+  fill: none;
+  stroke-width: 2.2;
+}
+.profile-ring .pr-bg {
+  stroke: rgba(255,255,255,0.15);
+}
+.profile-ring .pr-fill {
+  stroke: #E50914;
+  stroke-linecap: round;
+  stroke-dasharray: 119.38;  /* 2πr · r=19 */
+  stroke-dashoffset: 119.38;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 0 6px rgba(229,9,20,0.55));
+}
+.profile-wrap .profile-icon {
+  width: 32px; height: 32px;
+}
+.profile-wrap::after {
+  content: attr(data-count);
+  position: absolute;
+  bottom: -4px; inset-inline-end: -4px;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #E50914;
+  color: #fff;
+  font-size: 9px; font-weight: 900;
+  letter-spacing: 0.3px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+}
+.profile-wrap[data-count]:not([data-count=""])::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Per-folder (per-row) progress — large & clear */
+.row-header {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 14px;
+  padding-inline-end: 56px;  /* matches existing right padding of rows */
+}
+.row-progress {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: rgba(20,20,20,0.6);
+  border: 1px solid rgba(229,9,20,0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.row-progress-label {
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.92);
+  letter-spacing: 0.3px;
+}
+.row-progress-label b {
+  color: #E50914;
+  font-size: 13px;
+  font-weight: 900;
+  margin-inline: 2px;
+}
+.row-progress-bar {
+  width: 70px; height: 5px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.row-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #E50914, #ff6b6b);
+  border-radius: 3px;
+  box-shadow: 0 0 6px rgba(229,9,20,0.55);
+  transition: width 0.6s cubic-bezier(0.2,0.8,0.2,1);
+}
+.row-progress-pct {
+  font-size: 11px; font-weight: 900;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 0.3px;
+  min-width: 34px; text-align: end;
+}
+.row-progress.complete { border-color: rgba(70,211,105,0.55); background: rgba(10,40,18,0.6); }
+.row-progress.complete .row-progress-label b { color: #46d369; }
+.row-progress.complete .row-progress-fill { background: linear-gradient(90deg, #46d369, #22c55e); box-shadow: 0 0 6px rgba(70,211,105,0.55); }
+.row-progress.complete .row-progress-pct { color: #46d369; }
+.row-progress.empty { border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
+.row-progress.empty .row-progress-label b { color: rgba(255,255,255,0.4); }
+
+/* ═══════════════════════════════════════════
+   COMMIT 5 · Streak pill (next to profile)
+   ═══════════════════════════════════════════ */
+.streak-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(229,9,20,0.18), rgba(245,130,32,0.12));
+  border: 1px solid rgba(229,9,20,0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 13px; font-weight: 900;
+  color: #fff;
+  white-space: nowrap;
+  cursor: default;
+  transition: transform 0.2s;
+}
+.streak-pill:hover { transform: scale(1.04); }
+.streak-pill-flame {
+  font-size: 15px; line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(245,130,32,0.6));
+}
+.streak-pill-count { letter-spacing: 0.3px; }
+.streak-pill[data-streak="0"] { display: none; }
+
+/* Badge-earned toast variant */
+.sta-toast.badge-toast {
+  border-color: rgba(245,197,24,0.55);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 28px rgba(245,197,24,0.3);
+}
+
+/* ═══════════════════════════════════════════
+   COMMIT 6 · Notifications
+   ═══════════════════════════════════════════ */
+.notif-wrap { position: relative; }
+.notif-badge {
+  position: absolute;
+  top: -2px; inset-inline-end: -2px;
+  min-width: 16px; height: 16px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #E50914;
+  color: #fff;
+  font-size: 9px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  border: 1.5px solid rgba(0,0,0,0.7);
+  pointer-events: none;
+}
+.notif-badge[data-count="0"] { display: none; }
+
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  z-index: 200;
+  width: 340px;
+  max-height: 440px;
+  background: rgba(20,20,20,0.98);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.notif-dropdown.open { display: flex; flex-direction: column; }
+.notif-dropdown-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.notif-dropdown-head h4 {
+  font-size: 13px; font-weight: 800;
+  color: #fff; margin: 0;
+  letter-spacing: 0.4px;
+}
+.notif-clear {
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.55);
+  font-size: 11px; font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.notif-clear:hover { color: var(--nflx-red, #E50914); }
+.notif-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+.notif-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+}
+.notif-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-inline-start: 3px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.notif-item:hover {
+  background: rgba(229,9,20,0.08);
+  border-inline-start-color: var(--nflx-red, #E50914);
+}
+.notif-item-icon {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(229,9,20,0.3), rgba(229,9,20,0.08));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  color: #fff;
+}
+.notif-item-body { flex: 1; min-width: 0; }
+.notif-item-title {
+  font-size: 12px; font-weight: 700;
+  color: rgba(255,255,255,0.96);
+  line-height: 1.3;
+  overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.notif-item-meta {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+.notif-item-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--nflx-red, #E50914);
+  flex-shrink: 0;
+  box-shadow: 0 0 5px rgba(229,9,20,0.55);
+}
+
+/* ═══════════════════════════════════════════
+   COMMIT 7 · Profile panel (slide-in)
+   ═══════════════════════════════════════════ */
+.profile-panel-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 300;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.profile-panel-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.profile-panel {
+  position: fixed;
+  top: 0; bottom: 0;
+  inset-inline-start: 0;
+  width: 380px; max-width: 92vw;
+  background: linear-gradient(180deg, #181818 0%, #0b0b0b 100%);
+  border-inline-end: 1px solid rgba(255,255,255,0.1);
+  z-index: 301;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: flex; flex-direction: column;
+  box-shadow: 18px 0 60px rgba(0,0,0,0.5);
+}
+html[dir="rtl"] .profile-panel { transform: translateX(100%); }
+.profile-panel.open { transform: translateX(0); }
+
+.pp-head {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 12px;
+}
+.pp-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--nflx-red, #E50914), #7a0e12);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 22px; font-weight: 900;
+  box-shadow: 0 4px 14px rgba(229,9,20,0.35);
+}
+.pp-info { flex: 1; min-width: 0; }
+.pp-info-name { font-size: 15px; font-weight: 800; color: #fff; }
+.pp-info-email { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; word-break: break-all; }
+.pp-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: none; color: #fff;
+  font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit;
+}
+.pp-close:hover { background: rgba(229,9,20,0.3); }
+
+.pp-body { flex: 1; overflow-y: auto; padding: 16px 20px 8px; }
+
+.pp-section { margin-bottom: 20px; }
+.pp-section-title {
+  font-size: 10.5px; font-weight: 800;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase; letter-spacing: 1.8px;
+  margin-bottom: 10px;
+}
+
+.pp-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.pp-stat-cell {
+  padding: 12px 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  text-align: center;
+}
+.pp-stat-num {
+  font-size: 22px; font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+.pp-stat-label {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  margin-top: 6px;
+  letter-spacing: 0.3px;
+}
+
+.pp-streak {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(229,9,20,0.15), rgba(245,130,32,0.08));
+  border: 1px solid rgba(229,9,20,0.3);
+}
+.pp-streak-emoji { font-size: 28px; }
+.pp-streak-num {
+  font-size: 30px; font-weight: 900; color: #fff;
+  line-height: 1;
+}
+.pp-streak-label { font-size: 11px; color: rgba(255,255,255,0.7); }
+
+.pp-badges {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.pp-badge {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 6px; gap: 3px;
+  text-align: center;
+  position: relative;
+  cursor: default;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.pp-badge:hover { transform: scale(1.05); }
+.pp-badge.earned {
+  background: linear-gradient(135deg, rgba(245,197,24,0.18), rgba(229,9,20,0.08));
+  border-color: rgba(245,197,24,0.45);
+  box-shadow: 0 0 14px rgba(245,197,24,0.18);
+}
+.pp-badge.locked { opacity: 0.4; filter: grayscale(0.9); }
+.pp-badge-icon { font-size: 22px; line-height: 1; }
+.pp-badge-title {
+  font-size: 8.5px; font-weight: 800;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.pp-module {
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+}
+.pp-module-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11.5px; font-weight: 700;
+  color: rgba(255,255,255,0.92);
+  margin-bottom: 6px;
+}
+.pp-module-count {
+  font-size: 10px; color: rgba(255,255,255,0.55);
+  font-weight: 600;
+}
+.pp-module-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px; overflow: hidden;
+}
+.pp-module-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--nflx-red, #E50914), #ff6b6b);
+  border-radius: 3px;
+  transition: width 0.5s;
+}
+
+.pp-foot {
+  padding: 14px 20px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.pp-logout-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.pp-logout-btn:hover {
+  background: rgba(229,9,20,0.15);
+  border-color: var(--nflx-red, #E50914);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════
+   COMMIT 8 · Leaderboard row
+   ═══════════════════════════════════════════ */
+.leaderboard-row .rowTitle::before {
+  content: '🏆';
+  margin-inline-end: 8px;
+  font-size: 1em;
+}
+.leaderboard-card {
+  display: flex; align-items: center; gap: 14px;
+  width: 280px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(10,10,10,0.92));
+  border: 1px solid rgba(245,197,24,0.2);
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.leaderboard-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245,197,24,0.5);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 18px rgba(245,197,24,0.2);
+}
+.leaderboard-card[data-rank="1"] { border-color: rgba(245,197,24,0.55); box-shadow: 0 0 16px rgba(245,197,24,0.2); }
+.leaderboard-card[data-rank="2"] { border-color: rgba(200,200,210,0.4); }
+.leaderboard-card[data-rank="3"] { border-color: rgba(205,127,50,0.5); }
+
+.lb-rank {
+  font-family: 'Heebo', sans-serif;
+  font-size: 30px; font-weight: 900;
+  color: rgba(255,255,255,0.2);
+  line-height: 1;
+  min-width: 40px;
+  text-align: center;
+}
+.leaderboard-card[data-rank="1"] .lb-rank { color: #f5c518; }
+.leaderboard-card[data-rank="2"] .lb-rank { color: #c8c8d2; }
+.leaderboard-card[data-rank="3"] .lb-rank { color: #cd7f32; }
+
+.lb-body { flex: 1; min-width: 0; }
+.lb-name {
+  font-size: 13px; font-weight: 800;
+  color: #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lb-meta {
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 3px;
+  display: flex; align-items: center; gap: 8px;
+}
+.lb-meta b { color: rgba(255,255,255,0.88); font-weight: 900; }
+.lb-trend {
+  font-size: 10px; font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.lb-trend.up { color: #46d369; background: rgba(70,211,105,0.12); }
+.lb-trend.down { color: #ff6b6b; background: rgba(229,9,20,0.12); }
+.lb-trend.same { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
+
 .meta-layer {
   position: absolute;
   bottom: 22%;
@@ -467,16 +1213,17 @@ img { display: block; max-width: 100%; }
   transition: width 0.3s;
 }
 
-.boxart-1 { background: linear-gradient(135deg, #1a3a5c 0%, #0f1f33 100%); }
-.boxart-2 { background: linear-gradient(135deg, #5c1a3a 0%, #330f1f 100%); }
-.boxart-3 { background: linear-gradient(135deg, #3a5c1a 0%, #1f330f 100%); }
-.boxart-4 { background: linear-gradient(135deg, #5c3a1a 0%, #331f0f 100%); }
-.boxart-5 { background: linear-gradient(135deg, #3a1a5c 0%, #1f0f33 100%); }
-.boxart-6 { background: linear-gradient(135deg, #1a5c5c 0%, #0f3333 100%); }
-.boxart-7 { background: linear-gradient(135deg, #5c5c1a 0%, #33330f 100%); }
-.boxart-8 { background: linear-gradient(135deg, #5c1a1a 0%, #330f0f 100%); }
-.boxart-9 { background: linear-gradient(135deg, #2a2a5c 0%, #151533 100%); }
-.boxart-10 { background: linear-gradient(135deg, #5c2a5c 0%, #331533 100%); }
+/* Refined cinematic palette — muted, low-saturation tones */
+.boxart-1 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #1e3a5f 0%, #0a1628 100%); }
+.boxart-2 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #1d4226 0%, #0a1f11 100%); }
+.boxart-3 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #3d1f4a 0%, #14081a 100%); }
+.boxart-4 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #4a2e1d 0%, #1f1207 100%); }
+.boxart-5 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #1a4244 0%, #0a1f20 100%); }
+.boxart-6 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #3d1a3d 0%, #1a0a1a 100%); }
+.boxart-7 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #2a3544 0%, #0f141b 100%); }
+.boxart-8 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #4a1a22 0%, #1f0a0d 100%); }
+.boxart-9 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #304a6b 0%, #0e1c2c 100%); }
+.boxart-10 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #2d2d4a 0%, #12122a 100%); }
 
 .boxart-image::before {
   content: '';
@@ -751,6 +1498,150 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
     min-height: 48px;
   }
 }
+
+/* ═══════════════════════════════════════════
+   COMMIT 9 · Mobile Perfect (≤ 768px)
+   ═══════════════════════════════════════════ */
+.hamburger-btn {
+  display: none;
+  width: 42px; height: 42px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #fff;
+  align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  font-family: inherit;
+}
+.hamburger-btn svg { width: 22px; height: 22px; }
+.mobile-nav-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 400;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  flex-direction: column;
+  padding: 70px 24px 24px;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.mobile-nav-overlay.open { display: flex; opacity: 1; }
+.mobile-nav-overlay a {
+  display: block;
+  padding: 18px 14px;
+  font-size: 17px; font-weight: 700;
+  color: rgba(255,255,255,0.92);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  transition: color 0.2s, padding 0.2s;
+}
+.mobile-nav-overlay a:hover,
+.mobile-nav-overlay a.current {
+  color: var(--nflx-red, #E50914);
+  padding-inline-start: 22px;
+}
+.mobile-nav-close {
+  position: absolute; top: 18px; inset-inline-end: 18px;
+  width: 42px; height: 42px;
+  background: rgba(255,255,255,0.1);
+  border: none; border-radius: 50%; color: #fff;
+  font-size: 22px; cursor: pointer;
+  font-family: inherit;
+}
+
+@media (max-width: 768px) {
+  /* Nav */
+  .tabbed-primary-navigation { display: none; }
+  .hamburger-btn { display: flex; }
+  .logo { font-size: 0.8em; }
+  .main-header { padding: 0 14px; }
+  .secondary-navigation { gap: 6px; }
+  .streak-pill { padding: 5px 9px; font-size: 12px; }
+
+  /* Hero */
+  .billboard-row { padding-top: 0; min-height: 75vh; height: 75vh; }
+  .meta-layer {
+    bottom: 12% !important;
+    right: 20px; left: 20px;
+    max-width: none; min-width: 0;
+    text-align: center;
+    align-items: center !important;
+  }
+  .billboard-title { font-size: clamp(32px, 9vw, 54px) !important; text-align: center; }
+  .synopsis { font-size: 13.5px; text-align: center; }
+  .billboard-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+  .billboard-links .nflx-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Cards: 70vw + scroll-snap */
+  .rowContent {
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline-start: 16px;
+    padding-inline: 14px;
+    gap: 10px;
+  }
+  .slider-item {
+    flex: 0 0 70vw !important;
+    scroll-snap-align: start;
+  }
+  .row-header { padding-inline-end: 14px; gap: 10px; }
+  .row-progress {
+    width: 100%;
+    justify-content: space-between;
+    padding: 6px 12px;
+  }
+  .row-progress-bar { width: 80px; }
+
+  /* Card progress bar: thicker */
+  .card-progress { height: 4px; }
+
+  /* Profile panel → fullscreen */
+  .profile-panel {
+    width: 100vw; max-width: 100vw;
+    border-inline-end: none;
+  }
+
+  /* Notifications → bottom sheet */
+  .notif-dropdown {
+    position: fixed;
+    top: auto; bottom: 0;
+    inset-inline-start: 0; inset-inline-end: 0;
+    width: 100vw;
+    max-height: 70vh;
+    border-radius: 18px 18px 0 0;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-bottom: none;
+    box-shadow: 0 -20px 50px rgba(0,0,0,0.6);
+  }
+  .notif-dropdown.open {
+    animation: slideUpSheet 0.3s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  @keyframes slideUpSheet {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* Leaderboard card narrower */
+  .leaderboard-card { width: 65vw; }
+
+  /* Back-button + brand */
+  .nav-back-btn .back-label { display: none; }
+}
+
+@media (max-width: 480px) {
+  .billboard-title { font-size: clamp(28px, 10vw, 42px) !important; }
+  .pp-badges { grid-template-columns: repeat(3, 1fr); }
+  .pp-stat-num { font-size: 18px; }
+}
+
 </style>
 </head>
 <body>
@@ -763,22 +1654,42 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
   </a>
   <a href="dashboard.html" class="nav-back-btn" aria-label="חזור למסך הבחירה"><svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M8.46 2.29a1 1 0 0 1 1.42 0l8.53 8.53a1.67 1.67 0 0 1 0 2.36l-8.53 8.53a1 1 0 1 1-1.42-1.42L16.59 12 8.46 3.71a1 1 0 0 1 0-1.42"/></svg><span class="back-label">חזור למסך הבחירה</span></a>
 
+  <button class="hamburger-btn" id="hamburgerBtn" aria-label="תפריט">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+  </button>
+
   <ul class="tabbed-primary-navigation">
-    <li class="navigation-tab"><a href="#" class="current">דף הבית</a></li>
-    <li class="navigation-tab"><a href="#">קורסים</a></li>
-    <li class="navigation-tab"><a href="#">חדשים</a></li>
-    <li class="navigation-tab"><a href="#">הרשימה שלי</a></li>
-    <li class="navigation-tab"><a href="#">חיפוש לפי נושא</a></li>
+    <li class="navigation-tab"><a href="#" class="current" data-nav="home">דף הבית</a></li>
+    <li class="navigation-tab"><a href="#" data-nav="courses">קורסים</a></li>
+    <li class="navigation-tab"><a href="#" data-nav="new">חדשים</a></li>
+    <li class="navigation-tab"><a href="#" data-nav="mylist">הרשימה שלי</a></li>
+    <li class="navigation-tab"><a href="#" data-nav="search">חיפוש לפי נושא</a></li>
   </ul>
 
   <ul class="secondary-navigation">
     <li><button class="nav-icon-btn" aria-label="חיפוש">
       <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0m-1.38 7.03a9 9 0 1 1 1.41-1.41l5.68 5.67-1.42 1.42z" clip-rule="evenodd"/></svg>
     </button></li>
-    <li><button class="nav-icon-btn" aria-label="התראות">
-      <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M13 4.07A7 7 0 0 1 19 11v4.25q1.58.12 3.1.28l-.2 2a93 93 0 0 0-19.8 0l-.2-2q1.52-.15 3.1-.28V11a7 7 0 0 1 6-6.93V2h2zm4 11.06V11a5 5 0 0 0-10 0v4.13a97 97 0 0 1 10 0m-8.37 4.24C8.66 20.52 10.15 22 12 22s3.34-1.48 3.37-2.63c.01-.22-.2-.37-.42-.37h-5.9c-.23 0-.43.15-.42.37" clip-rule="evenodd"/></svg>
-    </button></li>
-    <li><div class="profile-icon" id="profileIcon">S</div></li>
+    <li class="notif-wrap">
+      <button class="nav-icon-btn" id="notifBtn" aria-label="התראות">
+        <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M13 4.07A7 7 0 0 1 19 11v4.25q1.58.12 3.1.28l-.2 2a93 93 0 0 0-19.8 0l-.2-2q1.52-.15 3.1-.28V11a7 7 0 0 1 6-6.93V2h2zm4 11.06V11a5 5 0 0 0-10 0v4.13a97 97 0 0 1 10 0m-8.37 4.24C8.66 20.52 10.15 22 12 22s3.34-1.48 3.37-2.63c.01-.22-.2-.37-.42-.37h-5.9c-.23 0-.43.15-.42.37" clip-rule="evenodd"/></svg>
+        <span class="notif-badge" id="notifBadge" data-count="0">0</span>
+      </button>
+      <div class="notif-dropdown" id="notifDropdown" role="menu">
+        <div class="notif-dropdown-head">
+          <h4>התראות · חדשים השבוע</h4>
+          <button class="notif-clear" id="notifClearBtn">סמן הכל כנקרא</button>
+        </div>
+        <div class="notif-list" id="notifList">
+          <div class="notif-empty">אין התראות חדשות</div>
+        </div>
+      </div>
+    </li>
+    <li><div class="streak-pill" id="streakPill" data-streak="0" title="ימים ברצף">
+      <span class="streak-pill-flame" aria-hidden="true">🔥</span>
+      <span class="streak-pill-count" id="streakCount">0</span>
+    </div></li>
+    <li><div class="profile-icon" id="profileIcon" title="התקדמות תצוף ליד כל תיקייה למטה">S</div></li>
   </ul>
 </div>
 
@@ -787,6 +1698,8 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
     <div class="hero-image"></div>
     <div class="trailer-vignette"></div>
     <div class="hero-vignette"></div>
+    <div class="hero-rtl-scrim" aria-hidden="true"></div>
+    <div class="hero-bottom-fade" aria-hidden="true"></div>
   </div>
 
   <div class="meta-layer">
@@ -842,6 +1755,53 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
   <span>😊 </span><span id="userNameDisplay"></span>
 </div>
 
+<!-- Profile Panel -->
+<div class="profile-panel-backdrop" id="profilePanelBackdrop"></div>
+<aside class="profile-panel" id="profilePanel" aria-hidden="true" aria-label="פרופיל">
+  <div class="pp-head">
+    <div class="pp-avatar" id="ppAvatar">S</div>
+    <div class="pp-info">
+      <div class="pp-info-name" id="ppName">משתמש</div>
+      <div class="pp-info-email" id="ppEmail">—</div>
+    </div>
+    <button class="pp-close" id="ppCloseBtn" aria-label="סגור">✕</button>
+  </div>
+  <div class="pp-body">
+    <section class="pp-section">
+      <div class="pp-section-title">סטטיסטיקות</div>
+      <div class="pp-stat-row">
+        <div class="pp-stat-cell"><div class="pp-stat-num" id="ppStatStarted">0</div><div class="pp-stat-label">הותחלו</div></div>
+        <div class="pp-stat-cell"><div class="pp-stat-num" id="ppStatCompleted">0</div><div class="pp-stat-label">הושלמו</div></div>
+        <div class="pp-stat-cell"><div class="pp-stat-num" id="ppStatWatchlist">0</div><div class="pp-stat-label">ברשימה</div></div>
+      </div>
+    </section>
+
+    <section class="pp-section">
+      <div class="pp-section-title">רצף</div>
+      <div class="pp-streak">
+        <span class="pp-streak-emoji">🔥</span>
+        <div>
+          <div class="pp-streak-num" id="ppStreakNum">0</div>
+          <div class="pp-streak-label">ימים ברצף</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pp-section">
+      <div class="pp-section-title">מדליות</div>
+      <div class="pp-badges" id="ppBadges"></div>
+    </section>
+
+    <section class="pp-section">
+      <div class="pp-section-title">התקדמות במודולים</div>
+      <div id="ppModules"></div>
+    </section>
+  </div>
+  <div class="pp-foot">
+    <button class="pp-logout-btn" id="ppLogoutBtn">יציאה</button>
+  </div>
+</aside>
+
 <script>
 const header = document.getElementById('mainHeader');
 window.addEventListener('scroll', () => {
@@ -872,6 +1832,848 @@ if (userEmail) {
   document.getElementById('profileIcon').textContent = userName.charAt(0).toUpperCase();
   localStorage.setItem('userEmail', userEmail);
 }
+
+/* ═══════════════════════════════════════════
+   PHASE 2B · localStorage foundation (per-user scoped)
+   ═══════════════════════════════════════════ */
+const ST_NS = userEmail ? `sta_${userEmail}` : 'sta_guest';
+const ST_KEYS = {
+  PROGRESS:          `${ST_NS}_progress`,          // { [videoId]: 0..100 }
+  WATCHLIST:         `${ST_NS}_watchlist`,         // [videoId, ...]
+  LAST_WATCHED:      `${ST_NS}_lastWatched`,       // { [videoId]: ISO timestamp }
+  STREAK:            `${ST_NS}_streak`,            // { count: N, lastLogin: "YYYY-MM-DD" }
+  BADGES:            `${ST_NS}_badges`,            // ["badge_id", ...]
+  NOTIFICATIONS_SEEN:`${ST_NS}_notifsSeen`,        // [videoId, ...]
+};
+
+function stGet(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    console.warn('stGet parse failed for', key, e);
+    return fallback;
+  }
+}
+function stSet(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch (e) {
+    console.warn('stSet failed for', key, e);
+  }
+}
+function stPush(key, val) {
+  const arr = stGet(key, []);
+  if (!Array.isArray(arr)) return;
+  if (!arr.includes(val)) { arr.push(val); stSet(key, arr); }
+}
+function stRemove(key, val) {
+  const arr = stGet(key, []);
+  if (!Array.isArray(arr)) return;
+  const i = arr.indexOf(val);
+  if (i >= 0) { arr.splice(i, 1); stSet(key, arr); }
+}
+function stHas(key, val) {
+  const arr = stGet(key, []);
+  return Array.isArray(arr) && arr.includes(val);
+}
+
+/* Initialize missing keys with empty defaults — idempotent, safe on every load */
+(function stInit() {
+  if (stGet(ST_KEYS.PROGRESS, null) === null) stSet(ST_KEYS.PROGRESS, {});
+  if (stGet(ST_KEYS.WATCHLIST, null) === null) stSet(ST_KEYS.WATCHLIST, []);
+  if (stGet(ST_KEYS.LAST_WATCHED, null) === null) stSet(ST_KEYS.LAST_WATCHED, {});
+  if (stGet(ST_KEYS.STREAK, null) === null) stSet(ST_KEYS.STREAK, { count: 0, lastLogin: null });
+  if (stGet(ST_KEYS.BADGES, null) === null) stSet(ST_KEYS.BADGES, []);
+  if (stGet(ST_KEYS.NOTIFICATIONS_SEEN, null) === null) stSet(ST_KEYS.NOTIFICATIONS_SEEN, []);
+})();
+
+/* Exposed on window for console debugging during dev */
+window.__sta = { ST_NS, ST_KEYS, stGet, stSet, stPush, stRemove, stHas };
+
+/* ═══════════════════════════════════════════
+   COMMIT 3 · Watch tracking (record lastWatched on card click)
+   ═══════════════════════════════════════════ */
+function trackVideoOpen(videoId, title) {
+  if (!videoId) return;
+  const lw = stGet(ST_KEYS.LAST_WATCHED, {});
+  lw[videoId] = { ts: Date.now(), title: title || '' };
+  stSet(ST_KEYS.LAST_WATCHED, lw);
+
+  // Seed a small progress so card shows the bar immediately
+  const pr = stGet(ST_KEYS.PROGRESS, {});
+  if (!pr[videoId] || pr[videoId] < 5) {
+    pr[videoId] = 5;
+    stSet(ST_KEYS.PROGRESS, pr);
+  }
+}
+
+// Delegated listener — captures any future card click (in addition to existing handlers)
+document.addEventListener('click', (e) => {
+  const container = e.target.closest('.title-card-container[data-video-id]');
+  if (!container) return;
+  const videoId = container.dataset.videoId;
+  const title = decodeURIComponent(container.dataset.videoTitle || '');
+  trackVideoOpen(videoId, title);
+}, true);
+
+/* ═══════════════════════════════════════════
+   COMMIT 3 · Continue Watching row (prepends after all rows load)
+   ═══════════════════════════════════════════ */
+function buildContinueWatchingRow() {
+  const lw = stGet(ST_KEYS.LAST_WATCHED, {});
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  const entries = Object.entries(lw)
+    .map(([id, meta]) => ({ id, title: (meta && meta.title) || '', ts: (meta && meta.ts) || 0, pct: progress[id] || 0 }))
+    .filter(e => e.id && e.ts > 0)
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, 10);
+
+  const container = document.getElementById('rowsContainer');
+  const existing = document.getElementById('continueWatchingRow');
+  if (existing) existing.remove();
+
+  if (entries.length === 0) return;
+
+  const cards = entries.map(e => `
+    <div class="slider-item">
+      <div class="title-card-container" data-video-id="${e.id}" data-video-title="${encodeURIComponent(e.title)}">
+        <div class="title-card">
+          <div class="boxart-container">
+            <div class="boxart-image boxart-1">
+              <div class="boxart-fallback" aria-hidden="true">
+                <span class="boxart-fallback-watermark">המשך</span>
+                <div class="boxart-fallback-play">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+                </div>
+                <div class="boxart-fallback-title">${e.title.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]))}</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-progress"><div class="card-progress-fill" style="width:${Math.min(100,Math.max(0,e.pct))}%"></div></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  const rowHtml = `
+    <section class="row continue-row" id="continueWatchingRow">
+      <div class="row-header">
+        <h2 class="rowTitle">המשך לצפות</h2>
+      </div>
+      <div class="row-container">
+        <div class="rowContent">${cards}</div>
+      </div>
+    </section>`;
+
+  container.insertAdjacentHTML('afterbegin', rowHtml);
+}
+
+// Build once at load + every 30s to catch new watches without full reload
+setTimeout(buildContinueWatchingRow, 1500);
+setInterval(buildContinueWatchingRow, 30000);
+
+/* ═══════════════════════════════════════════
+   COMMIT 3 · First-visit demo seed
+   Populates LAST_WATCHED with 4 real videos from the page so users
+   can SEE the feature immediately. Runs only if history is empty
+   (preserves real data afterwards).
+   ═══════════════════════════════════════════ */
+function seedDemoWatchHistory() {
+  const lw = stGet(ST_KEYS.LAST_WATCHED, {});
+  if (Object.keys(lw).length > 0) return;  // user already has real data
+
+  const cards = Array.from(document.querySelectorAll('.title-card-container[data-video-id]')).slice(0, 4);
+  if (cards.length === 0) return;
+
+  const progressValues = [72, 45, 18, 90];
+  const hoursAgo = [2, 8, 24, 72];
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  const lastWatched = {};
+
+  cards.forEach((card, i) => {
+    const id = card.dataset.videoId;
+    const title = decodeURIComponent(card.dataset.videoTitle || '');
+    if (!id) return;
+    lastWatched[id] = { ts: Date.now() - hoursAgo[i] * 3600000, title };
+    progress[id] = progressValues[i];
+  });
+
+  stSet(ST_KEYS.LAST_WATCHED, lastWatched);
+  stSet(ST_KEYS.PROGRESS, progress);
+  buildContinueWatchingRow();
+  // Force re-render of the rows containing seeded cards so their
+  // progress bars appear (since render is templated at build time)
+  document.querySelectorAll('.title-card-container[data-video-id]').forEach(card => {
+    const id = card.dataset.videoId;
+    const pct = progress[id];
+    if (!pct || pct <= 0) return;
+    if (card.querySelector('.card-progress')) return;
+    const titleCard = card.querySelector('.title-card');
+    if (!titleCard) return;
+    const bar = document.createElement('div');
+    bar.className = 'card-progress';
+    bar.innerHTML = `<div class="card-progress-fill" style="width:${Math.min(100,pct)}%"></div>`;
+    titleCard.appendChild(bar);
+  });
+}
+// Run after rows are likely rendered (Drive fetch takes time)
+setTimeout(seedDemoWatchHistory, 2500);
+
+/* ═══════════════════════════════════════════
+   COMMIT 4 · Overall progress pill
+   ═══════════════════════════════════════════ */
+function computeOverallProgress() {
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  const started = Object.values(progress).filter(p => p > 0).length;
+  const allCards = document.querySelectorAll('.title-card-container[data-video-id]');
+  // Dedupe by videoId (Continue Watching row copies cards)
+  const ids = new Set();
+  allCards.forEach(c => { if (c.dataset.videoId) ids.add(c.dataset.videoId); });
+  const total = ids.size;
+  const pct = total ? Math.round((started / total) * 100) : 0;
+  return { started, total, pct };
+}
+
+function renderOverallProgress() {
+  const icon = document.getElementById('profileIcon');
+  if (!icon) return;
+  const { started, total, pct } = computeOverallProgress();
+  icon.title = total > 0
+    ? `סה"כ: ${started} מתוך ${total} וידאוז הותחלו · ${pct}%`
+    : 'התקדמות תצוף ליד כל תיקייה למטה';
+}
+
+function renderRowProgress() {
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  document.querySelectorAll('.row').forEach(row => {
+    if (row.id === 'continueWatchingRow' || row.id === 'myListRow') return;
+    const header = row.querySelector('.row-header');
+    if (!header) return;
+    const cards = row.querySelectorAll('.title-card-container[data-video-id]');
+    if (cards.length === 0) return;
+    let started = 0;
+    cards.forEach(c => { if ((progress[c.dataset.videoId] || 0) > 0) started++; });
+    const pct = cards.length ? Math.round((started / cards.length) * 100) : 0;
+    let pill = header.querySelector('.row-progress');
+    if (!pill) {
+      pill = document.createElement('span');
+      pill.className = 'row-progress';
+      pill.innerHTML = `
+        <span class="row-progress-label">הותחלו <b></b>מתוך <b></b></span>
+        <div class="row-progress-bar"><div class="row-progress-fill"></div></div>
+        <span class="row-progress-pct"></span>
+      `;
+      header.appendChild(pill);
+    }
+    const boldEls = pill.querySelectorAll('.row-progress-label b');
+    boldEls[0].textContent = started;
+    boldEls[1].textContent = cards.length;
+    pill.querySelector('.row-progress-fill').style.width = pct + '%';
+    pill.querySelector('.row-progress-pct').textContent = pct + '%';
+    pill.classList.toggle('complete', started === cards.length && cards.length > 0);
+    pill.classList.toggle('empty', started === 0);
+  });
+}
+
+function renderAllProgress() {
+  renderOverallProgress();
+  renderRowProgress();
+}
+setTimeout(renderAllProgress, 2800);
+setInterval(renderAllProgress, 30000);
+
+/* ═══════════════════════════════════════════
+   COMMIT 4 · Toast notification
+   ═══════════════════════════════════════════ */
+function showToast(msg) {
+  let t = document.getElementById('staToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'staToast';
+    t.className = 'sta-toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ═══════════════════════════════════════════
+   COMMIT 4 · Watchlist toggle (delegated)
+   ═══════════════════════════════════════════ */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.watchlist-btn');
+  if (!btn) return;
+  e.stopPropagation(); e.preventDefault();
+  const id = btn.dataset.videoId;
+  if (!id) return;
+  const inList = stHas(ST_KEYS.WATCHLIST, id);
+  if (inList) {
+    stRemove(ST_KEYS.WATCHLIST, id);
+    showToast('הוסר מהרשימה שלי');
+  } else {
+    stPush(ST_KEYS.WATCHLIST, id);
+    showToast('✓ נוסף להרשימה שלי');
+  }
+  // Sync visual state across all copies of this card (rows + continue row)
+  document.querySelectorAll(`.watchlist-btn[data-video-id="${id}"]`).forEach(b => {
+    b.classList.toggle('in-list', !inList);
+    b.textContent = (!inList) ? '✓' : '+';
+  });
+}, true);
+
+/* ═══════════════════════════════════════════
+   COMMIT 4 · Nav filters
+   ═══════════════════════════════════════════ */
+function applyNavFilter(mode) {
+  const rows = document.querySelectorAll('.row, .billboard-row');
+  const allItems = document.querySelectorAll('.slider-item');
+  // Reset: show everything
+  document.querySelectorAll('.row').forEach(r => r.classList.remove('filter-hidden'));
+  allItems.forEach(i => i.classList.remove('filter-hidden'));
+  // Remove virtual "my list" row if present
+  const existingMyList = document.getElementById('myListRow');
+  if (existingMyList) existingMyList.remove();
+
+  if (mode === 'home') { return; }
+
+  if (mode === 'courses') {
+    document.querySelectorAll('.row').forEach(r => {
+      const t = (r.querySelector('.rowTitle')?.textContent || '').toLowerCase();
+      const match = t.includes('קורס') || t.includes('הדרכה') || t.includes('הדרכת');
+      if (!match && r.id !== 'continueWatchingRow') r.classList.add('filter-hidden');
+    });
+    return;
+  }
+
+  if (mode === 'new') {
+    const weekAgo = Date.now() - 7 * 24 * 3600 * 1000;
+    document.querySelectorAll('.slider-item').forEach(item => {
+      const card = item.querySelector('.title-card-container');
+      const m = card?.dataset.modified;
+      if (!m) { item.classList.add('filter-hidden'); return; }
+      const ts = new Date(m).getTime();
+      if (!isFinite(ts) || ts < weekAgo) item.classList.add('filter-hidden');
+    });
+    // Hide rows that have zero visible cards after filtering
+    document.querySelectorAll('.row').forEach(r => {
+      const vis = r.querySelectorAll('.slider-item:not(.filter-hidden)').length;
+      if (vis === 0) r.classList.add('filter-hidden');
+    });
+    return;
+  }
+
+  if (mode === 'mylist') {
+    const wl = new Set(stGet(ST_KEYS.WATCHLIST, []));
+    document.querySelectorAll('.row').forEach(r => r.classList.add('filter-hidden'));
+    if (wl.size === 0) {
+      showToast('הרשימה שלי ריקה · לחצי + על כרטיס');
+      return;
+    }
+    // Build virtual my-list row from cards
+    const container = document.getElementById('rowsContainer');
+    const uniqueById = new Map();
+    document.querySelectorAll('.title-card-container[data-video-id]').forEach(c => {
+      const id = c.dataset.videoId;
+      if (wl.has(id) && !uniqueById.has(id)) uniqueById.set(id, c.closest('.slider-item').cloneNode(true));
+    });
+    if (uniqueById.size === 0) return;
+    const rowHtml = `<section class="row my-list-row" id="myListRow">
+      <div class="row-header"><h2 class="rowTitle">הרשימה שלי · ${uniqueById.size} פריטים</h2></div>
+      <div class="row-container"><div class="rowContent"></div></div>
+    </section>`;
+    container.insertAdjacentHTML('afterbegin', rowHtml);
+    const rc = document.querySelector('#myListRow .rowContent');
+    uniqueById.forEach(node => rc.appendChild(node));
+    return;
+  }
+
+  if (mode === 'search') {
+    const q = prompt('חפשי וידאו לפי שם:', '');
+    if (q === null || q.trim() === '') {
+      applyNavFilter('home');
+      document.querySelectorAll('.navigation-tab a').forEach(a => a.classList.toggle('current', a.dataset.nav === 'home'));
+      return;
+    }
+    const qLower = q.toLowerCase();
+    document.querySelectorAll('.slider-item').forEach(item => {
+      const card = item.querySelector('.title-card-container');
+      const title = decodeURIComponent(card?.dataset.videoTitle || '').toLowerCase();
+      if (!title.includes(qLower)) item.classList.add('filter-hidden');
+    });
+    document.querySelectorAll('.row').forEach(r => {
+      const vis = r.querySelectorAll('.slider-item:not(.filter-hidden)').length;
+      if (vis === 0) r.classList.add('filter-hidden');
+    });
+    return;
+  }
+}
+
+document.addEventListener('click', (e) => {
+  const tab = e.target.closest('.navigation-tab a[data-nav]');
+  if (!tab) return;
+  e.preventDefault();
+  document.querySelectorAll('.navigation-tab a').forEach(a => a.classList.remove('current'));
+  tab.classList.add('current');
+  applyNavFilter(tab.dataset.nav);
+});
+
+/* ═══════════════════════════════════════════
+   COMMIT 5 · Streak system
+   ═══════════════════════════════════════════ */
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function yesterdayStr() {
+  const d = new Date(); d.setDate(d.getDate() - 1);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function updateStreak() {
+  const streak = stGet(ST_KEYS.STREAK, { count: 0, lastLogin: null });
+  const today = todayStr();
+  const yest = yesterdayStr();
+  if (streak.lastLogin === today) {
+    // same-day revisit, no change
+  } else if (streak.lastLogin === yest) {
+    streak.count = (streak.count || 0) + 1;
+    streak.lastLogin = today;
+  } else {
+    streak.count = 1;
+    streak.lastLogin = today;
+  }
+  stSet(ST_KEYS.STREAK, streak);
+  renderStreakPill();
+  return streak;
+}
+function renderStreakPill() {
+  const streak = stGet(ST_KEYS.STREAK, { count: 0 });
+  const pill = document.getElementById('streakPill');
+  const cnt = document.getElementById('streakCount');
+  if (!pill || !cnt) return;
+  pill.setAttribute('data-streak', String(streak.count || 0));
+  cnt.textContent = streak.count || 0;
+  pill.title = streak.count > 0 ? `${streak.count} ימים ברצף · המשיכי ככה!` : 'עוד אין רצף';
+}
+updateStreak();
+
+/* ═══════════════════════════════════════════
+   COMMIT 5 · Badges engine
+   ═══════════════════════════════════════════ */
+const BADGE_DEFS = {
+  first_video:  { icon: '🎬', title: 'צפייה ראשונה',      desc: 'התחלת לצפות!' },
+  week_streak:  { icon: '🔥', title: 'שבוע ברצף',         desc: '7 ימי חיבור רצופים' },
+  month_streak: { icon: '⚡', title: 'חודש ברצף',         desc: '30 ימי חיבור רצופים' },
+  module_HOM:   { icon: '💼', title: 'מודול HOM הושלם',   desc: 'השלמת את כל הזדמנויות עסקית' },
+  module_zoomim:{ icon: '🎥', title: 'זומים הושלם',       desc: 'השלמת את כל הזומים' },
+  early_bird:   { icon: '🌅', title: 'ציפור מוקדם',       desc: '5 צפיות לפני 9:00 בבוקר' },
+  marathon:     { icon: '🏃', title: 'מרתון',             desc: '3 וידאוז רצופים באותו יום' },
+};
+
+function computeBadges() {
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  const streak = stGet(ST_KEYS.STREAK, { count: 0 });
+  const lw = stGet(ST_KEYS.LAST_WATCHED, {});
+  const existing = new Set(stGet(ST_KEYS.BADGES, []));
+  const newly = [];
+
+  // first_video: any progress > 0
+  if (!existing.has('first_video') && Object.values(progress).some(p => p > 0)) newly.push('first_video');
+
+  // streaks
+  if (!existing.has('week_streak') && (streak.count || 0) >= 7) newly.push('week_streak');
+  if (!existing.has('month_streak') && (streak.count || 0) >= 30) newly.push('month_streak');
+
+  // marathon: 3 videos started in same calendar day
+  if (!existing.has('marathon')) {
+    const byDay = {};
+    Object.values(lw).forEach(e => {
+      if (!e || !e.ts) return;
+      const d = new Date(e.ts);
+      const key = d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+      byDay[key] = (byDay[key] || 0) + 1;
+    });
+    if (Object.values(byDay).some(n => n >= 3)) newly.push('marathon');
+  }
+
+  // early_bird: 5 LAST_WATCHED entries with hour < 9
+  if (!existing.has('early_bird')) {
+    const earlyCount = Object.values(lw).filter(e => {
+      if (!e || !e.ts) return false;
+      return new Date(e.ts).getHours() < 9;
+    }).length;
+    if (earlyCount >= 5) newly.push('early_bird');
+  }
+
+  // module completion: if a category has all cards with progress >= 90
+  if (!existing.has('module_HOM') || !existing.has('module_zoomim')) {
+    const byCat = {};
+    document.querySelectorAll('.title-card-container[data-video-id][data-category]').forEach(c => {
+      const cat = decodeURIComponent(c.dataset.category || '').toLowerCase();
+      if (!cat) return;
+      if (!byCat[cat]) byCat[cat] = { total: 0, done: 0 };
+      byCat[cat].total++;
+      if ((progress[c.dataset.videoId] || 0) >= 90) byCat[cat].done++;
+    });
+    Object.entries(byCat).forEach(([cat, s]) => {
+      if (s.total === 0 || s.done < s.total) return;
+      if (cat.includes('hom') && !existing.has('module_HOM')) newly.push('module_HOM');
+      if (cat.includes('זום') && !existing.has('module_zoomim')) newly.push('module_zoomim');
+    });
+  }
+
+  if (newly.length === 0) return [];
+  const updated = [...existing, ...newly];
+  stSet(ST_KEYS.BADGES, updated);
+  return newly;
+}
+
+function showBadgeToast(badgeId) {
+  const b = BADGE_DEFS[badgeId];
+  if (!b) return;
+  let t = document.getElementById('staToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'staToast';
+    t.className = 'sta-toast';
+    document.body.appendChild(t);
+  }
+  t.classList.add('badge-toast');
+  t.textContent = `${b.icon}  פתחת: ${b.title}`;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.classList.remove('badge-toast'), 500);
+  }, 3200);
+}
+
+function recomputeBadges() {
+  const newly = computeBadges();
+  newly.forEach((b, i) => setTimeout(() => showBadgeToast(b), i * 3600));
+}
+// Run once after rows + seed settle, then every 30s alongside progress renders
+setTimeout(recomputeBadges, 3500);
+setInterval(recomputeBadges, 30000);
+
+/* ═══════════════════════════════════════════
+   COMMIT 6 · Notifications (new videos, last 7d)
+   ═══════════════════════════════════════════ */
+function collectNewVideos() {
+  const weekAgo = Date.now() - 7 * 24 * 3600 * 1000;
+  const seen = new Set(stGet(ST_KEYS.NOTIFICATIONS_SEEN, []));
+  const cards = Array.from(document.querySelectorAll('.title-card-container[data-video-id]'));
+  const byId = new Map();
+  cards.forEach(c => {
+    const id = c.dataset.videoId;
+    if (!id || byId.has(id) || seen.has(id)) return;
+    const m = c.dataset.modified;
+    if (!m) return;
+    const ts = new Date(m).getTime();
+    if (!isFinite(ts) || ts < weekAgo) return;
+    const title = decodeURIComponent(c.dataset.videoTitle || '');
+    const cat = decodeURIComponent(c.dataset.category || '');
+    byId.set(id, { id, title, cat, ts });
+  });
+  return Array.from(byId.values()).sort((a, b) => b.ts - a.ts);
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  const badge = document.getElementById('notifBadge');
+  if (!list || !badge) return;
+  const items = collectNewVideos();
+  badge.setAttribute('data-count', String(items.length));
+  badge.textContent = items.length > 9 ? '9+' : String(items.length);
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="notif-empty">אין התראות חדשות</div>';
+    return;
+  }
+  list.innerHTML = items.map(it => {
+    const daysAgo = Math.floor((Date.now() - it.ts) / (24 * 3600 * 1000));
+    const whenLabel = daysAgo === 0 ? 'היום' : (daysAgo === 1 ? 'אתמול' : `לפני ${daysAgo} ימים`);
+    const safeTitle = (it.title || '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+    const safeCat = (it.cat || '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+    return `
+      <div class="notif-item" data-video-id="${it.id}" role="menuitem" tabindex="0">
+        <div class="notif-item-icon">▶</div>
+        <div class="notif-item-body">
+          <div class="notif-item-title">${safeTitle}</div>
+          <div class="notif-item-meta">${safeCat} · ${whenLabel}</div>
+        </div>
+        <div class="notif-item-dot" aria-hidden="true"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function markNotifSeen(videoId) {
+  if (!videoId) return;
+  stPush(ST_KEYS.NOTIFICATIONS_SEEN, videoId);
+  renderNotifications();
+}
+
+// Click bell → toggle dropdown
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('#notifBtn');
+  const dd = document.getElementById('notifDropdown');
+  if (btn && dd) {
+    e.stopPropagation();
+    dd.classList.toggle('open');
+    if (dd.classList.contains('open')) renderNotifications();
+    return;
+  }
+  const item = e.target.closest('.notif-item');
+  if (item && dd) {
+    const id = item.dataset.videoId;
+    markNotifSeen(id);
+    dd.classList.remove('open');
+    // Trigger click on the matching card (so existing openVideo logic fires)
+    const card = document.querySelector(`.title-card-container[data-video-id="${id}"]`);
+    if (card) card.click();
+    return;
+  }
+  const clear = e.target.closest('#notifClearBtn');
+  if (clear) {
+    e.stopPropagation();
+    const items = collectNewVideos();
+    items.forEach(it => stPush(ST_KEYS.NOTIFICATIONS_SEEN, it.id));
+    renderNotifications();
+    return;
+  }
+  // Click outside → close
+  if (dd && dd.classList.contains('open') && !e.target.closest('.notif-wrap')) {
+    dd.classList.remove('open');
+  }
+});
+
+// Initial render + refresh
+setTimeout(renderNotifications, 3000);
+setInterval(renderNotifications, 30000);
+
+/* ═══════════════════════════════════════════
+   COMMIT 7 · Profile panel
+   ═══════════════════════════════════════════ */
+function openProfilePanel() {
+  const panel = document.getElementById('profilePanel');
+  const back = document.getElementById('profilePanelBackdrop');
+  if (!panel || !back) return;
+  renderProfilePanel();
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden', 'false');
+  back.classList.add('open');
+}
+function closeProfilePanel() {
+  const panel = document.getElementById('profilePanel');
+  const back = document.getElementById('profilePanelBackdrop');
+  if (!panel || !back) return;
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
+  back.classList.remove('open');
+}
+
+function renderProfilePanel() {
+  // Header
+  const email = userEmail || '—';
+  const name = (email && email.split) ? email.split('@')[0] : 'משתמש';
+  const initial = (name.charAt(0) || 'S').toUpperCase();
+  document.getElementById('ppAvatar').textContent = initial;
+  document.getElementById('ppName').textContent = name;
+  document.getElementById('ppEmail').textContent = email;
+
+  // Stats
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  const started = Object.values(progress).filter(p => p > 0).length;
+  const completed = Object.values(progress).filter(p => p >= 90).length;
+  const watchlist = (stGet(ST_KEYS.WATCHLIST, []) || []).length;
+  document.getElementById('ppStatStarted').textContent = started;
+  document.getElementById('ppStatCompleted').textContent = completed;
+  document.getElementById('ppStatWatchlist').textContent = watchlist;
+
+  // Streak
+  const streak = stGet(ST_KEYS.STREAK, { count: 0 });
+  document.getElementById('ppStreakNum').textContent = streak.count || 0;
+
+  // Badges
+  const earned = new Set(stGet(ST_KEYS.BADGES, []));
+  const badgesHtml = Object.entries(BADGE_DEFS).map(([id, b]) => {
+    const isE = earned.has(id);
+    const safeTitle = b.title.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+    return `
+      <div class="pp-badge ${isE ? 'earned' : 'locked'}" title="${b.title} · ${b.desc}">
+        <div class="pp-badge-icon">${b.icon}</div>
+        <div class="pp-badge-title">${safeTitle}</div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('ppBadges').innerHTML = badgesHtml;
+
+  // Modules (per-folder)
+  const byCat = {};
+  document.querySelectorAll('.title-card-container[data-video-id][data-category]').forEach(c => {
+    const cat = decodeURIComponent(c.dataset.category || '');
+    if (!cat) return;
+    if (!byCat[cat]) byCat[cat] = { total: 0, done: 0 };
+    byCat[cat].total++;
+    if ((progress[c.dataset.videoId] || 0) > 0) byCat[cat].done++;
+  });
+  const modulesHtml = Object.entries(byCat).map(([cat, s]) => {
+    const pct = s.total ? Math.round((s.done / s.total) * 100) : 0;
+    const safeCat = cat.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+    return `
+      <div class="pp-module">
+        <div class="pp-module-head"><span>${safeCat}</span><span class="pp-module-count">${s.done}/${s.total}</span></div>
+        <div class="pp-module-bar"><div class="pp-module-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }).join('') || '<div class="notif-empty">אין עדיין נתונים</div>';
+  document.getElementById('ppModules').innerHTML = modulesHtml;
+}
+
+// Hook: click S icon opens panel
+document.addEventListener('click', (e) => {
+  const icon = e.target.closest('#profileIcon');
+  if (icon) { openProfilePanel(); return; }
+  const close = e.target.closest('#ppCloseBtn') || e.target.closest('#profilePanelBackdrop');
+  if (close) { closeProfilePanel(); return; }
+  const logout = e.target.closest('#ppLogoutBtn');
+  if (logout) {
+    if (confirm('לצאת מהחשבון? הנתונים המקומיים יישמרו.')) {
+      localStorage.removeItem('userEmail');
+      window.location.href = 'entry.html';
+    }
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeProfilePanel();
+});
+
+/* ═══════════════════════════════════════════
+   COMMIT 7 · Hero Play button — smart pick
+   Priority: featured.json → lastWatched → first card
+   ═══════════════════════════════════════════ */
+async function getHeroTarget() {
+  // 1. Try featured.json
+  try {
+    const res = await fetch('featured.json', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.featured_video_id) {
+        const weekTs = data.week_of ? new Date(data.week_of).getTime() : 0;
+        if (!weekTs || Date.now() - weekTs < 14 * 24 * 3600 * 1000) {
+          return { id: data.featured_video_id, source: 'featured' };
+        }
+      }
+    }
+  } catch (e) { /* file missing — fall through */ }
+  // 2. Last watched
+  const lw = stGet(ST_KEYS.LAST_WATCHED, {});
+  const last = Object.entries(lw).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0))[0];
+  if (last && last[0]) return { id: last[0], source: 'lastWatched' };
+  // 3. First visible card
+  const first = document.querySelector('.row:not(#continueWatchingRow) .title-card-container[data-video-id]');
+  if (first) return { id: first.dataset.videoId, source: 'first' };
+  return null;
+}
+async function heroPlayHandler() {
+  const target = await getHeroTarget();
+  if (!target) { scrollToRows(); return; }
+  const card = document.querySelector(`.title-card-container[data-video-id="${target.id}"]`);
+  if (card) { card.click(); return; }
+  // Target not visible — fallback scroll
+  scrollToRows();
+}
+// Rebind hero play button
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.nflx-btn.color-primary');
+  if (!btn) return;
+  e.preventDefault();
+  heroPlayHandler();
+}, true);
+
+/* ═══════════════════════════════════════════
+   COMMIT 8 · Leaderboard (Phase 2C mock)
+   ═══════════════════════════════════════════ */
+async function buildLeaderboardRow() {
+  try {
+    const res = await fetch('leaderboard.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const clubs = (data && data.clubs) || [];
+    if (!clubs.length) return;
+    const container = document.getElementById('rowsContainer');
+    if (!container) return;
+    // Remove existing leaderboard row (re-render safe)
+    const existing = document.getElementById('leaderboardRow');
+    if (existing) existing.remove();
+
+    const trendLabel = { up: '↑', down: '↓', same: '—' };
+    const trophy = (r) => r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : '';
+    const cards = clubs.map((c, i) => {
+      const rank = i + 1;
+      const safeName = (c.name || '').replace(/[<>&"']/g, ch => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[ch]));
+      const safeLeader = (c.leader || '').replace(/[<>&"']/g, ch => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[ch]));
+      const trend = c.trend || 'same';
+      return `
+        <div class="slider-item">
+          <div class="leaderboard-card" data-rank="${rank}">
+            <div class="lb-rank">${trophy(rank) || '#' + rank}</div>
+            <div class="lb-body">
+              <div class="lb-name">${safeName}</div>
+              <div class="lb-meta">
+                <span><b>${(c.points || 0).toLocaleString('he-IL')}</b> נק'</span>
+                <span>· ${safeLeader}</span>
+                <span class="lb-trend ${trend}">${trendLabel[trend]}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const weekLabel = data.week_of ? `· ${data.week_of}` : '';
+    const rowHtml = `
+      <section class="row leaderboard-row" id="leaderboardRow">
+        <div class="row-header">
+          <h2 class="rowTitle">הלוח של המועדונים ${weekLabel}</h2>
+        </div>
+        <div class="row-container">
+          <div class="rowContent">${cards}</div>
+        </div>
+      </section>
+    `;
+    container.insertAdjacentHTML('beforeend', rowHtml);
+  } catch (e) {
+    console.warn('leaderboard load failed', e);
+  }
+}
+setTimeout(buildLeaderboardRow, 2000);
+
+/* ═══════════════════════════════════════════
+   COMMIT 9 · Hamburger + mobile overlay
+   ═══════════════════════════════════════════ */
+document.addEventListener('click', (e) => {
+  const hb = e.target.closest('#hamburgerBtn');
+  const overlay = document.getElementById('mobileNavOverlay');
+  if (hb && overlay) { overlay.classList.add('open'); return; }
+  const close = e.target.closest('#mobileNavClose');
+  if (close && overlay) { overlay.classList.remove('open'); return; }
+  // Click link inside overlay → filter + close
+  const link = e.target.closest('.mobile-nav-overlay a[data-nav]');
+  if (link && overlay) {
+    e.preventDefault();
+    document.querySelectorAll('.mobile-nav-overlay a').forEach(a => a.classList.remove('current'));
+    link.classList.add('current');
+    // Sync desktop tabs
+    document.querySelectorAll('.navigation-tab a').forEach(a => a.classList.toggle('current', a.dataset.nav === link.dataset.nav));
+    applyNavFilter(link.dataset.nav);
+    overlay.classList.remove('open');
+  }
+});
 
 /* ═══════════════════════════════════════════
    GOOGLE DRIVE INTEGRATION
@@ -960,7 +2762,11 @@ function renderRow(folderName, files) {
 
   const cleanTitle = cleanFolderName(folderName);
   const cards = videos.map((f, i) => {
-    const boxartClass = boxartPalette[i % boxartPalette.length];
+    // Deterministic palette pick per video (hash of id+name — prevents neighbor color clashes)
+    const _hashInput = (f.id || '') + '|' + (f.name || '');
+    let _h = 0;
+    for (let _k = 0; _k < _hashInput.length; _k++) _h = ((_h << 5) - _h + _hashInput.charCodeAt(_k)) | 0;
+    const boxartClass = boxartPalette[Math.abs(_h) % boxartPalette.length];
     const title = f.name.replace(/\.(mp4|mov|avi|mkv)$/i, '').replace(/^Copy of\s*/i, '').trim();
     const thumbnail = f.thumbnailLink
       ? f.thumbnailLink.replace(/=s\d+$/, '=s1280')
@@ -971,11 +2777,19 @@ function renderRow(folderName, files) {
 
     return `
       <div class="slider-item">
-        <div class="title-card-container" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}">
+        <div class="title-card-container" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}" data-modified="${f.modifiedTime || ''}" data-category="${encodeURIComponent(cleanTitle || folderName || '')}">
+          <button type="button" class="watchlist-btn ${stHas(ST_KEYS.WATCHLIST, f.id) ? 'in-list' : ''}" data-video-id="${f.id}" aria-label="הוסף להרשימה שלי" title="הוסף להרשימה שלי">${stHas(ST_KEYS.WATCHLIST, f.id) ? '✓' : '+'}</button>
           <div class="title-card">
             <div class="boxart-container">
-              <div class="boxart-image ${thumbnail ? '' : boxartClass}" style="${thumbStyle}">
-                ${thumbnail ? '' : `<span class="boxart-label">${escapeHtml(title)}</span>`}
+              <div class="boxart-image ${boxartClass} ${thumbnail ? '' : 'no-thumb'}">
+                ${thumbnail ? `<img src="${thumbnail}" alt="${escapeHtml(title)}" loading="lazy" onload="if(!this.naturalWidth||!this.naturalHeight)this.closest('.boxart-image').classList.add('no-thumb')" onerror="this.closest('.boxart-image').classList.add('no-thumb')">` : ''}
+                <div class="boxart-fallback" aria-hidden="true">
+                  <span class="boxart-fallback-watermark">SUPER·TEAM</span>
+                  <div class="boxart-fallback-play">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+                  </div>
+                  <div class="boxart-fallback-title">${escapeHtml(title)}</div>
+                </div>
               </div>
             </div>
             <div class="card-overlay">
@@ -985,6 +2799,10 @@ function renderRow(folderName, files) {
                 <span>▶️ Drive</span>
               </div>
             </div>
+            ${(() => {
+              const _p = (stGet(ST_KEYS.PROGRESS, {}) || {})[f.id];
+              return (_p && _p > 0) ? `<div class="card-progress"><div class="card-progress-fill" style="width:${Math.min(100,Math.max(0,_p))}%"></div></div>` : '';
+            })()}
           </div>
         </div>
       </div>`;
@@ -1097,5 +2915,14 @@ document.addEventListener('keydown', e => {
 loadAcademy();
 </script>
 
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+  <button class="mobile-nav-close" id="mobileNavClose" aria-label="סגור">✕</button>
+  <a href="#" data-nav="home" class="current">דף הבית</a>
+  <a href="#" data-nav="courses">קורסים</a>
+  <a href="#" data-nav="new">חדשים</a>
+  <a href="#" data-nav="mylist">הרשימה שלי</a>
+  <a href="#" data-nav="search">חיפוש לפי נושא</a>
+</div>
 </body>
 </html>
