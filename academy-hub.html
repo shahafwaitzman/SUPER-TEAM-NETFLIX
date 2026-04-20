@@ -538,6 +538,37 @@ img { display: block; max-width: 100%; }
 .row-progress.empty { border-color: rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
 .row-progress.empty .row-progress-label b { color: rgba(255,255,255,0.4); }
 
+/* ═══════════════════════════════════════════
+   COMMIT 5 · Streak pill (next to profile)
+   ═══════════════════════════════════════════ */
+.streak-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(229,9,20,0.18), rgba(245,130,32,0.12));
+  border: 1px solid rgba(229,9,20,0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 13px; font-weight: 900;
+  color: #fff;
+  white-space: nowrap;
+  cursor: default;
+  transition: transform 0.2s;
+}
+.streak-pill:hover { transform: scale(1.04); }
+.streak-pill-flame {
+  font-size: 15px; line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(245,130,32,0.6));
+}
+.streak-pill-count { letter-spacing: 0.3px; }
+.streak-pill[data-streak="0"] { display: none; }
+
+/* Badge-earned toast variant */
+.sta-toast.badge-toast {
+  border-color: rgba(245,197,24,0.55);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 28px rgba(245,197,24,0.3);
+}
+
 .meta-layer {
   position: absolute;
   bottom: 22%;
@@ -1133,6 +1164,10 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
     <li><button class="nav-icon-btn" aria-label="התראות">
       <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M13 4.07A7 7 0 0 1 19 11v4.25q1.58.12 3.1.28l-.2 2a93 93 0 0 0-19.8 0l-.2-2q1.52-.15 3.1-.28V11a7 7 0 0 1 6-6.93V2h2zm4 11.06V11a5 5 0 0 0-10 0v4.13a97 97 0 0 1 10 0m-8.37 4.24C8.66 20.52 10.15 22 12 22s3.34-1.48 3.37-2.63c.01-.22-.2-.37-.42-.37h-5.9c-.23 0-.43.15-.42.37" clip-rule="evenodd"/></svg>
     </button></li>
+    <li><div class="streak-pill" id="streakPill" data-streak="0" title="ימים ברצף">
+      <span class="streak-pill-flame" aria-hidden="true">🔥</span>
+      <span class="streak-pill-count" id="streakCount">0</span>
+    </div></li>
     <li><div class="profile-icon" id="profileIcon" title="התקדמות תצוף ליד כל תיקייה למטה">S</div></li>
   </ul>
 </div>
@@ -1619,6 +1654,144 @@ document.addEventListener('click', (e) => {
 });
 
 /* ═══════════════════════════════════════════
+   COMMIT 5 · Streak system
+   ═══════════════════════════════════════════ */
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function yesterdayStr() {
+  const d = new Date(); d.setDate(d.getDate() - 1);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function updateStreak() {
+  const streak = stGet(ST_KEYS.STREAK, { count: 0, lastLogin: null });
+  const today = todayStr();
+  const yest = yesterdayStr();
+  if (streak.lastLogin === today) {
+    // same-day revisit, no change
+  } else if (streak.lastLogin === yest) {
+    streak.count = (streak.count || 0) + 1;
+    streak.lastLogin = today;
+  } else {
+    streak.count = 1;
+    streak.lastLogin = today;
+  }
+  stSet(ST_KEYS.STREAK, streak);
+  renderStreakPill();
+  return streak;
+}
+function renderStreakPill() {
+  const streak = stGet(ST_KEYS.STREAK, { count: 0 });
+  const pill = document.getElementById('streakPill');
+  const cnt = document.getElementById('streakCount');
+  if (!pill || !cnt) return;
+  pill.setAttribute('data-streak', String(streak.count || 0));
+  cnt.textContent = streak.count || 0;
+  pill.title = streak.count > 0 ? `${streak.count} ימים ברצף · המשיכי ככה!` : 'עוד אין רצף';
+}
+updateStreak();
+
+/* ═══════════════════════════════════════════
+   COMMIT 5 · Badges engine
+   ═══════════════════════════════════════════ */
+const BADGE_DEFS = {
+  first_video:  { icon: '🎬', title: 'צפייה ראשונה',      desc: 'התחלת לצפות!' },
+  week_streak:  { icon: '🔥', title: 'שבוע ברצף',         desc: '7 ימי חיבור רצופים' },
+  month_streak: { icon: '⚡', title: 'חודש ברצף',         desc: '30 ימי חיבור רצופים' },
+  module_HOM:   { icon: '💼', title: 'מודול HOM הושלם',   desc: 'השלמת את כל הזדמנויות עסקית' },
+  module_zoomim:{ icon: '🎥', title: 'זומים הושלם',       desc: 'השלמת את כל הזומים' },
+  early_bird:   { icon: '🌅', title: 'ציפור מוקדם',       desc: '5 צפיות לפני 9:00 בבוקר' },
+  marathon:     { icon: '🏃', title: 'מרתון',             desc: '3 וידאוז רצופים באותו יום' },
+};
+
+function computeBadges() {
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  const streak = stGet(ST_KEYS.STREAK, { count: 0 });
+  const lw = stGet(ST_KEYS.LAST_WATCHED, {});
+  const existing = new Set(stGet(ST_KEYS.BADGES, []));
+  const newly = [];
+
+  // first_video: any progress > 0
+  if (!existing.has('first_video') && Object.values(progress).some(p => p > 0)) newly.push('first_video');
+
+  // streaks
+  if (!existing.has('week_streak') && (streak.count || 0) >= 7) newly.push('week_streak');
+  if (!existing.has('month_streak') && (streak.count || 0) >= 30) newly.push('month_streak');
+
+  // marathon: 3 videos started in same calendar day
+  if (!existing.has('marathon')) {
+    const byDay = {};
+    Object.values(lw).forEach(e => {
+      if (!e || !e.ts) return;
+      const d = new Date(e.ts);
+      const key = d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();
+      byDay[key] = (byDay[key] || 0) + 1;
+    });
+    if (Object.values(byDay).some(n => n >= 3)) newly.push('marathon');
+  }
+
+  // early_bird: 5 LAST_WATCHED entries with hour < 9
+  if (!existing.has('early_bird')) {
+    const earlyCount = Object.values(lw).filter(e => {
+      if (!e || !e.ts) return false;
+      return new Date(e.ts).getHours() < 9;
+    }).length;
+    if (earlyCount >= 5) newly.push('early_bird');
+  }
+
+  // module completion: if a category has all cards with progress >= 90
+  if (!existing.has('module_HOM') || !existing.has('module_zoomim')) {
+    const byCat = {};
+    document.querySelectorAll('.title-card-container[data-video-id][data-category]').forEach(c => {
+      const cat = decodeURIComponent(c.dataset.category || '').toLowerCase();
+      if (!cat) return;
+      if (!byCat[cat]) byCat[cat] = { total: 0, done: 0 };
+      byCat[cat].total++;
+      if ((progress[c.dataset.videoId] || 0) >= 90) byCat[cat].done++;
+    });
+    Object.entries(byCat).forEach(([cat, s]) => {
+      if (s.total === 0 || s.done < s.total) return;
+      if (cat.includes('hom') && !existing.has('module_HOM')) newly.push('module_HOM');
+      if (cat.includes('זום') && !existing.has('module_zoomim')) newly.push('module_zoomim');
+    });
+  }
+
+  if (newly.length === 0) return [];
+  const updated = [...existing, ...newly];
+  stSet(ST_KEYS.BADGES, updated);
+  return newly;
+}
+
+function showBadgeToast(badgeId) {
+  const b = BADGE_DEFS[badgeId];
+  if (!b) return;
+  let t = document.getElementById('staToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'staToast';
+    t.className = 'sta-toast';
+    document.body.appendChild(t);
+  }
+  t.classList.add('badge-toast');
+  t.textContent = `${b.icon}  פתחת: ${b.title}`;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.classList.remove('badge-toast'), 500);
+  }, 3200);
+}
+
+function recomputeBadges() {
+  const newly = computeBadges();
+  newly.forEach((b, i) => setTimeout(() => showBadgeToast(b), i * 3600));
+}
+// Run once after rows + seed settle, then every 30s alongside progress renders
+setTimeout(recomputeBadges, 3500);
+setInterval(recomputeBadges, 30000);
+
+/* ═══════════════════════════════════════════
    GOOGLE DRIVE INTEGRATION
    ═══════════════════════════════════════════ */
 const DRIVE_CONFIG = {
@@ -1720,7 +1893,7 @@ function renderRow(folderName, files) {
 
     return `
       <div class="slider-item">
-        <div class="title-card-container" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}" data-modified="${f.modifiedTime || ''}">
+        <div class="title-card-container" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}" data-modified="${f.modifiedTime || ''}" data-category="${encodeURIComponent(cleanTitle || folderName || '')}">
           <button type="button" class="watchlist-btn ${stHas(ST_KEYS.WATCHLIST, f.id) ? 'in-list' : ''}" data-video-id="${f.id}" aria-label="הוסף להרשימה שלי" title="הוסף להרשימה שלי">${stHas(ST_KEYS.WATCHLIST, f.id) ? '✓' : '+'}</button>
           <div class="title-card">
             <div class="boxart-container">
