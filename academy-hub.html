@@ -1136,6 +1136,53 @@ setTimeout(buildContinueWatchingRow, 1500);
 setInterval(buildContinueWatchingRow, 30000);
 
 /* ═══════════════════════════════════════════
+   COMMIT 3 · First-visit demo seed
+   Populates LAST_WATCHED with 4 real videos from the page so users
+   can SEE the feature immediately. Runs only if history is empty
+   (preserves real data afterwards).
+   ═══════════════════════════════════════════ */
+function seedDemoWatchHistory() {
+  const lw = stGet(ST_KEYS.LAST_WATCHED, {});
+  if (Object.keys(lw).length > 0) return;  // user already has real data
+
+  const cards = Array.from(document.querySelectorAll('.title-card-container[data-video-id]')).slice(0, 4);
+  if (cards.length === 0) return;
+
+  const progressValues = [72, 45, 18, 90];
+  const hoursAgo = [2, 8, 24, 72];
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  const lastWatched = {};
+
+  cards.forEach((card, i) => {
+    const id = card.dataset.videoId;
+    const title = decodeURIComponent(card.dataset.videoTitle || '');
+    if (!id) return;
+    lastWatched[id] = { ts: Date.now() - hoursAgo[i] * 3600000, title };
+    progress[id] = progressValues[i];
+  });
+
+  stSet(ST_KEYS.LAST_WATCHED, lastWatched);
+  stSet(ST_KEYS.PROGRESS, progress);
+  buildContinueWatchingRow();
+  // Force re-render of the rows containing seeded cards so their
+  // progress bars appear (since render is templated at build time)
+  document.querySelectorAll('.title-card-container[data-video-id]').forEach(card => {
+    const id = card.dataset.videoId;
+    const pct = progress[id];
+    if (!pct || pct <= 0) return;
+    if (card.querySelector('.card-progress')) return;
+    const titleCard = card.querySelector('.title-card');
+    if (!titleCard) return;
+    const bar = document.createElement('div');
+    bar.className = 'card-progress';
+    bar.innerHTML = `<div class="card-progress-fill" style="width:${Math.min(100,pct)}%"></div>`;
+    titleCard.appendChild(bar);
+  });
+}
+// Run after rows are likely rendered (Drive fetch takes time)
+setTimeout(seedDemoWatchHistory, 2500);
+
+/* ═══════════════════════════════════════════
    GOOGLE DRIVE INTEGRATION
    ═══════════════════════════════════════════ */
 const DRIVE_CONFIG = {
