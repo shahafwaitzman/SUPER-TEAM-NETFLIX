@@ -219,36 +219,62 @@ img { display: block; max-width: 100%; }
 }
 .boxart-fallback {
   position: absolute; inset: 0; z-index: 1;
-  background:
-    radial-gradient(ellipse 120% 90% at 60% 40%, rgba(229,9,20,0.28), transparent 70%),
-    linear-gradient(135deg, #141414 0%, #3a0608 55%, #E50914 100%);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 14px; gap: 10px;
-  text-align: center;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 12px 14px 14px;
   color: #fff;
+  /* Dot-grid pattern overlay on top of card's gradient */
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 14px 14px;
 }
 .boxart-image.no-thumb img { display: none; }
 .boxart-image.no-thumb .boxart-fallback { z-index: 3; }
-.boxart-fallback-logo {
-  font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
-  font-size: 52px; font-weight: 900;
-  color: rgba(255,255,255,0.98);
+
+/* Watermark (top-right in LTR flow = visually "start" in RTL) */
+.boxart-fallback-watermark {
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.42);
   line-height: 1;
-  letter-spacing: 2px;
-  text-shadow: 0 4px 14px rgba(0,0,0,0.55);
-  background: linear-gradient(135deg, #fff, #e5e5e5);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent;
+  align-self: start; justify-self: start;
+  padding: 3px 7px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 3px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
+
+/* Central play icon — the focal element */
+.boxart-fallback-play {
+  align-self: center; justify-self: center;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,255,255,0.28);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.88);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  transition: transform 0.3s, background 0.3s;
+}
+.boxart-fallback-play svg { width: 22px; height: 22px; margin-inline-start: 3px; }
+.title-card-container:hover .boxart-fallback-play {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
+}
+
+/* Title at bottom */
 .boxart-fallback-title {
   font-size: 12px; font-weight: 700;
-  color: rgba(255,255,255,0.95);
-  line-height: 1.3;
-  max-height: 2.6em;
+  color: rgba(255,255,255,0.96);
+  line-height: 1.35;
+  max-height: 2.7em;
   overflow: hidden;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.55);
-  padding: 0 4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  align-self: end;
+  text-align: start;
 }
 
 .meta-layer {
@@ -534,16 +560,17 @@ img { display: block; max-width: 100%; }
   transition: width 0.3s;
 }
 
-.boxart-1 { background: linear-gradient(135deg, #1a3a5c 0%, #0f1f33 100%); }
-.boxart-2 { background: linear-gradient(135deg, #5c1a3a 0%, #330f1f 100%); }
-.boxart-3 { background: linear-gradient(135deg, #3a5c1a 0%, #1f330f 100%); }
-.boxart-4 { background: linear-gradient(135deg, #5c3a1a 0%, #331f0f 100%); }
-.boxart-5 { background: linear-gradient(135deg, #3a1a5c 0%, #1f0f33 100%); }
-.boxart-6 { background: linear-gradient(135deg, #1a5c5c 0%, #0f3333 100%); }
-.boxart-7 { background: linear-gradient(135deg, #5c5c1a 0%, #33330f 100%); }
-.boxart-8 { background: linear-gradient(135deg, #5c1a1a 0%, #330f0f 100%); }
-.boxart-9 { background: linear-gradient(135deg, #2a2a5c 0%, #151533 100%); }
-.boxart-10 { background: linear-gradient(135deg, #5c2a5c 0%, #331533 100%); }
+/* Refined cinematic palette — muted, low-saturation tones */
+.boxart-1 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #1e3a5f 0%, #0a1628 100%); }
+.boxart-2 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #1d4226 0%, #0a1f11 100%); }
+.boxart-3 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #3d1f4a 0%, #14081a 100%); }
+.boxart-4 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #4a2e1d 0%, #1f1207 100%); }
+.boxart-5 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #1a4244 0%, #0a1f20 100%); }
+.boxart-6 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #3d1a3d 0%, #1a0a1a 100%); }
+.boxart-7 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #2a3544 0%, #0f141b 100%); }
+.boxart-8 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #4a1a22 0%, #1f0a0d 100%); }
+.boxart-9 { background: radial-gradient(ellipse 120% 90% at 75% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #304a6b 0%, #0e1c2c 100%); }
+.boxart-10 { background: radial-gradient(ellipse 120% 90% at 25% 25%, rgba(255,255,255,0.1), transparent 55%), linear-gradient(135deg, #2d2d4a 0%, #12122a 100%); }
 
 .boxart-image::before {
   content: '';
@@ -1029,7 +1056,11 @@ function renderRow(folderName, files) {
 
   const cleanTitle = cleanFolderName(folderName);
   const cards = videos.map((f, i) => {
-    const boxartClass = boxartPalette[i % boxartPalette.length];
+    // Deterministic palette pick per video (hash of id + title — prevents neighbor color clashes)
+    const _hashInput = (f.id || '') + '|' + title;
+    let _h = 0;
+    for (let _k = 0; _k < _hashInput.length; _k++) _h = ((_h << 5) - _h + _hashInput.charCodeAt(_k)) | 0;
+    const boxartClass = boxartPalette[Math.abs(_h) % boxartPalette.length];
     const title = f.name.replace(/\.(mp4|mov|avi|mkv)$/i, '').replace(/^Copy of\s*/i, '').trim();
     const thumbnail = f.thumbnailLink
       ? f.thumbnailLink.replace(/=s\d+$/, '=s1280')
@@ -1043,10 +1074,13 @@ function renderRow(folderName, files) {
         <div class="title-card-container" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}">
           <div class="title-card">
             <div class="boxart-container">
-              <div class="boxart-image ${thumbnail ? '' : 'no-thumb'}">
+              <div class="boxart-image ${boxartClass} ${thumbnail ? '' : 'no-thumb'}">
                 ${thumbnail ? `<img src="${thumbnail}" alt="${escapeHtml(title)}" loading="lazy" onerror="this.closest('.boxart-image').classList.add('no-thumb')">` : ''}
                 <div class="boxart-fallback" aria-hidden="true">
-                  <div class="boxart-fallback-logo">S</div>
+                  <span class="boxart-fallback-watermark">SUPER·TEAM</span>
+                  <div class="boxart-fallback-play">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
+                  </div>
                   <div class="boxart-fallback-title">${escapeHtml(title)}</div>
                 </div>
               </div>
