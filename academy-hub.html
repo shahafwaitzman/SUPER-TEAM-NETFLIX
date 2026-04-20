@@ -426,6 +426,99 @@ img { display: block; max-width: 100%; }
 .row.filter-hidden,
 .slider-item.filter-hidden { display: none !important; }
 
+/* ═══════════════════════════════════════════
+   COMMIT 4 REFINE · Profile ring + Per-row progress
+   ═══════════════════════════════════════════ */
+
+/* Profile avatar with progress ring */
+.profile-wrap {
+  position: relative;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.profile-ring {
+  position: absolute; inset: 0;
+  width: 44px; height: 44px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.profile-ring circle {
+  fill: none;
+  stroke-width: 2.2;
+}
+.profile-ring .pr-bg {
+  stroke: rgba(255,255,255,0.15);
+}
+.profile-ring .pr-fill {
+  stroke: #E50914;
+  stroke-linecap: round;
+  stroke-dasharray: 119.38;  /* 2πr · r=19 */
+  stroke-dashoffset: 119.38;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 0 6px rgba(229,9,20,0.55));
+}
+.profile-wrap .profile-icon {
+  width: 32px; height: 32px;
+}
+.profile-wrap::after {
+  content: attr(data-count);
+  position: absolute;
+  bottom: -4px; inset-inline-end: -4px;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #E50914;
+  color: #fff;
+  font-size: 9px; font-weight: 900;
+  letter-spacing: 0.3px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+}
+.profile-wrap[data-count]:not([data-count=""])::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Per-row progress indicator next to row title */
+.row-progress {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-inline-start: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 10px;
+  vertical-align: middle;
+}
+.row-progress-count {
+  color: rgba(255,255,255,0.85);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.row-progress-bar {
+  width: 60px; height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.row-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #E50914, #ff6b6b);
+  border-radius: 2px;
+  box-shadow: 0 0 5px rgba(229,9,20,0.5);
+  transition: width 0.6s cubic-bezier(0.2,0.8,0.2,1);
+}
+.row-progress.complete .row-progress-count { color: #46d369; }
+.row-progress.complete .row-progress-fill { background: linear-gradient(90deg, #46d369, #22c55e); box-shadow: 0 0 5px rgba(70,211,105,0.5); }
+.row-header { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+
 .meta-layer {
   position: absolute;
   bottom: 22%;
@@ -1015,18 +1108,19 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
   </ul>
 
   <ul class="secondary-navigation">
-    <li id="overallProgressWrap" class="overall-progress-pill" style="display:none;" title="וידאוז שהותחלו">
-      <span class="op-caption">התקדמות</span>
-      <span class="op-label" id="opLabel">0/0</span>
-      <div class="op-bar"><div class="op-fill" id="opFill" style="width:0%"></div></div>
-    </li>
     <li><button class="nav-icon-btn" aria-label="חיפוש">
       <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0m-1.38 7.03a9 9 0 1 1 1.41-1.41l5.68 5.67-1.42 1.42z" clip-rule="evenodd"/></svg>
     </button></li>
     <li><button class="nav-icon-btn" aria-label="התראות">
       <svg viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M13 4.07A7 7 0 0 1 19 11v4.25q1.58.12 3.1.28l-.2 2a93 93 0 0 0-19.8 0l-.2-2q1.52-.15 3.1-.28V11a7 7 0 0 1 6-6.93V2h2zm4 11.06V11a5 5 0 0 0-10 0v4.13a97 97 0 0 1 10 0m-8.37 4.24C8.66 20.52 10.15 22 12 22s3.34-1.48 3.37-2.63c.01-.22-.2-.37-.42-.37h-5.9c-.23 0-.43.15-.42.37" clip-rule="evenodd"/></svg>
     </button></li>
-    <li><div class="profile-icon" id="profileIcon">S</div></li>
+    <li class="profile-wrap" id="profileWrap" title="התקדמות">
+      <svg class="profile-ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="19" class="pr-bg"/>
+        <circle cx="22" cy="22" r="19" class="pr-fill" id="profileRingFill"/>
+      </svg>
+      <div class="profile-icon" id="profileIcon">S</div>
+    </li>
   </ul>
 </div>
 
@@ -1327,17 +1421,52 @@ function computeOverallProgress() {
 }
 
 function renderOverallProgress() {
-  const wrap = document.getElementById('overallProgressWrap');
+  const wrap = document.getElementById('profileWrap');
   if (!wrap) return;
   const { started, total, pct } = computeOverallProgress();
-  if (total === 0) { wrap.style.display = 'none'; return; }
-  wrap.style.display = 'flex';
-  document.getElementById('opLabel').textContent = `${started}/${total}`;
-  document.getElementById('opFill').style.width = pct + '%';
+  if (total === 0) { wrap.removeAttribute('data-count'); return; }
+  const fill = document.getElementById('profileRingFill');
+  if (fill) {
+    const circ = 119.38;  // 2πr, r=19
+    fill.style.strokeDashoffset = circ * (1 - pct / 100);
+  }
+  wrap.setAttribute('data-count', started > 0 ? String(started) : '');
   wrap.title = `${started} וידאוז הותחלו מתוך ${total} · ${pct}%`;
 }
-setTimeout(renderOverallProgress, 2800);
-setInterval(renderOverallProgress, 30000);
+
+function renderRowProgress() {
+  const progress = stGet(ST_KEYS.PROGRESS, {});
+  document.querySelectorAll('.row').forEach(row => {
+    if (row.id === 'continueWatchingRow' || row.id === 'myListRow') return;
+    const header = row.querySelector('.row-header');
+    if (!header) return;
+    const cards = row.querySelectorAll('.title-card-container[data-video-id]');
+    if (cards.length === 0) return;
+    let started = 0;
+    cards.forEach(c => { if ((progress[c.dataset.videoId] || 0) > 0) started++; });
+    const pct = cards.length ? Math.round((started / cards.length) * 100) : 0;
+    let pill = header.querySelector('.row-progress');
+    if (!pill) {
+      pill = document.createElement('span');
+      pill.className = 'row-progress';
+      pill.innerHTML = `
+        <span class="row-progress-count"></span>
+        <div class="row-progress-bar"><div class="row-progress-fill"></div></div>
+      `;
+      header.appendChild(pill);
+    }
+    pill.querySelector('.row-progress-count').textContent = `${started}/${cards.length}`;
+    pill.querySelector('.row-progress-fill').style.width = pct + '%';
+    pill.classList.toggle('complete', started === cards.length && cards.length > 0);
+  });
+}
+
+function renderAllProgress() {
+  renderOverallProgress();
+  renderRowProgress();
+}
+setTimeout(renderAllProgress, 2800);
+setInterval(renderAllProgress, 30000);
 
 /* ═══════════════════════════════════════════
    COMMIT 4 · Toast notification
