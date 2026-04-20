@@ -1056,8 +1056,8 @@ function renderRow(folderName, files) {
 
   const cleanTitle = cleanFolderName(folderName);
   const cards = videos.map((f, i) => {
-    // Deterministic palette pick per video (hash of id + title — prevents neighbor color clashes)
-    const _hashInput = (f.id || '') + '|' + title;
+    // Deterministic palette pick per video (hash of id+name — prevents neighbor color clashes)
+    const _hashInput = (f.id || '') + '|' + (f.name || '');
     let _h = 0;
     for (let _k = 0; _k < _hashInput.length; _k++) _h = ((_h << 5) - _h + _hashInput.charCodeAt(_k)) | 0;
     const boxartClass = boxartPalette[Math.abs(_h) % boxartPalette.length];
