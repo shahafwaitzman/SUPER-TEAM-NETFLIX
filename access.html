@@ -331,6 +331,21 @@ select option { background: #141414; color: #fff; }
 </head>
 <body>
 
+<script>
+// Auto-login: if user already logged in on this device, skip the form
+(function autoRedirect() {
+  try {
+    const savedEmail = localStorage.getItem('userEmail');
+    const savedAt = parseInt(localStorage.getItem('userEmailSavedAt') || '0', 10);
+    // Expire after 60 days of inactivity (optional safety)
+    const ageDays = (Date.now() - savedAt) / (1000 * 60 * 60 * 24);
+    if (savedEmail && ageDays < 60) {
+      window.location.replace('dashboard.html?user=' + encodeURIComponent(savedEmail));
+    }
+  } catch (e) { /* ignore — show form */ }
+})();
+</script>
+
 <div class="main-header">
   <a href="entry.html" class="logo" aria-label="Academy">
     <span class="logo-super">SUPER TEAM</span>
@@ -402,6 +417,9 @@ async function verify() {
           user.email === email &&
           user.tab === tab &&
           user.status === 'approved') {
+        // Auto-login: remember this user so future visits skip the form
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userEmailSavedAt', Date.now().toString());
         document.getElementById('message').style.display = 'none';
         window.location.href = 'dashboard.html?user=' + encodeURIComponent(email);
         return;

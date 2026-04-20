@@ -398,6 +398,21 @@ body::after {
 </head>
 <body>
 
+<script>
+// Auto-login: if user already logged in on this device, skip the form
+(function autoRedirect() {
+  try {
+    const savedEmail = localStorage.getItem('userEmail');
+    const savedAt = parseInt(localStorage.getItem('userEmailSavedAt') || '0', 10);
+    // Expire after 60 days of inactivity (optional safety)
+    const ageDays = (Date.now() - savedAt) / (1000 * 60 * 60 * 24);
+    if (savedEmail && ageDays < 60) {
+      window.location.replace('dashboard.html?user=' + encodeURIComponent(savedEmail));
+    }
+  } catch (e) { /* ignore — show form */ }
+})();
+</script>
+
 <div class="main-header">
   <a href="#" class="logo" aria-label="Academy">
     <span class="logo-super">SUPER TEAM</span>
