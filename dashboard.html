@@ -173,9 +173,9 @@ body::after {
 /* Choice cards */
 .choice-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-  gap: 32px;
-  max-width: 1200px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1400px;
   width: 100%;
   margin-top: 20px;
   animation: fadeInUp 1s 0.2s both cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -273,9 +273,9 @@ body::after {
 
 .choice-content {
   position: relative; z-index: 3;
-  padding: 32px 28px;
+  padding: clamp(18px, 2vw, 30px) clamp(16px, 1.8vw, 26px);
   display: flex; flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .choice-badge {
@@ -293,16 +293,17 @@ body::after {
 
 .choice-title {
   font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-size: 32px;
+  font-size: clamp(22px, 2.4vw, 32px);
   font-weight: 900;
   letter-spacing: 1px;
   text-transform: uppercase;
   text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  line-height: 1.1;
 }
 
 .choice-description {
-  font-size: 14px;
-  color: rgba(255,255,255,0.85);
+  font-size: clamp(12px, 1.05vw, 14px);
+  color: rgba(255,255,255,0.88);
   line-height: 1.5;
   margin-bottom: 8px;
   text-shadow: 0 1px 4px rgba(0,0,0,0.8);
@@ -337,15 +338,26 @@ body::after {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .main-header { padding: 0 16px; }
-  .dashboard-container { padding: calc(var(--nflx-header-height) + 20px) 16px 40px; gap: 32px; }
-  .welcome-section { margin-top: 12px; }
-  .choice-grid { grid-template-columns: 1fr; gap: 20px; }
-  .choice-card { aspect-ratio: 16 / 10; max-height: 320px; }
+/* Responsive — keep 3 in a row on desktop/laptop, stack on tablet+mobile */
+@media (max-width: 900px) {
+  .choice-grid { grid-template-columns: 1fr; gap: 16px; max-width: 520px; }
+  .choice-card { aspect-ratio: 16 / 10; max-height: 280px; }
   .choice-icon { font-size: 80px; top: 38%; }
   .choice-title { font-size: 26px; }
+  .choice-description { font-size: 13.5px; }
+  .choice-content { padding: 22px 20px; }
+}
+@media (max-width: 768px) {
+  .main-header { padding: 0 16px; }
+  .dashboard-container { padding: calc(var(--nflx-header-height) + 20px) 16px 40px; gap: 28px; }
+  .welcome-section { margin-top: 12px; }
+  .choice-card { aspect-ratio: 16 / 10; max-height: 260px; }
+  .choice-cta { padding: 9px 18px; font-size: 13px; }
+}
+@media (max-width: 420px) {
+  .choice-card { aspect-ratio: 4 / 3; max-height: 240px; }
+  .choice-title { font-size: 22px; }
+  .choice-icon { font-size: 64px; }
 }
 
 
