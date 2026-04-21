@@ -3000,7 +3000,8 @@ function rebuildHeroFromLatest() {
   // Wire the Play button to open this specific video
   window.__latestVideoId = id;
 }
-setTimeout(rebuildHeroFromLatest, 2200);
+// Triggered from inside loadAcademy() → attachHandlers() so we know cards exist
+window.__rebuildHeroFromLatest = rebuildHeroFromLatest;
 
 /* ═══════════════════════════════════════════
    PHASE 3 P2 · "סיימתי" button wiring
@@ -3590,6 +3591,10 @@ async function loadAcademy() {
 }
 
 function attachHandlers() {
+  // Call latest-video hero rebuild as soon as cards are in DOM
+  if (typeof window.__rebuildHeroFromLatest === 'function') {
+    try { window.__rebuildHeroFromLatest(); } catch (e) { console.warn('rebuildHero failed', e); }
+  }
   // Carousel scroll arrows
   document.querySelectorAll('.row-container').forEach(container => {
     const content = container.querySelector('.rowContent');
