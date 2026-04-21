@@ -347,113 +347,7 @@ body::after {
   }
 }
 
-/* ═════ Shared Super Team Nav (unified across projects) ═════ */
-.st-nav-root {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 1000; height: 68px;
-  display: flex; align-items: center;
-  padding: 0 4%;
-  gap: 12px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
-  font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
-}
-.st-logo {
-  display: inline-flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-decoration: none; user-select: none;
-  line-height: 1;
-  flex-shrink: 0;
-}
-.st-logo .logo-super {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-weight: 900; font-size: 11px;
-  color: #fff; letter-spacing: 2px;
-}
-.st-logo .logo-line {
-  width: 44px; height: 1.5px;
-  background: linear-gradient(to right, transparent 0%, #fff 50%, transparent 100%);
-  margin: 4px 0; border-radius: 2px;
-  box-shadow: 0 0 6px rgba(255,255,255,0.5);
-}
-.st-logo .logo-academy {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-weight: 900; font-size: 18px;
-  color: #E50914; letter-spacing: 1.5px;
-  text-shadow: 0 2px 8px rgba(229,9,20,0.5);
-}
 
-/* Uniform action buttons */
-.st-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.9);
-  font-family: inherit; font-size: 12.5px; font-weight: 700;
-  cursor: pointer; text-decoration: none;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-.st-btn:hover {
-  background: rgba(229,9,20,0.18);
-  border-color: rgba(229,9,20,0.5);
-  color: #fff;
-}
-.st-btn.primary {
-  background: linear-gradient(135deg, #E50914, #B9090B);
-  border-color: transparent;
-  color: #fff;
-}
-.st-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(229,9,20,0.4); }
-.st-btn svg { width: 14px; height: 14px; fill: currentColor; }
-
-.st-nav-spacer { flex: 1; }
-
-.st-hamburger {
-  width: 40px; height: 40px;
-  display: none; align-items: center; justify-content: center;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px;
-  color: #fff; cursor: pointer;
-  font-family: inherit;
-  padding: 0;
-}
-.st-hamburger svg { width: 20px; height: 20px; }
-
-.st-mobile-menu {
-  display: none;
-  position: fixed; top: 68px;
-  inset-inline-start: 0; inset-inline-end: 0;
-  background: rgba(0,0,0,0.96);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 999;
-  padding: 16px;
-  flex-direction: column; gap: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  animation: stSlideDown 0.25s ease;
-}
-@keyframes stSlideDown {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.st-mobile-menu.open { display: flex; }
-.st-mobile-menu a { padding: 14px; }
-
-@media (max-width: 768px) {
-  .st-nav-root { padding: 0 4%; height: 60px; }
-  .st-mobile-menu { top: 60px; }
-  .st-desktop-only { display: none !important; }
-  .st-hamburger { display: inline-flex; }
-  .st-logo .logo-academy { font-size: 16px; }
-  .st-logo .logo-super { font-size: 10px; }
-}
-
-/* Offset body content so fixed nav doesn't overlap */
-body.st-nav-installed { padding-top: 0; }
-/* ═════ /Shared Super Team Nav ═════ */
 
 
 
@@ -488,7 +382,9 @@ body.stn-bg-hero::after {
    has its own billboard) — those opt-out by not adding the class */
 /* ═════ /Shared hero background ═════ */
 
-/* ═════ Super Team Unified Nav v3 — retention-style tabs ═════ */
+
+
+/* ═════ Super Team Unified Nav v4 (final) ═════ */
 :root {
   --stn-bg:     #0a0a0a;
   --stn-red:    #E50914;
@@ -504,7 +400,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   z-index: 1000;
   height: 68px;
   display: flex; align-items: center;
-  gap: 10px;
+  gap: 16px;
   padding: 0 24px;
   background: rgba(10,10,10,0.88);
   backdrop-filter: blur(14px);
@@ -513,14 +409,11 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
   direction: rtl;
 }
-.stn-bar.scrolled {
-  background: rgba(10,10,10,0.96);
-  box-shadow: 0 2px 14px rgba(0,0,0,0.35);
-}
+.stn-bar.scrolled { background: rgba(10,10,10,0.97); }
 
-/* Logo — right side (RTL start), unchanged visual */
+/* Logo — RTL start (right side) */
 .stn-logo {
-  order: 0; flex-shrink: 0;
+  flex-shrink: 0;
   display: inline-flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-decoration: none; user-select: none;
@@ -535,52 +428,57 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   width: 44px; height: 1.5px;
   background: linear-gradient(to right, transparent, #fff, transparent);
   margin: 3px 0; border-radius: 2px;
-  box-shadow: 0 0 6px rgba(255,255,255,0.45);
 }
 .stn-logo .stn-logo-brand {
   font-family: 'Bebas Neue', 'Heebo', sans-serif;
   font-weight: 900; font-size: 19px;
   color: var(--stn-red); letter-spacing: 1.6px;
-  text-shadow: 0 2px 8px rgba(229,9,20,0.5);
+  text-shadow: 0 2px 8px rgba(229,9,20,0.45);
 }
 
-.stn-spacer { flex: 1; }
-
-/* Actions on the left (RTL end) — text-style buttons */
-.stn-actions {
+/* Middle: tabs (optional per page) */
+.stn-tabs {
+  flex: 1;
   display: inline-flex; align-items: center;
   gap: 4px;
-  order: 2;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.stn-tabs::-webkit-scrollbar { display: none; }
 
-/* Text-style link/button (for קודם / דף הבית and inline tabs) */
-.stn-link {
+/* Tab / link — plain text with subtle hover, active = solid red */
+.stn-tab {
   display: inline-flex; align-items: center;
   gap: 6px;
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 7px 14px;
+  border-radius: 7px;
   background: transparent;
   border: none;
   color: var(--stn-text);
-  font-family: inherit; font-size: 14px; font-weight: 500;
+  font-family: inherit;
+  font-size: 14px; font-weight: 500;
   cursor: pointer; text-decoration: none;
   transition: color 0.15s, background 0.15s;
   white-space: nowrap;
 }
-.stn-link:hover {
-  color: #fff;
-  background: var(--stn-hover);
-}
-.stn-link.active,
-.stn-link[aria-current="page"] {
+.stn-tab:hover { color: #fff; background: var(--stn-hover); }
+.stn-tab.active,
+.stn-tab[aria-current="page"] {
   background: var(--stn-red);
   color: #fff;
   font-weight: 600;
 }
-.stn-link svg { width: 14px; height: 14px; fill: currentColor; }
+.stn-tab svg { width: 14px; height: 14px; fill: currentColor; }
 
-/* Hamburger — circular, subtle */
-.stn-ham-wrap { position: relative; order: 2; }
+/* Right side action cluster (RTL end) */
+.stn-actions {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center;
+  gap: 2px;
+}
+
+/* Hamburger button */
+.stn-ham-wrap { position: relative; }
 .stn-ham-btn {
   width: 38px; height: 38px;
   display: inline-flex; align-items: center; justify-content: center;
@@ -592,10 +490,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   transition: all 0.15s;
   padding: 0;
 }
-.stn-ham-btn:hover {
-  background: var(--stn-hover);
-  color: #fff;
-}
+.stn-ham-btn:hover { background: var(--stn-hover); color: #fff; }
 .stn-ham-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
 .stn-ham-menu {
@@ -612,11 +507,6 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   padding: 8px 0;
   display: none; flex-direction: column;
   z-index: 1100;
-  animation: stnFade 0.18s ease;
-}
-@keyframes stnFade {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 .stn-ham-menu.open { display: flex; }
 .stn-ham-header {
@@ -647,39 +537,38 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   color: var(--stn-red);
   margin-inline-start: auto;
 }
-.stn-ham-divider {
-  height: 1px; background: var(--stn-border); margin: 6px 0;
-}
+.stn-ham-divider { height: 1px; background: var(--stn-border); margin: 6px 0; }
 
-/* Responsive */
 @media (max-width: 900px) {
-  .stn-bar { gap: 6px; padding: 0 14px; height: 60px; }
+  .stn-bar { gap: 8px; padding: 0 14px; height: 60px; }
   body.stn-installed { padding-top: 60px; }
-  .stn-link-label { display: none; }
-  .stn-link { padding: 8px 10px; }
+  .stn-tab-label { display: none; }
+  .stn-tab { padding: 7px 10px; font-size: 13px; }
   .stn-logo .stn-logo-brand { font-size: 16px; }
   .stn-logo .stn-logo-super { font-size: 10px; }
 }
-/* ═════ /v3 ═════ */
+/* ═════ /v4 ═════ */
 </style>
 </head>
 <body class="stn-bg-hero">
 <div class="stn-bar" id="stnBar">
-  <a href="/dashboard.html" class="stn-logo" aria-label="Super Team ACADEMY">
+  <a href="https://superteamhlf.team/dashboard.html" class="stn-logo" aria-label="Super Team ACADEMY">
     <span class="stn-logo-super">SUPER TEAM</span>
     <span class="stn-logo-line"></span>
     <span class="stn-logo-brand">ACADEMY</span>
   </a>
-  <div class="stn-spacer"></div>
-  
+
+  <div class="stn-tabs">
+  </div>
+
   <div class="stn-actions">
-    <button type="button" class="stn-link" onclick="window.history.length>1?window.history.back():window.location.href='dashboard.html'" aria-label="חזור">
+    <button type="button" class="stn-tab" onclick="window.history.length>1?window.history.back():window.location.href='https://superteamhlf.team/dashboard.html'" aria-label="קודם">
       <svg viewBox="0 0 24 24"><path d="M15.59 18.41L10.17 13 15.59 7.59 14 6l-7 7 7 7z"/></svg>
-      <span class="stn-link-label">קודם</span>
+      <span class="stn-tab-label">קודם</span>
     </button>
-    <a href="https://superteamhlf.team/dashboard.html" class="stn-link" aria-label="דף הבית">
+    <a href="https://superteamhlf.team/dashboard.html" class="stn-tab" aria-label="דף הבית">
       <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <span class="stn-link-label">דף הבית</span>
+      <span class="stn-tab-label">דף הבית</span>
     </a>
     <div class="stn-ham-wrap">
       <button type="button" class="stn-ham-btn" id="stnHamBtn" aria-label="תפריט">
@@ -687,69 +576,17 @@ body.stn-installed { padding-top: 68px; margin: 0; }
       </button>
       <div class="stn-ham-menu" id="stnHamMenu" role="menu">
         <div class="stn-ham-header">מערכות סופר טים</div>
-        <a href="https://superteamhlf.team/dashboard.html" class="stn-ham-link active" role="menuitem">
-          <span>אקדמיה</span>
-          <span class="stn-ham-link-brand">ACADEMY</span>
-        </a>
-        <a href="https://flow-argoni.netlify.app/" class="stn-ham-link " role="menuitem">
-          <span>פלואו עסקי</span>
-          <span class="stn-ham-link-brand">FLOW</span>
-        </a>
-        <a href="https://herbalife-retention-uwog.vercel.app/dashboard" class="stn-ham-link " role="menuitem">
-          <span>שימור לקוחות</span>
-          <span class="stn-ham-link-brand">RETENTION</span>
-        </a>
+        <a href="https://superteamhlf.team/dashboard.html" class="stn-ham-link active"><span>אקדמיה</span><span class="stn-ham-link-brand">ACADEMY</span></a>
+        <a href="https://flow-argoni.netlify.app/" class="stn-ham-link "><span>פלואו עסקי</span><span class="stn-ham-link-brand">FLOW</span></a>
+        <a href="https://herbalife-retention-uwog.vercel.app/dashboard" class="stn-ham-link "><span>שימור לקוחות</span><span class="stn-ham-link-brand">RETENTION</span></a>
         <div class="stn-ham-divider"></div>
-        <button type="button" class="stn-ham-link" onclick="(function(){try{localStorage.removeItem('userEmail');localStorage.removeItem('userEmailSavedAt');localStorage.removeItem('stSessionSeen');}catch(e){}window.location.href='https://superteamhlf.team/entry.html';})()" role="menuitem">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/></svg>
-          <span>יציאה</span>
-        </button>
+        <button type="button" class="stn-ham-link" onclick="(function(){try{localStorage.removeItem('userEmail');localStorage.removeItem('userEmailSavedAt');localStorage.removeItem('stSessionSeen');}catch(e){}window.location.href='https://superteamhlf.team/entry.html';})()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/></svg><span>יציאה</span></button>
       </div>
     </div>
   </div>
 </div>
 
 
-
-  <div class="stn-spacer"></div>
-
-  <div class="stn-actions">
-    <button type="button" class="stn-btn" onclick="window.history.length>1?window.history.back():window.location.href='dashboard.html'" aria-label="חזור למסך הקודם">
-      <svg viewBox="0 0 24 24"><path d="M15.59 18.41L10.17 13 15.59 7.59 14 6l-7 7 7 7z"/></svg>
-      <span class="stn-btn-label">קודם</span>
-    </button>
-    <a href="https://superteamhlf.team/dashboard.html" class="stn-btn" aria-label="דף הבית">
-      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <span class="stn-btn-label">דף הבית</span>
-    </a>
-
-    <div class="stn-ham-wrap">
-      <button type="button" class="stn-icon-btn" id="stnHamBtn" aria-label="תפריט">
-        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
-      </button>
-      <div class="stn-ham-menu" id="stnHamMenu" role="menu">
-        <div class="stn-ham-header">מערכות סופר טים</div>
-        <a href="https://superteamhlf.team/dashboard.html" class="stn-ham-link active" role="menuitem">
-          <span>אקדמיה</span>
-          <span class="stn-ham-link-brand">ACADEMY</span>
-        </a>
-        <a href="https://flow-argoni.netlify.app/" class="stn-ham-link " role="menuitem">
-          <span>פלואו עסקי</span>
-          <span class="stn-ham-link-brand">FLOW</span>
-        </a>
-        <a href="https://herbalife-retention-uwog.vercel.app/dashboard" class="stn-ham-link " role="menuitem" target="_blank" rel="noopener">
-          <span>שימור לקוחות</span>
-          <span class="stn-ham-link-brand">RETENTION</span>
-        </a>
-        <div class="stn-ham-divider"></div>
-        <button type="button" class="stn-ham-link" onclick="(function(){try{localStorage.removeItem('userEmail');localStorage.removeItem('userEmailSavedAt');}catch(e){}window.location.href='https://superteamhlf.team/entry.html';})()" role="menuitem">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/></svg>
-          <span>יציאה</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <div class="main-header">
@@ -792,5 +629,33 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 
 
 
+<script>
+(function() {
+  function init() {
+    if (document.body) document.body.classList.add('stn-installed');
+    window.addEventListener('scroll', function() {
+      var bar = document.getElementById('stnBar');
+      if (bar) bar.classList.toggle('scrolled', window.scrollY > 20);
+    });
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('#stnHamBtn');
+      var menu = document.getElementById('stnHamMenu');
+      if (btn && menu) { e.stopPropagation(); menu.classList.toggle('open'); return; }
+      if (menu && menu.classList.contains('open') && !e.target.closest('.stn-ham-wrap')) {
+        menu.classList.remove('open');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var menu = document.getElementById('stnHamMenu');
+        if (menu) menu.classList.remove('open');
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else init();
+})();
+</script>
 </body>
 </html>
