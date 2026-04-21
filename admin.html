@@ -381,191 +381,58 @@ body.stn-bg-hero::after {
 
 
 
-/* ═════ Super Team Unified Nav v4 (final) ═════ */
-:root {
-  --stn-bg:     #0a0a0a;
-  --stn-red:    #E50914;
-  --stn-border: rgba(255,255,255,0.08);
-  --stn-hover:  rgba(255,255,255,0.08);
-  --stn-text:   rgba(255,255,255,0.75);
-  --stn-muted:  rgba(255,255,255,0.5);
-}
-body.stn-installed { padding-top: 68px; margin: 0; }
 
+
+/* ═════ Super Team Nav — final (v5) ═════ */
+body.stn-installed { padding-top: 68px; margin: 0; }
 .stn-bar {
   position: fixed; top: 0; left: 0; right: 0;
-  z-index: 1000;
-  height: 68px;
+  z-index: 1000; height: 68px;
   display: flex; align-items: center;
-  gap: 16px;
-  padding: 0 24px;
+  gap: 16px; padding: 0 24px;
   background: rgba(10,10,10,0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--stn-border);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
   direction: rtl;
 }
 .stn-bar.scrolled { background: rgba(10,10,10,0.97); }
-
-/* Logo — RTL start (right side) */
-.stn-logo {
-  flex-shrink: 0;
-  display: inline-flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-decoration: none; user-select: none;
-  line-height: 1; padding: 4px 0;
-}
-.stn-logo .stn-logo-super {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-weight: 900; font-size: 11px;
-  color: #fff; letter-spacing: 2.2px;
-}
-.stn-logo .stn-logo-line {
-  width: 44px; height: 1.5px;
-  background: linear-gradient(to right, transparent, #fff, transparent);
-  margin: 3px 0; border-radius: 2px;
-}
-.stn-logo .stn-logo-brand {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-weight: 900; font-size: 19px;
-  color: var(--stn-red); letter-spacing: 1.6px;
-  text-shadow: 0 2px 8px rgba(229,9,20,0.45);
-}
-
-/* Middle: tabs (optional per page) */
-.stn-tabs {
-  flex: 1;
-  display: inline-flex; align-items: center;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.stn-tabs::-webkit-scrollbar { display: none; }
-
-/* Tab / link — plain text with subtle hover, active = solid red */
-.stn-tab {
-  display: inline-flex; align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 7px;
-  background: transparent;
-  border: none;
-  color: var(--stn-text);
-  font-family: inherit;
-  font-size: 14px; font-weight: 500;
-  cursor: pointer; text-decoration: none;
-  transition: color 0.15s, background 0.15s;
-  white-space: nowrap;
-}
-.stn-tab:hover { color: #fff; background: var(--stn-hover); }
-.stn-tab.active,
-.stn-tab[aria-current="page"] {
-  background: var(--stn-red);
-  color: #fff;
-  font-weight: 600;
-}
-.stn-tab svg { width: 14px; height: 14px; fill: currentColor; }
-
-/* Right side action cluster (RTL end) */
-.stn-actions {
-  flex-shrink: 0;
-  display: inline-flex; align-items: center;
-  gap: 2px;
-}
-
-/* Hamburger button */
+.stn-logo { flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; user-select: none; line-height: 1; padding: 4px 0; }
+.stn-logo .stn-logo-super { font-family: 'Bebas Neue','Heebo',sans-serif; font-weight: 900; font-size: 11px; color: #fff; letter-spacing: 2.2px; }
+.stn-logo .stn-logo-line { width: 44px; height: 1.5px; background: linear-gradient(to right, transparent, #fff, transparent); margin: 3px 0; border-radius: 2px; }
+.stn-logo .stn-logo-brand { font-family: 'Bebas Neue','Heebo',sans-serif; font-weight: 900; font-size: 19px; color: #E50914; letter-spacing: 1.6px; text-shadow: 0 2px 8px rgba(229,9,20,0.45); }
+.stn-right { flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; }
 .stn-ham-wrap { position: relative; }
-.stn-ham-btn {
-  width: 38px; height: 38px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  background: transparent;
-  border: none;
-  color: var(--stn-text);
-  cursor: pointer;
-  transition: all 0.15s;
-  padding: 0;
-}
-.stn-ham-btn:hover { background: var(--stn-hover); color: #fff; }
+.stn-ham-btn { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: transparent; border: none; color: rgba(255,255,255,0.75); cursor: pointer; padding: 0; transition: all 0.15s; }
+.stn-ham-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
 .stn-ham-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
-.stn-ham-menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  inset-inline-end: 0;
-  min-width: 240px;
-  background: rgba(18,18,18,0.98);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--stn-border);
-  border-radius: 10px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
-  padding: 8px 0;
-  display: none; flex-direction: column;
-  z-index: 1100;
-}
+.stn-ham-menu { position: absolute; top: calc(100% + 10px); inset-inline-end: 0; min-width: 240px; background: rgba(18,18,18,0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; box-shadow: 0 18px 40px rgba(0,0,0,0.6); padding: 8px 0; display: none; flex-direction: column; z-index: 1100; }
 .stn-ham-menu.open { display: flex; }
-.stn-ham-header {
-  font-size: 10px; font-weight: 800;
-  color: var(--stn-muted);
-  text-transform: uppercase; letter-spacing: 1.4px;
-  padding: 10px 18px 6px;
-}
-.stn-ham-link {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 18px;
-  color: #fff;
-  font-size: 13px; font-weight: 600;
-  text-decoration: none;
-  transition: background 0.15s;
-  border: none; background: transparent;
-  font-family: inherit; text-align: right;
-  cursor: pointer; width: 100%;
-}
-.stn-ham-link:hover { background: var(--stn-hover); }
-.stn-ham-link.active {
-  background: rgba(229,9,20,0.2);
-  border-inline-end: 3px solid var(--stn-red);
-}
-.stn-ham-link-brand {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-size: 13px; letter-spacing: 1.5px;
-  color: var(--stn-red);
-  margin-inline-start: auto;
-}
-.stn-ham-divider { height: 1px; background: var(--stn-border); margin: 6px 0; }
-
-@media (max-width: 900px) {
-  .stn-bar { gap: 8px; padding: 0 14px; height: 60px; }
-  body.stn-installed { padding-top: 60px; }
-  .stn-tab-label { display: none; }
-  .stn-tab { padding: 7px 10px; font-size: 13px; }
-  .stn-logo .stn-logo-brand { font-size: 16px; }
-  .stn-logo .stn-logo-super { font-size: 10px; }
-}
-/* ═════ /v4 ═════ */
+.stn-ham-header { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1.4px; padding: 10px 18px 6px; }
+.stn-ham-link { display: flex; align-items: center; gap: 12px; padding: 12px 18px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; transition: background 0.15s; border: none; background: transparent; font-family: inherit; text-align: right; cursor: pointer; width: 100%; }
+.stn-ham-link:hover { background: rgba(255,255,255,0.08); }
+.stn-ham-link.active { background: rgba(229,9,20,0.2); border-inline-end: 3px solid #E50914; }
+.stn-ham-link-brand { font-family: 'Bebas Neue','Heebo',sans-serif; font-size: 13px; letter-spacing: 1.5px; color: #E50914; margin-inline-start: auto; }
+.stn-ham-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 6px 0; }
+.stn-tabs { flex: 1; display: inline-flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; justify-content: center; }
+.stn-tabs::-webkit-scrollbar { display: none; }
+.stn-tab { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; background: transparent; border: none; color: rgba(255,255,255,0.75); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: color 0.15s, background 0.15s; white-space: nowrap; }
+.stn-tab:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.stn-tab.active { background: #E50914; color: #fff; font-weight: 600; }
+.stn-tab svg { width: 14px; height: 14px; fill: currentColor; }
+.stn-left { flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
+@media (max-width: 900px) { .stn-bar { gap: 8px; padding: 0 14px; height: 60px; } body.stn-installed { padding-top: 60px; } .stn-tab-label { display: none; } .stn-tab { padding: 7px 10px; font-size: 13px; } .stn-logo .stn-logo-brand { font-size: 16px; } .stn-logo .stn-logo-super { font-size: 10px; } }
+/* ═════ /v5 ═════ */
 </style>
 </head>
 <body class="stn-bg-hero">
 <div class="stn-bar" id="stnBar">
-  <a href="https://superteamhlf.team/dashboard.html" class="stn-logo" aria-label="Super Team ACADEMY">
-    <span class="stn-logo-super">SUPER TEAM</span>
-    <span class="stn-logo-line"></span>
-    <span class="stn-logo-brand">ACADEMY</span>
-  </a>
-
-  <div class="stn-tabs">
-  </div>
-
-  <div class="stn-actions">
-    <button type="button" class="stn-tab" onclick="window.history.length>1?window.history.back():window.location.href='https://superteamhlf.team/dashboard.html'" aria-label="קודם">
-      <svg viewBox="0 0 24 24"><path d="M15.59 18.41L10.17 13 15.59 7.59 14 6l-7 7 7 7z"/></svg>
-      <span class="stn-tab-label">קודם</span>
-    </button>
-    <a href="https://superteamhlf.team/dashboard.html" class="stn-tab" aria-label="דף הבית">
-      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <span class="stn-tab-label">דף הבית</span>
+  <div class="stn-right">
+    <a href="https://superteamhlf.team/dashboard.html" class="stn-logo" aria-label="Super Team ACADEMY">
+      <span class="stn-logo-super">SUPER TEAM</span>
+      <span class="stn-logo-line"></span>
+      <span class="stn-logo-brand">ACADEMY</span>
     </a>
     <div class="stn-ham-wrap">
       <button type="button" class="stn-ham-btn" id="stnHamBtn" aria-label="תפריט">
@@ -577,11 +444,28 @@ body.stn-installed { padding-top: 68px; margin: 0; }
         <a href="https://flow-argoni.netlify.app/" class="stn-ham-link "><span>פלואו עסקי</span><span class="stn-ham-link-brand">FLOW</span></a>
         <a href="https://herbalife-retention-uwog.vercel.app/dashboard" class="stn-ham-link "><span>שימור לקוחות</span><span class="stn-ham-link-brand">RETENTION</span></a>
         <div class="stn-ham-divider"></div>
-        <button type="button" class="stn-ham-link" onclick="(function(){try{localStorage.removeItem('userEmail');localStorage.removeItem('userEmailSavedAt');localStorage.removeItem('stSessionSeen');}catch(e){}window.location.href='https://superteamhlf.team/entry.html';})()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/></svg><span>יציאה</span></button>
+        <button type="button" class="stn-ham-link" onclick="(function(){try{localStorage.removeItem('userEmail');localStorage.removeItem('userEmailSavedAt');localStorage.removeItem('stSessionSeen');}catch(e){}window.location.href='https://superteamhlf.team/entry.html';})()">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/></svg>
+          <span>יציאה</span>
+        </button>
       </div>
     </div>
   </div>
+  <div class="stn-tabs">
+  </div>
+  <div class="stn-left">
+    <button type="button" class="stn-tab" onclick="window.history.length>1?window.history.back():window.location.href='https://superteamhlf.team/dashboard.html'" aria-label="קודם">
+      <svg viewBox="0 0 24 24"><path d="M15.59 18.41L10.17 13 15.59 7.59 14 6l-7 7 7 7z"/></svg>
+      <span class="stn-tab-label">קודם</span>
+    </button>
+    <a href="https://superteamhlf.team/dashboard.html" class="stn-tab" aria-label="דף הבית">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="stn-tab-label">דף הבית</span>
+    </a>
+  </div>
 </div>
+
+
 
 
 
@@ -1052,32 +936,20 @@ function collectLocalSurveys() {
 </script>
 
 
+
 <script>
 (function() {
   function init() {
     if (document.body) document.body.classList.add('stn-installed');
-    window.addEventListener('scroll', function() {
-      var bar = document.getElementById('stnBar');
-      if (bar) bar.classList.toggle('scrolled', window.scrollY > 20);
-    });
+    window.addEventListener('scroll', function() { var b = document.getElementById('stnBar'); if (b) b.classList.toggle('scrolled', window.scrollY > 20); });
     document.addEventListener('click', function(e) {
-      var btn = e.target.closest('#stnHamBtn');
-      var menu = document.getElementById('stnHamMenu');
+      var btn = e.target.closest('#stnHamBtn'); var menu = document.getElementById('stnHamMenu');
       if (btn && menu) { e.stopPropagation(); menu.classList.toggle('open'); return; }
-      if (menu && menu.classList.contains('open') && !e.target.closest('.stn-ham-wrap')) {
-        menu.classList.remove('open');
-      }
+      if (menu && menu.classList.contains('open') && !e.target.closest('.stn-ham-wrap')) menu.classList.remove('open');
     });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        var menu = document.getElementById('stnHamMenu');
-        if (menu) menu.classList.remove('open');
-      }
-    });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { var m = document.getElementById('stnHamMenu'); if (m) m.classList.remove('open'); } });
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else init();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
 </body>
