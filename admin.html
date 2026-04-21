@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+<script>
+/* ═════ Super Team Auth Gate — must run before any render ═════ */
+(function() {
+  try {
+    const saved = localStorage.getItem('userEmail');
+    const ts = parseInt(localStorage.getItem('userEmailSavedAt') || '0', 10);
+    const ageDays = ts ? (Date.now() - ts) / 86400000 : 99999;
+    if (!saved || !ts || ageDays >= 60) {
+      // Not logged in — bounce to entry.
+      window.location.replace('https://superteamhlf.team/entry.html');
+    }
+  } catch (e) {
+    window.location.replace('https://superteamhlf.team/entry.html');
+  }
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Team Admin</title>
