@@ -1,38 +1,9 @@
 {
-  "session_start": "2026-04-20T06:51:22Z",
+  "session_start": "2026-04-21T07:25:24Z",
   "budget_total": 280000,
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
-  "priorities": [
-    {
-      "id": "1",
-      "title": "P3-P1: cleanup + latest-video hero + NEW badge",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 0
-    },
-    {
-      "id": "2",
-      "title": "P3-P2: completed button + clearer streak",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 0
-    },
-    {
-      "id": "3",
-      "title": "P3-P3: post-video survey",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 0
-    },
-    {
-      "id": "4",
-      "title": "P3-P4: admin analytics dashboard",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 0
-    }
-  ],
+  "priorities": [],
   "totals": {
     "turns": 0,
     "estimated_tokens": 0,

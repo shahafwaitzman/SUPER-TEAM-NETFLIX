@@ -481,6 +481,42 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   </div>
 </div>
 
+<main class="page-container">
+  <div class="form-card">
+    <div class="form-eyebrow">משתמש קיים</div>
+    <h1 class="form-title">כניסה לחשבון</h1>
+    <p class="form-subtitle">הכנס/י פרטים כדי להיכנס למערכת</p>
+
+    <div class="form-group">
+      <label for="name">שם מלא</label>
+      <input type="text" id="name" placeholder="ישראל ישראלי">
+    </div>
+
+    <div class="form-group">
+      <label for="email">אימייל</label>
+      <input type="email" id="email" placeholder="example@gmail.com">
+    </div>
+
+    <div class="form-group">
+      <label for="tab">בחר TAB</label>
+      <select id="tab">
+        <option value="">-- בחר/י TAB --</option>
+        <option value="shahafwai@gmail.com">שחף ויצמן</option>
+        <option value="other@example.com">אחר</option>
+      </select>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="verify()">כניסה</button>
+
+    <div class="status" id="message"></div>
+
+    <div class="back-link">
+      <a href="entry.html">← חזור</a>
+    </div>
+  </div>
+</main>
+
+
 
 
 
@@ -505,6 +541,78 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
+</script>
+<script>
+// Auto-login: if user already logged in on this device, skip the form
+(function autoRedirect() {
+  try {
+    const savedEmail = localStorage.getItem('userEmail');
+    const savedAt = parseInt(localStorage.getItem('userEmailSavedAt') || '0', 10);
+    // Expire after 60 days of inactivity (optional safety)
+    const ageDays = (Date.now() - savedAt) / (1000 * 60 * 60 * 24);
+    if (savedEmail && ageDays < 60) {
+      window.location.replace('dashboard.html?user=' + encodeURIComponent(savedEmail));
+    }
+  } catch (e) { /* ignore — show form */ }
+})();
+</script>
+<script>
+const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+
+async function verify() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const tab = document.getElementById('tab').value;
+  const btn = document.getElementById('submitBtn');
+
+  if (!name || !email || !tab) {
+    showMessage('❌ יש למלא את כל השדות', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'בודק...';
+  showMessage('⏳ בדיקת פרטים...', 'loading');
+
+  try {
+    const res = await fetch(FIREBASE_URL + '/users.json');
+    const users = await res.json() || {};
+
+    for (const [key, user] of Object.entries(users)) {
+      if (user.name === name &&
+          user.email === email &&
+          user.tab === tab &&
+          user.status === 'approved') {
+        // Auto-login: remember this user so future visits skip the form
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userEmailSavedAt', Date.now().toString());
+        document.getElementById('message').style.display = 'none';
+        window.location.href = 'dashboard.html?user=' + encodeURIComponent(email);
+        return;
+      }
+    }
+
+    showMessage('❌ הפרטים לא תואמים. בדקי את השדות או פני ל-TAB שלך', 'error');
+    btn.disabled = false;
+    btn.textContent = 'כניסה';
+
+  } catch(e) {
+    showMessage('❌ שגיאה: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = 'כניסה';
+  }
+}
+
+function showMessage(text, type) {
+  const msgDiv = document.getElementById('message');
+  msgDiv.textContent = text;
+  msgDiv.className = 'status ' + type;
+  msgDiv.style.display = 'block';
+}
+
+document.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') verify();
+});
 </script>
 </body>
 </html>
