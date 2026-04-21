@@ -2257,25 +2257,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   </div>
 </div>
 
-<script>
-// ═══════════════════════════════════════════
-// AUTH GATE — blocks direct URL access
-// Anyone hitting this page without a fresh login is redirected to entry.html
-// ═══════════════════════════════════════════
-(function enforceAuth() {
-  try {
-    const saved = localStorage.getItem('userEmail');
-    const ts = parseInt(localStorage.getItem('userEmailSavedAt') || '0', 10);
-    const ageDays = (Date.now() - ts) / (1000 * 60 * 60 * 24);
-    // Require: email saved AND saved less than 60 days ago
-    if (!saved || !ts || ageDays >= 60) {
-      window.location.replace('entry.html');
-    }
-  } catch (e) {
-    window.location.replace('entry.html');
-  }
-})();
-</script>
+
 
 <section class="billboard-row">
   <div class="hero-image-wrapper">
@@ -2422,10 +2404,12 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 
 <script>
 const header = document.getElementById('mainHeader');
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 80) header.classList.add('scrolled');
-  else header.classList.remove('scrolled');
-});
+if (header) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 80) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  });
+}
 
 document.querySelectorAll('.row-container').forEach(container => {
   const content = container.querySelector('.rowContent');
@@ -2446,10 +2430,12 @@ const userEmail = localStorage.getItem('userEmail') || params.get('user');
 if (userEmail) {
   const userName = userEmail.split('@')[0];
   const indicator = document.getElementById('userIndicator');
-  document.getElementById('userNameDisplay').textContent = userName;
-  indicator.style.display = 'block';
-  document.getElementById('profileIcon').textContent = userName.charAt(0).toUpperCase();
-  localStorage.setItem('userEmail', userEmail);
+  const nameEl = document.getElementById('userNameDisplay');
+  const profileEl = document.getElementById('profileIcon');
+  if (nameEl) nameEl.textContent = userName;
+  if (indicator) indicator.style.display = 'block';
+  if (profileEl) profileEl.textContent = userName.charAt(0).toUpperCase();
+  try { localStorage.setItem('userEmail', userEmail); } catch (e) {}
 }
 
 /* ═══════════════════════════════════════════
