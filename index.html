@@ -394,9 +394,40 @@ body::after {
     min-height: 48px;
   }
 }
+
+/* ═════ Shared hero background (crowd + Israeli flag) ═════ */
+body.stn-bg-hero {
+  position: relative;
+  background-color: #0a0a0a;
+}
+body.stn-bg-hero::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('hero.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  opacity: 0.35;
+  z-index: -2;
+  pointer-events: none;
+  filter: contrast(1.05) saturate(1.1) brightness(0.9);
+}
+body.stn-bg-hero::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 30%, rgba(229,9,20,0.12), transparent 70%),
+    linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.75) 45%, rgba(10,10,10,0.92) 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+/* Skip hero bg on pages that already have their own dedicated hero (like academy-hub
+   has its own billboard) — those opt-out by not adding the class */
+/* ═════ /Shared hero background ═════ */
 </style>
 </head>
-<body>
+<body class="stn-bg-hero">
 
 <div class="main-header">
   <a href="#" class="logo" aria-label="Academy">
