@@ -1,5 +1,1 @@
-{
-  "priority_id": 1,
-  "source_plan": "PDR-P1-Fix-Approval-Workflow",
-  "files": ["approve.html"]
-}
+{"priority_id": 1, "source_plan": "phase-3-cleanup", "files": ["academy-hub.html", "leaderboard.json", "admin.html"]}

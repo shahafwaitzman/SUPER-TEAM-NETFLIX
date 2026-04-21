@@ -1,5 +1,1 @@
-{
-  "priority_id": 1,
-  "source_plan": "PDR-P1-Scope-Amendment",
-  "files": ["index-v2.html", "approve-v2.html"]
-}
+{"priority_id": 1, "source_plan": "phase-3-auto-login-plus-retention-card", "files": ["academy-hub.html", "leaderboard.json", "admin.html", "entry.html", "access.html", "dashboard.html"]}

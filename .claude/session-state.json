@@ -1,22 +1,42 @@
 {
-  "session_start": "2026-04-18T08:25:24Z",
+  "session_start": "2026-04-20T06:51:22Z",
   "budget_total": 280000,
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
   "priorities": [
     {
-      "id": 1,
-      "name": "Netflix-accurate redesign of academy-hub.html",
+      "id": "1",
+      "title": "P3-P1: cleanup + latest-video hero + NEW badge",
       "status": "completed",
       "pdr_approved": true,
-      "estimated_tokens": 45000,
-      "checkpoint_commit": "d29cbf5"
+      "estimated_tokens": 0
+    },
+    {
+      "id": "2",
+      "title": "P3-P2: completed button + clearer streak",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 0
+    },
+    {
+      "id": "3",
+      "title": "P3-P3: post-video survey",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 0
+    },
+    {
+      "id": "4",
+      "title": "P3-P4: admin analytics dashboard",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 0
     }
   ],
   "totals": {
-    "turns": 14,
-    "estimated_tokens": 45000,
-    "budget_remaining": 235000,
+    "turns": 0,
+    "estimated_tokens": 0,
+    "budget_remaining": 280000,
     "budget_status": "GREEN"
   }
 }
