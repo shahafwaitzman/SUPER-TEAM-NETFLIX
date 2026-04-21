@@ -602,194 +602,7 @@ body::after {
 body.st-nav-installed { padding-top: 0; }
 /* ═════ /Shared Super Team Nav ═════ */
 
-/* ═════ Super Team Unified Nav v2 ═════ */
-:root {
-  --stn-bg:      #141414;
-  --stn-red:     #E50914;
-  --stn-border:  rgba(255,255,255,0.08);
-  --stn-hover:   rgba(229,9,20,0.15);
-  --stn-text:    rgba(255,255,255,0.92);
-  --stn-muted:   rgba(255,255,255,0.55);
-}
-body.stn-installed { padding-top: 68px; margin: 0; }
-body.stn-installed.stn-overlay { padding-top: 0; }
 
-.stn-bar {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 1000;
-  height: 68px;
-  display: flex; align-items: center;
-  gap: 10px;
-  padding: 0 4%;
-  background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
-  font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
-  direction: rtl;
-}
-.stn-bar.scrolled {
-  background: rgba(10,10,10,0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.4);
-}
-
-/* Logo — always on the right (RTL start = right) */
-.stn-logo {
-  order: 0;
-  display: inline-flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-decoration: none; user-select: none;
-  line-height: 1; flex-shrink: 0;
-  padding: 6px 0;
-}
-.stn-logo .stn-logo-super {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-weight: 900; font-size: 11px;
-  color: #fff; letter-spacing: 2.2px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
-}
-.stn-logo .stn-logo-line {
-  width: 44px; height: 1.5px;
-  background: linear-gradient(to right, transparent 0%, #fff 50%, transparent 100%);
-  margin: 3px 0; border-radius: 2px;
-  box-shadow: 0 0 6px rgba(255,255,255,0.45);
-}
-.stn-logo .stn-logo-brand {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-weight: 900; font-size: 19px;
-  color: var(--stn-red); letter-spacing: 1.6px;
-  text-shadow: 0 2px 8px rgba(229,9,20,0.5);
-}
-.stn-logo:hover .stn-logo-brand { text-shadow: 0 2px 12px rgba(229,9,20,0.75); }
-
-/* Spacer that pushes action buttons all the way to the visual left */
-.stn-spacer { flex: 1; }
-
-/* Action buttons group (hamburger + icons + profile) */
-.stn-actions {
-  display: inline-flex; align-items: center; gap: 8px;
-  order: 2;
-}
-
-.stn-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px;
-  border-radius: 7px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--stn-border);
-  color: var(--stn-text);
-  font-family: inherit; font-size: 12.5px; font-weight: 700;
-  cursor: pointer; text-decoration: none;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-.stn-btn:hover {
-  background: var(--stn-hover);
-  border-color: rgba(229,9,20,0.5);
-  color: #fff;
-}
-.stn-btn svg { width: 14px; height: 14px; fill: currentColor; }
-
-.stn-icon-btn {
-  width: 40px; height: 40px;
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px solid var(--stn-border);
-  color: var(--stn-text);
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit; padding: 0;
-  position: relative;
-}
-.stn-icon-btn:hover {
-  background: var(--stn-hover); border-color: var(--stn-red); color: #fff;
-}
-.stn-icon-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
-/* Hamburger dropdown */
-.stn-ham-wrap { position: relative; }
-.stn-ham-menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  inset-inline-end: 0;
-  min-width: 240px;
-  background: rgba(18,18,18,0.98);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--stn-border);
-  border-radius: 10px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
-  padding: 8px 0;
-  display: none; flex-direction: column;
-  z-index: 1100;
-  animation: stnSlideIn 0.2s ease;
-}
-@keyframes stnSlideIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.stn-ham-menu.open { display: flex; }
-.stn-ham-header {
-  font-size: 10px; font-weight: 800;
-  color: var(--stn-muted);
-  text-transform: uppercase; letter-spacing: 1.4px;
-  padding: 10px 18px 6px;
-}
-.stn-ham-link {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 18px;
-  color: #fff;
-  font-size: 13px; font-weight: 700;
-  text-decoration: none;
-  transition: background 0.15s;
-  border: none; background: transparent;
-  font-family: inherit; text-align: right;
-  cursor: pointer; width: 100%;
-}
-.stn-ham-link:hover { background: var(--stn-hover); }
-.stn-ham-link.active {
-  background: rgba(229,9,20,0.2);
-  border-inline-end: 3px solid var(--stn-red);
-}
-.stn-ham-link-brand {
-  font-family: 'Bebas Neue', 'Heebo', sans-serif;
-  font-size: 13px; letter-spacing: 1.5px;
-  color: var(--stn-red);
-  margin-inline-start: auto;
-}
-.stn-ham-divider {
-  height: 1px;
-  background: var(--stn-border);
-  margin: 6px 0;
-}
-
-/* Back + home buttons — on the visual left (RTL end) */
-.stn-nav-left {
-  display: inline-flex; align-items: center; gap: 8px;
-  order: 1;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .stn-bar { gap: 6px; padding: 0 14px; height: 60px; }
-  body.stn-installed { padding-top: 60px; }
-  .stn-btn-label { display: none; }
-  .stn-btn { padding: 8px 10px; }
-  .stn-logo .stn-logo-brand { font-size: 16px; }
-  .stn-logo .stn-logo-super { font-size: 10px; }
-}
-@media (max-width: 480px) {
-  .stn-bar { padding: 0 8px; }
-  .stn-actions { gap: 4px; }
-}
-
-/* Legacy logo rules override — force consistent brand color even where
-   legacy pages used different colors */
-.stn-installed .logo-academy,
-.stn-installed .st-logo .logo-academy {
-  color: var(--stn-red) !important;
-}
-/* ═════ /Unified Nav v2 ═════ */
 
 /* ═════ Shared hero background (crowd + Israeli flag) ═════ */
 body.stn-bg-hero {
@@ -821,15 +634,229 @@ body.stn-bg-hero::after {
 /* Skip hero bg on pages that already have their own dedicated hero (like academy-hub
    has its own billboard) — those opt-out by not adding the class */
 /* ═════ /Shared hero background ═════ */
+
+/* ═════ Super Team Unified Nav v3 — retention-style tabs ═════ */
+:root {
+  --stn-bg:     #0a0a0a;
+  --stn-red:    #E50914;
+  --stn-border: rgba(255,255,255,0.08);
+  --stn-hover:  rgba(255,255,255,0.08);
+  --stn-text:   rgba(255,255,255,0.75);
+  --stn-muted:  rgba(255,255,255,0.5);
+}
+body.stn-installed { padding-top: 68px; margin: 0; }
+
+.stn-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: 68px;
+  display: flex; align-items: center;
+  gap: 10px;
+  padding: 0 24px;
+  background: rgba(10,10,10,0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--stn-border);
+  font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+  direction: rtl;
+}
+.stn-bar.scrolled {
+  background: rgba(10,10,10,0.96);
+  box-shadow: 0 2px 14px rgba(0,0,0,0.35);
+}
+
+/* Logo — right side (RTL start), unchanged visual */
+.stn-logo {
+  order: 0; flex-shrink: 0;
+  display: inline-flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-decoration: none; user-select: none;
+  line-height: 1; padding: 4px 0;
+}
+.stn-logo .stn-logo-super {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 11px;
+  color: #fff; letter-spacing: 2.2px;
+}
+.stn-logo .stn-logo-line {
+  width: 44px; height: 1.5px;
+  background: linear-gradient(to right, transparent, #fff, transparent);
+  margin: 3px 0; border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.45);
+}
+.stn-logo .stn-logo-brand {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-weight: 900; font-size: 19px;
+  color: var(--stn-red); letter-spacing: 1.6px;
+  text-shadow: 0 2px 8px rgba(229,9,20,0.5);
+}
+
+.stn-spacer { flex: 1; }
+
+/* Actions on the left (RTL end) — text-style buttons */
+.stn-actions {
+  display: inline-flex; align-items: center;
+  gap: 4px;
+  order: 2;
+}
+
+/* Text-style link/button (for קודם / דף הבית and inline tabs) */
+.stn-link {
+  display: inline-flex; align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: var(--stn-text);
+  font-family: inherit; font-size: 14px; font-weight: 500;
+  cursor: pointer; text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.stn-link:hover {
+  color: #fff;
+  background: var(--stn-hover);
+}
+.stn-link.active,
+.stn-link[aria-current="page"] {
+  background: var(--stn-red);
+  color: #fff;
+  font-weight: 600;
+}
+.stn-link svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* Hamburger — circular, subtle */
+.stn-ham-wrap { position: relative; order: 2; }
+.stn-ham-btn {
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: var(--stn-text);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+.stn-ham-btn:hover {
+  background: var(--stn-hover);
+  color: #fff;
+}
+.stn-ham-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+.stn-ham-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  min-width: 240px;
+  background: rgba(18,18,18,0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--stn-border);
+  border-radius: 10px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+  padding: 8px 0;
+  display: none; flex-direction: column;
+  z-index: 1100;
+  animation: stnFade 0.18s ease;
+}
+@keyframes stnFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stn-ham-menu.open { display: flex; }
+.stn-ham-header {
+  font-size: 10px; font-weight: 800;
+  color: var(--stn-muted);
+  text-transform: uppercase; letter-spacing: 1.4px;
+  padding: 10px 18px 6px;
+}
+.stn-ham-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px;
+  color: #fff;
+  font-size: 13px; font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+  border: none; background: transparent;
+  font-family: inherit; text-align: right;
+  cursor: pointer; width: 100%;
+}
+.stn-ham-link:hover { background: var(--stn-hover); }
+.stn-ham-link.active {
+  background: rgba(229,9,20,0.2);
+  border-inline-end: 3px solid var(--stn-red);
+}
+.stn-ham-link-brand {
+  font-family: 'Bebas Neue', 'Heebo', sans-serif;
+  font-size: 13px; letter-spacing: 1.5px;
+  color: var(--stn-red);
+  margin-inline-start: auto;
+}
+.stn-ham-divider {
+  height: 1px; background: var(--stn-border); margin: 6px 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .stn-bar { gap: 6px; padding: 0 14px; height: 60px; }
+  body.stn-installed { padding-top: 60px; }
+  .stn-link-label { display: none; }
+  .stn-link { padding: 8px 10px; }
+  .stn-logo .stn-logo-brand { font-size: 16px; }
+  .stn-logo .stn-logo-super { font-size: 10px; }
+}
+/* ═════ /v3 ═════ */
 </style>
 </head>
 <body class="stn-bg-hero">
 <div class="stn-bar" id="stnBar">
-  <a href="dashboard.html" class="stn-logo" aria-label="Super Team ACADEMY">
+  <a href="/dashboard.html" class="stn-logo" aria-label="Super Team ACADEMY">
     <span class="stn-logo-super">SUPER TEAM</span>
     <span class="stn-logo-line"></span>
     <span class="stn-logo-brand">ACADEMY</span>
   </a>
+  <div class="stn-spacer"></div>
+  
+  <div class="stn-actions">
+    <button type="button" class="stn-link" onclick="window.history.length>1?window.history.back():window.location.href='dashboard.html'" aria-label="חזור">
+      <svg viewBox="0 0 24 24"><path d="M15.59 18.41L10.17 13 15.59 7.59 14 6l-7 7 7 7z"/></svg>
+      <span class="stn-link-label">קודם</span>
+    </button>
+    <a href="https://superteamhlf.team/dashboard.html" class="stn-link" aria-label="דף הבית">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="stn-link-label">דף הבית</span>
+    </a>
+    <div class="stn-ham-wrap">
+      <button type="button" class="stn-ham-btn" id="stnHamBtn" aria-label="תפריט">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      </button>
+      <div class="stn-ham-menu" id="stnHamMenu" role="menu">
+        <div class="stn-ham-header">מערכות סופר טים</div>
+        <a href="https://superteamhlf.team/dashboard.html" class="stn-ham-link active" role="menuitem">
+          <span>אקדמיה</span>
+          <span class="stn-ham-link-brand">ACADEMY</span>
+        </a>
+        <a href="https://flow-argoni.netlify.app/" class="stn-ham-link " role="menuitem">
+          <span>פלואו עסקי</span>
+          <span class="stn-ham-link-brand">FLOW</span>
+        </a>
+        <a href="https://herbalife-retention-uwog.vercel.app/dashboard" class="stn-ham-link " role="menuitem">
+          <span>שימור לקוחות</span>
+          <span class="stn-ham-link-brand">RETENTION</span>
+        </a>
+        <div class="stn-ham-divider"></div>
+        <button type="button" class="stn-ham-link" onclick="(function(){try{localStorage.removeItem('userEmail');localStorage.removeItem('userEmailSavedAt');localStorage.removeItem('stSessionSeen');}catch(e){}window.location.href='https://superteamhlf.team/entry.html';})()" role="menuitem">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/></svg>
+          <span>יציאה</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
   <div class="stn-spacer"></div>
 
@@ -992,35 +1019,6 @@ function logout() {
 </script>
 
 
-<script>
-/* Super Team Nav — shared runtime */
-(function() {
-  document.body.classList.add('stn-installed');
-  // Scroll shadow
-  window.addEventListener('scroll', function() {
-    const bar = document.getElementById('stnBar');
-    if (bar) bar.classList.toggle('scrolled', window.scrollY > 20);
-  });
-  // Hamburger toggle
-  document.addEventListener('click', function(e) {
-    const btn = e.target.closest('#stnHamBtn');
-    const menu = document.getElementById('stnHamMenu');
-    if (btn && menu) {
-      e.stopPropagation();
-      menu.classList.toggle('open');
-      return;
-    }
-    if (menu && menu.classList.contains('open') && !e.target.closest('.stn-ham-wrap')) {
-      menu.classList.remove('open');
-    }
-  });
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      const menu = document.getElementById('stnHamMenu');
-      if (menu) menu.classList.remove('open');
-    }
-  });
-})();
-</script>
+
 </body>
 </html>
