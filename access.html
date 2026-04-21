@@ -485,7 +485,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
   <div class="form-card">
     <div class="form-eyebrow">משתמש קיים</div>
     <h1 class="form-title">כניסה לחשבון</h1>
-    <p class="form-subtitle">הכנס/י פרטים כדי להיכנס למערכת</p>
+    <p class="form-subtitle">פרטי הכניסה שלך</p>
 
     <div class="form-group">
       <label for="name">שם מלא</label>
@@ -500,7 +500,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
     <div class="form-group">
       <label for="tab">בחר TAB</label>
       <select id="tab">
-        <option value="">-- בחר/י TAB --</option>
+        <option value="">-- TAB --</option>
         <option value="shahafwai@gmail.com">שחף ויצמן</option>
         <option value="other@example.com">אחר</option>
       </select>
@@ -592,7 +592,7 @@ async function verify() {
       }
     }
 
-    showMessage('❌ הפרטים לא תואמים. בדקי את השדות או פני ל-TAB שלך', 'error');
+    showMessage('❌ הפרטים לא תואמים. לבדוק שוב את השדות או לפנות ל-TAB שלך', 'error');
     btn.disabled = false;
     btn.textContent = 'כניסה';
 
