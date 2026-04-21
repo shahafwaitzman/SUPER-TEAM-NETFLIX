@@ -434,18 +434,18 @@ body.stn-bg-hero::after {
 
 
 
-/* ═════ Super Team Nav — final (v5) ═════ */
+/* ═════ Super Team Nav — final (v6 right-aligned) ═════ */
 body.stn-installed { padding-top: 68px; margin: 0; }
 .stn-bar {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 1000; height: 68px;
   display: flex; align-items: center;
-  gap: 16px; padding: 0 24px;
+  gap: 12px; padding: 0 24px;
   background: rgba(10,10,10,0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+  font-family: 'Heebo','Segoe UI',Arial,sans-serif;
   direction: rtl;
 }
 .stn-bar.scrolled { background: rgba(10,10,10,0.97); }
@@ -466,15 +466,47 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 .stn-ham-link.active { background: rgba(229,9,20,0.2); border-inline-end: 3px solid #E50914; }
 .stn-ham-link-brand { font-family: 'Bebas Neue','Heebo',sans-serif; font-size: 13px; letter-spacing: 1.5px; color: #E50914; margin-inline-start: auto; }
 .stn-ham-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 6px 0; }
-.stn-tabs { flex: 1; display: inline-flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; justify-content: center; }
+
+/* TABS: right-aligned (start of RTL), NOT centered */
+.stn-tabs {
+  flex: 0 1 auto;
+  display: inline-flex; align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
 .stn-tabs::-webkit-scrollbar { display: none; }
 .stn-tab { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; background: transparent; border: none; color: rgba(255,255,255,0.75); font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: color 0.15s, background 0.15s; white-space: nowrap; }
 .stn-tab:hover { color: #fff; background: rgba(255,255,255,0.08); }
 .stn-tab.active { background: #E50914; color: #fff; font-weight: 600; }
 .stn-tab svg { width: 14px; height: 14px; fill: currentColor; }
-.stn-left { flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; }
-@media (max-width: 900px) { .stn-bar { gap: 8px; padding: 0 14px; height: 60px; } body.stn-installed { padding-top: 60px; } .stn-tab-label { display: none; } .stn-tab { padding: 7px 10px; font-size: 13px; } .stn-logo .stn-logo-brand { font-size: 16px; } .stn-logo .stn-logo-super { font-size: 10px; } }
-/* ═════ /v5 ═════ */
+
+/* LEFT CLUSTER: pushed to the visual end with margin-inline-start: auto */
+.stn-left {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: auto;  /* <-- pushes to visual left end in RTL */
+}
+
+@media (max-width: 900px) {
+  .stn-bar { gap: 6px; padding: 0 12px; height: 60px; }
+  body.stn-installed { padding-top: 60px; }
+  .stn-tab-label { display: none; }
+  .stn-tab { padding: 7px 10px; font-size: 13px; }
+  .stn-logo .stn-logo-brand { font-size: 16px; }
+  .stn-logo .stn-logo-super { font-size: 10px; }
+  .stn-tabs { flex: 1 1 auto; }  /* on mobile, tabs grow to fill remaining space */
+}
+@media (max-width: 560px) {
+  .stn-bar { gap: 4px; padding: 0 8px; }
+  .stn-tab { padding: 6px 8px; font-size: 12px; }
+  .stn-ham-btn { width: 34px; height: 34px; }
+  .stn-ham-btn svg { width: 16px; height: 16px; }
+}
+/* ═════ /v6 ═════ */
 </style>
 </head>
 <body class="stn-bg-hero">
