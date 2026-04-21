@@ -669,7 +669,7 @@ function updateBulkActionBar() {
 
 async function deleteBulk() {
   if (selectedUsers.size === 0) return;
-  if (!confirm(`בטוח שרוצה למחוק ${selectedUsers.size} משתמשים? לא ניתן לחזור מהפעולה הזאת!`)) return;
+  if (!confirm(`בטוח שרוצה למחוק ${selectedUsers.size} משתמשים? לא ניתן לחזור/י מהפעולה הזאת!`)) return;
 
   for (const key of selectedUsers) {
     try {
