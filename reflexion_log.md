@@ -37,3 +37,38 @@
 
 - P1 #completed: Redesigned academy-hub.html with pixel-accurate Netflix design. Used Chrome MCP + live getComputedStyle extraction from netflix.com (logged-in session) to measure 50+ exact values: colors (#141414/#E50914/rgba(109,109,110,0.7)), fonts (Heebo 900, 14px/500 nav, 16.32px/500 buttons, 16.8px row titles), dimensions (70px navbar, 16:9 cards with 2.4-4px border-radius, 48x124 handle arrows), gradients (3-layer vignette with exact stops: 0→15%→29%→44%→68%→100%), Netflix cubic-bezier easing (0.5,0,0.1,1), SVG icon paths (play/info/search/bell exactly copied). Built 642-line file: navbar + hero billboard with stadium bg + 5 horizontal carousel rows + progress bars + pagination dots + hover effects + 7 responsive breakpoints. Commit d29cbf5 pushed to GitHub Pages. Budget: ~45K/280K (GREEN).
 - Key learning #meta: Live DevTools extraction via Chrome MCP beats manual screenshots for design fidelity. One getComputedStyle pass yields 30+ accurate values vs estimated. Public-facing site design values (colors, spacing, SVG paths) are fair reference for UI inspiration while using original assets/branding.
+
+## 2026-04-22 | Priority 1: TAB dropdown sync + deploy
+**Problem:** access.html login page showed only 2 TABs (שחף + אחר), blocking 15 team members from signing in.
+**Root cause #1:** register.html had full roster but access.html was never synced.
+**Root cause #2 (hidden):** Netlify GitHub webhook NOT connected — last prod deploy was manual zip from Apr 5. Local + origin/main were 17+ commits ahead of what was live.
+**Fix:** Updated access.html (commit 605285c) + manual `netlify deploy --prod --dir=.` via CLI.
+**Learnings:**
+  - Always verify LIVE vs GIT vs LOCAL before declaring a fix complete
+  - This repo's deploy pipeline is broken — future commits will NOT auto-deploy
+  - Follow-up needed: reconnect GitHub → Netlify webhook, OR document manual deploy step
+  - Security: GitHub PAT exposed in git remote URL — needs rotation
+
+## 2026-04-22 | Priority 2: Remove WhatsApp prompt sentence
+**Problem:** register.html success dialog promised "אפשר גם לשלוח הודעה ישירה בוואטסאפ" but the green WhatsApp button only renders when the TAB has a `tabWa` field — which most don't.
+**Fix:** Removed the misleading sentence from showSuccess() inline HTML (commit e8a4f96).
+**Learning:** Conditional UI promises should not have hardcoded intro text — tie the copy to the button render condition, not above it.
+
+## 2026-04-22 | Priority 3: Approval email points to wrong page
+**Problem:** Emails sent to TABs linked to `approve-v2.html` (34-line stub with only "חזרה לאקדמיה" button) instead of `approve.html` (412-line full version with WhatsApp handoff + pre-built welcome message).
+**Root cause:** `register.html` L611 hardcoded `APPROVE_BASE = '.../approve-v2.html'`. Someone pointed it to v2 during testing and never reverted.
+**Fix:** Switched APPROVE_BASE to `/approve.html` (commit 7345bcc).
+**Learnings:**
+  - Two files with similar names = landmine. Consider deleting approve-v2.html as cleanup.
+  - Visible-vs-actual delta (user shows screenshot → matches code? → check APPROVE_BASE string) is a great debug pattern.
+
+## 2026-04-22 | Priority 4: Remove 4 emojis from entry.html cards
+**Problem:** User wanted choice cards (הצטרפות חדשה / כניסה לחשבון) cleaner — ✨, 🌟, 👤, 🔑 felt cheap.
+**Fix:** Removed all 4 emoji occurrences. Kept badges as text-only (commit d16cda2).
+**Learning:** User's follow-up expanded scope to ALL 80+ emojis across 11 files with SVG replacement → too big for P4 → handed off to next session.
+
+## 2026-04-22 | SESSION META #scope #deploy #security
+- **SCOPE DRIFT:** User started asking about Excel dashboard build, pivoted to TAB bug, pivoted to WhatsApp copy, pivoted to approval email, pivoted to emoji cleanup. 5 distinct tasks in one session — the pipeline's priority-cap saved us from a 6th (emoji SVG replacement).
+- **DEPLOYMENT CRITICAL:** Netlify GitHub webhook is broken. ALL 4 priorities required manual `netlify deploy --prod` via CLI. Future sessions MUST know this.
+- **SECURITY URGENT:** GitHub PAT `ghp_V4V8...` exposed in git remote URL. Needs rotation + switch to SSH or credential helper.
+- **PATTERN:** Every priority required: commit → push → manual netlify deploy → curl to verify live. Consider a shell alias `team-ship` that does all three.

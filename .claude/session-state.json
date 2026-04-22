@@ -1,13 +1,46 @@
 {
-  "session_start": "2026-04-21T07:25:24Z",
+  "session_start": "2026-04-22T06:23:30Z",
   "budget_total": 280000,
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
-  "priorities": [],
+  "priorities": [
+    {
+      "id": 1,
+      "title": "Sync TAB list in access.html with register.html + deploy",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 8000,
+      "checkpoint_commit": "605285c"
+    },
+    {
+      "id": 2,
+      "title": "Remove WhatsApp prompt sentence from register success dialog",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 2000,
+      "checkpoint_commit": "e8a4f96"
+    },
+    {
+      "id": 3,
+      "title": "Fix approval email link: approve-v2.html -> approve.html",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 3000,
+      "checkpoint_commit": "7345bcc"
+    },
+    {
+      "id": 4,
+      "title": "Remove 4 emojis from entry.html choice cards",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 2000,
+      "checkpoint_commit": "d16cda2"
+    }
+  ],
   "totals": {
-    "turns": 0,
-    "estimated_tokens": 0,
-    "budget_remaining": 280000,
+    "turns": 15,
+    "estimated_tokens": 15000,
+    "budget_remaining": 265000,
     "budget_status": "GREEN"
   }
 }
