@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Super Team Academy">
-<meta property="og:title" content="✨ Super Team Academy — הצטרפות">
+<meta property="og:title" content="Super Team Academy — הצטרפות">
 <meta property="og:description" content="בקשת גישה חדשה לאקדמיה ולפלואו העסקי">
 <meta property="og:image" content="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/register.html">
 <meta property="og:locale" content="he_IL">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="✨ Super Team Academy — הצטרפות">
+<meta name="twitter:title" content="Super Team Academy — הצטרפות">
 <meta name="twitter:description" content="בקשת גישה חדשה לאקדמיה ולפלואו העסקי">
 <meta name="twitter:image" content="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/og-image.jpg">
 <meta name="theme-color" content="#E50914">
@@ -657,7 +657,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
     if (!form) return;
     var html = ''
       + '<div style="text-align:center; padding:10px 4px;">'
-      + '  <div style="font-size:48px; margin-bottom:12px;">✅</div>'
+      + '  <div style="margin-bottom:12px; color:#46d369;"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>'
       + '  <h2 style="font-size:22px; margin-bottom:10px;">הבקשה נשלחה!</h2>'
       + '  <p style="color:rgba(255,255,255,0.75); margin-bottom:18px; line-height:1.6;">'
       + '    שלחנו מייל ל-<b>' + tabName + '</b> לאישור.'
@@ -665,7 +665,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
       + (tabWa
           ? '  <a href="' + tabWa + '" target="_blank" rel="noopener" '
           + '     style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#fff; padding:12px 22px; border-radius:8px; font-weight:700; text-decoration:none; margin-bottom:10px;">'
-          + '    💬 הודעה בוואטסאפ'
+          + '    הודעה בוואטסאפ <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="1.1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.2em"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
           + '  </a><br>'
           : '')
       + '  <a href="entry.html" style="color:#aaa; font-size:14px;">← חזרה למסך הבית</a>'
@@ -684,15 +684,15 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 
     // Validation
     if (!name || !email || !phone || !tabEmail) {
-      setStatus('❌ יש למלא את כל השדות', false);
+      setStatus('יש למלא את כל השדות', false);
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setStatus('❌ כתובת מייל לא תקינה', false);
+      setStatus('כתובת מייל לא תקינה', false);
       return;
     }
     if (!TAB_ROSTER[tabEmail]) {
-      setStatus('❌ בחר/י חבר/ת טאב מהרשימה', false);
+      setStatus('בחר/י חבר/ת טאב מהרשימה', false);
       return;
     }
 
@@ -747,7 +747,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 
     } catch (err) {
       console.error(err);
-      setStatus('❌ שגיאה בשליחה: ' + (err.message || err), false);
+      setStatus('שגיאה בשליחה: ' + (err.message || err), false);
       btn.disabled = false;
       btn.textContent = 'שלח בקשה';
     }

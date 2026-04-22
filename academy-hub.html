@@ -21,7 +21,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Super Team Academy">
-<meta property="og:title" content="🎬 האקדמיה — Super Team">
+<meta property="og:title" content="האקדמיה — Super Team">
 <meta property="og:description" content="כל הקורסים, הסדרות והזומים במקום אחד — Netflix-style">
 <meta property="og:image" content="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,7 @@
 <meta property="og:url" content="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/academy-hub.html">
 <meta property="og:locale" content="he_IL">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="🎬 האקדמיה — Super Team">
+<meta name="twitter:title" content="האקדמיה — Super Team">
 <meta name="twitter:description" content="כל הקורסים, הסדרות והזומים במקום אחד — Netflix-style">
 <meta name="twitter:image" content="https://shahafwaitzman.github.io/SUPER-TEAM-NETFLIX/og-image.jpg">
 <meta name="theme-color" content="#E50914">
@@ -168,6 +168,28 @@ img { display: block; max-width: 100%; }
 }
 @media (min-width: 950px) {
   .billboard-row { padding-top: 46%; }
+}
+
+/* MOBILE — shrink hero so the first row of videos peeks above the fold */
+@media (max-width: 768px) {
+  .billboard-row {
+    padding-top: 0;
+    min-height: 380px;
+    max-height: 50vh;
+    margin-bottom: 12px;
+  }
+  .meta-layer { bottom: 8% !important; gap: 8px !important; }
+  .billboard-title { font-size: 30px !important; letter-spacing: 1px !important; }
+  .billboard-title::after { width: 50px !important; height: 2px !important; margin: 5px auto !important; }
+  .hero-subtitle, .billboard-desc { font-size: 11px !important; line-height: 1.3 !important; }
+}
+@media (max-width: 480px) {
+  .billboard-row {
+    min-height: 340px;
+    max-height: 44vh;
+    margin-bottom: 8px;
+  }
+  .billboard-title { font-size: 26px !important; }
 }
 
 .hero-image-wrapper { position: absolute; inset: 0; z-index: 0; }
@@ -475,7 +497,7 @@ img { display: block; max-width: 100%; }
   margin-bottom: 14px;
   align-self: flex-start;
 }
-.latest-tag::before { content: '⚡'; }
+.latest-tag::before { content: ''; display:inline-block; width:0.9em; height:0.9em; margin-left:4px; vertical-align:-0.1em; background-color:currentColor; -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>") no-repeat center/contain; mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'/></svg>") no-repeat center/contain; }
 .billboard-title.latest-video-title {
   font-size: clamp(28px, 4.2vw, 56px) !important;
   text-transform: none;
@@ -1255,10 +1277,13 @@ html[dir="rtl"] .profile-panel { transform: translateX(100%); }
   backdrop-filter: blur(8px);
 }
 .maturity-rating::before {
-  content: "⭐";
+  content: ""; display:inline-block;
+  width: 14px; height: 14px;
   position: absolute; left: 12px; top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>") no-repeat center/contain;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>") no-repeat center/contain;
 }
 .maturity-rating .maturity-number { font-size: 13.2px; font-weight: 500; }
 
@@ -2078,7 +2103,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 </div>
 
 <div class="user-indicator" id="userIndicator" style="display:none;">
-  <span>😊 </span><span id="userNameDisplay"></span>
+  <span id="userNameDisplay"></span>
 </div>
 
 <!-- Profile Panel -->
@@ -2106,7 +2131,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
       <div class="pp-section-title">רצף צפייה</div>
       <div class="pp-streak-rich">
         <div class="pp-streak-head">
-          <span class="pp-streak-emoji">🔥</span>
+          <span class="pp-streak-emoji" aria-hidden="true" style="color:#ff6b35"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
           <div>
             <div class="pp-streak-num" id="ppStreakNum">0</div>
             <div class="pp-streak-label">ימים רצופים של צפייה</div>
@@ -2132,7 +2157,7 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 <div class="survey-backdrop" id="surveyBackdrop"></div>
 <div class="survey-modal" id="surveyModal" role="dialog" aria-hidden="true">
   <div class="survey-head">
-    <div class="survey-tag">⚡ משוב מהיר</div>
+    <div class="survey-tag">משוב מהיר <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-0.1em"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
     <h3 class="survey-title" id="surveyTitle">מה לקחת מהוידאו הזה?</h3>
     <p class="survey-sub">4 שאלות קצרות · 60 שניות · יעזור לנו להשתפר</p>
     <button class="survey-close" id="surveyCloseBtn" aria-label="דלג">דלג</button>
@@ -3350,7 +3375,7 @@ async function loadAcademy() {
     attachHandlers();
 
   } catch (err) {
-    loading.innerHTML = `<div class="drive-error">❌ שגיאה בטעינה מהדרייב:<br><small>${escapeHtml(err.message)}</small></div>`;
+    loading.innerHTML = `<div class="drive-error">שגיאה בטעינה מהדרייב <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.12em"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg><br><small>${escapeHtml(err.message)}</small></div>`;
   }
 }
 
@@ -3367,7 +3392,7 @@ function updateHeroFromFile(f, folderName) {
     if (!metaLayer) return;
     const dateLabel = created ? created.toLocaleDateString('he-IL') : '';
     metaLayer.innerHTML = `
-      <span class="latest-tag">⚡ החדש באקדמיה</span>
+      <span class="latest-tag">החדש באקדמיה</span>
       <h1 class="billboard-title latest-video-title">${esc(title)}</h1>
       <div class="latest-meta">
         <span>${esc(folderName)}</span>
