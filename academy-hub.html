@@ -2246,13 +2246,69 @@ function stGet(key, fallback) {
     return fallback;
   }
 }
+
+/* ═ Cloud sync — every stSet also fires to Firebase, fire-and-forget ═ */
+const __FB_ACADEMY = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+function __fbEmailKey() {
+  return (userEmail || '').trim().toLowerCase().replace(/[.#$\[\]]/g, '_') || 'guest';
+}
+function __keyToFbType(localKey) {
+  // Map local storage key suffix → Firebase subpath
+  if (localKey.endsWith('_progress'))     return 'progress';
+  if (localKey.endsWith('_watchlist'))    return 'watchlist';
+  if (localKey.endsWith('_lastWatched'))  return 'lastWatched';
+  if (localKey.endsWith('_streak'))       return 'streak';
+  if (localKey.endsWith('_badges'))       return 'badges';
+  if (localKey.endsWith('_surveys'))      return 'surveys';
+  if (localKey.endsWith('_notifsSeen'))   return 'notifsSeen';
+  return null;
+}
+function __cloudSync(localKey, val) {
+  const type = __keyToFbType(localKey);
+  if (!type) return;
+  const emailKey = __fbEmailKey();
+  if (emailKey === 'guest') return; // don't sync guests
+  const url = `${__FB_ACADEMY}/academy_data/${emailKey}/${type}.json`;
+  try {
+    fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: val, updatedAt: Date.now() })
+    }).catch(() => {/* offline is fine — localStorage kept */});
+  } catch (e) { /* silent */ }
+}
+
 function stSet(key, val) {
   try {
     localStorage.setItem(key, JSON.stringify(val));
+    __cloudSync(key, val);
   } catch (e) {
     console.warn('stSet failed for', key, e);
   }
 }
+
+/* On load: pull any cloud data newer than local and overwrite local */
+async function __cloudPull() {
+  const emailKey = __fbEmailKey();
+  if (emailKey === 'guest') return;
+  try {
+    const res = await fetch(`${__FB_ACADEMY}/academy_data/${emailKey}.json`);
+    const cloud = await res.json();
+    if (!cloud || typeof cloud !== 'object') return;
+    const map = { progress:'PROGRESS', watchlist:'WATCHLIST', lastWatched:'LAST_WATCHED',
+                  streak:'STREAK', badges:'BADGES', surveys:'SURVEYS', notifsSeen:'NOTIFICATIONS_SEEN' };
+    for (const [fbType, stKey] of Object.entries(map)) {
+      if (!cloud[fbType] || !('data' in cloud[fbType])) continue;
+      const cloudTs = cloud[fbType].updatedAt || 0;
+      const localRaw = localStorage.getItem(ST_KEYS[stKey]);
+      // Accept cloud if local is empty or cloud is newer
+      if (localRaw === null || cloudTs > Date.now() - 1000) {
+        try { localStorage.setItem(ST_KEYS[stKey], JSON.stringify(cloud[fbType].data)); } catch(e) {}
+      }
+    }
+  } catch (e) { /* silent */ }
+}
+if (userEmail) { __cloudPull(); }
 function stPush(key, val) {
   const arr = stGet(key, []);
   if (!Array.isArray(arr)) return;

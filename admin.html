@@ -594,6 +594,8 @@ body.stn-installed { padding-top: 68px; margin: 0; }
     <button class="admin-tab" onclick="setTab('approved')" id="tabApproved">מאושרים <span class="count" id="countApproved">0</span></button>
     <button class="admin-tab" onclick="setTab('all')" id="tabAll">הכל <span class="count" id="countAll">0</span></button>
     <button class="admin-tab" onclick="setTab('progress')" id="tabProgress">התקדמות</button>
+    <button class="admin-tab" onclick="setTab('surveys')" id="tabSurveys">משובים</button>
+    <button class="admin-tab" onclick="setTab('engagement')" id="tabEngagement">Engagement</button>
     <button class="admin-tab" onclick="setTab('analytics')" id="tabAnalytics">אנליטיקה</button>
   </div>
 
@@ -616,6 +618,26 @@ body.stn-installed { padding-top: 68px; margin: 0; }
       <thead><tr><th>שם</th><th>טלפון</th><th>התקדמות</th><th>סרטונים שנצפו</th></tr></thead>
       <tbody id="progressBody"></tbody>
     </table>
+  </div>
+
+  <!-- Surveys view -->
+  <div class="analytics-view" id="surveysView">
+    <div class="ana-section">
+      <div class="ana-section-title">תגובות סקרים — לפי וידאו ומשתמש</div>
+      <div id="surveysBody" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Engagement view -->
+  <div class="analytics-view" id="engagementView">
+    <div class="ana-kpi-grid" id="engKpis"></div>
+    <div class="ana-section">
+      <div class="ana-section-title">פעילות לפי משתמש</div>
+      <table style="width:100%;color:var(--text);font-size:14px;">
+        <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><th style="text-align:right;padding:10px">משתמש</th><th style="text-align:center;padding:10px">Streak</th><th style="text-align:center;padding:10px">נצפו</th><th style="text-align:center;padding:10px">רשימת צפייה</th><th style="text-align:center;padding:10px">Badges</th><th style="text-align:center;padding:10px">סקרים מולאו</th><th style="text-align:center;padding:10px">אחרון פעיל</th></tr></thead>
+        <tbody id="engagementBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="analytics-view" id="analyticsView">
@@ -863,7 +885,7 @@ setInterval(loadUsers, 10000);
    PHASE 3 P4 · Admin analytics
    ═══════════════════════════════════════════ */
 (function setupAnalyticsTab() {
-  // Intercept setTab to handle 'analytics'
+  // Intercept setTab to handle 'analytics', 'surveys', 'engagement'
   const origSetTab = window.setTab;
   window.setTab = function(tab) {
     currentTab = tab;
@@ -874,8 +896,15 @@ setInterval(loadUsers, 10000);
     const listView = document.getElementById('userList');
     const progressView = document.getElementById('progressView');
     const analyticsView = document.getElementById('analyticsView');
+    const surveysView = document.getElementById('surveysView');
+    const engagementView = document.getElementById('engagementView');
     const selectAll = document.getElementById('selectAllWrapper');
     const bulkActions = document.getElementById('bulkActions');
+
+    // Hide all custom views first
+    [analyticsView, surveysView, engagementView].forEach(v => {
+      if (v) { v.classList.remove('active'); v.style.display = 'none'; }
+    });
 
     if (tab === 'analytics') {
       if (listView) listView.style.display = 'none';
@@ -886,10 +915,141 @@ setInterval(loadUsers, 10000);
       renderAnalytics();
       return;
     }
-    if (analyticsView) { analyticsView.classList.remove('active'); analyticsView.style.display = 'none'; }
+    if (tab === 'surveys') {
+      if (listView) listView.style.display = 'none';
+      if (progressView) progressView.style.display = 'none';
+      if (surveysView) { surveysView.classList.add('active'); surveysView.style.display = 'block'; }
+      if (selectAll) selectAll.style.display = 'none';
+      if (bulkActions) bulkActions.style.display = 'none';
+      renderSurveys();
+      return;
+    }
+    if (tab === 'engagement') {
+      if (listView) listView.style.display = 'none';
+      if (progressView) progressView.style.display = 'none';
+      if (engagementView) { engagementView.classList.add('active'); engagementView.style.display = 'block'; }
+      if (selectAll) selectAll.style.display = 'none';
+      if (bulkActions) bulkActions.style.display = 'none';
+      renderEngagement();
+      return;
+    }
     if (typeof origSetTab === 'function') origSetTab(tab);
   };
 })();
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ═ Surveys tab ═ */
+async function renderSurveys() {
+  const body = document.getElementById('surveysBody');
+  if (!body) return;
+  body.innerHTML = '<div style="color:rgba(255,255,255,0.5);padding:20px">טוען...</div>';
+  try {
+    const res = await fetch(FIREBASE_URL + '/academy_data.json');
+    const data = await res.json() || {};
+    const rows = [];
+    for (const [emailKey, payload] of Object.entries(data)) {
+      if (!payload || !payload.surveys || !payload.surveys.data) continue;
+      const surveys = payload.surveys.data;
+      for (const [videoId, s] of Object.entries(surveys)) {
+        if (!s) continue;
+        rows.push({ emailKey, videoId, ...s });
+      }
+    }
+    rows.sort((a,b) => (b.ts||0) - (a.ts||0));
+    if (!rows.length) {
+      body.innerHTML = '<div style="color:rgba(255,255,255,0.5);padding:20px;text-align:center">עדיין לא התקבלו סקרים</div>';
+      return;
+    }
+    body.innerHTML = rows.map(r => {
+      const date = r.ts ? new Date(r.ts).toLocaleString('he-IL') : '';
+      const email = r.emailKey.replace(/_/g,'.').replace('.com','@com').replace('..','.'); // best-effort display
+      return `
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;">
+          <strong style="color:var(--red)">${escapeHtml(r.title || r.videoId)}</strong>
+          <span style="color:rgba(255,255,255,0.5)">${escapeHtml(r.emailKey)} · ${date}</span>
+        </div>
+        ${r.takeaway ? `<div style="margin-bottom:8px"><span style="color:rgba(255,255,255,0.5);font-size:12px">💡 תובנה:</span> ${escapeHtml(r.takeaway)}</div>` : ''}
+        ${r.clear    ? `<div style="margin-bottom:8px"><span style="color:rgba(255,255,255,0.5);font-size:12px">✓ ברור:</span> ${escapeHtml(r.clear)}</div>` : ''}
+        ${r.unclear  ? `<div style="margin-bottom:8px"><span style="color:rgba(255,255,255,0.5);font-size:12px">? לא ברור:</span> ${escapeHtml(r.unclear)}</div>` : ''}
+        ${r.questions? `<div><span style="color:rgba(255,255,255,0.5);font-size:12px">❓ שאלות:</span> ${escapeHtml(r.questions)}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch (e) {
+    body.innerHTML = '<div style="color:#e50914;padding:20px">שגיאה: ' + e.message + '</div>';
+  }
+}
+
+/* ═ Engagement tab ═ */
+async function renderEngagement() {
+  const body = document.getElementById('engagementBody');
+  const kpis = document.getElementById('engKpis');
+  if (!body) return;
+  body.innerHTML = '<tr><td colspan="7" style="padding:20px;color:rgba(255,255,255,0.5)">טוען...</td></tr>';
+  try {
+    const [usersRes, acadRes] = await Promise.all([
+      fetch(FIREBASE_URL + '/users.json'),
+      fetch(FIREBASE_URL + '/academy_data.json')
+    ]);
+    const users = await usersRes.json() || {};
+    const academy = await acadRes.json() || {};
+
+    // Build lookup: emailKey -> user
+    const emailKeyToUser = {};
+    for (const [key, u] of Object.entries(users)) {
+      if (!u || typeof u !== 'object' || u.status !== 'approved') continue;
+      const em = (u.email||'').toLowerCase().replace(/[.#$\[\]]/g,'_');
+      emailKeyToUser[em] = u;
+    }
+
+    const rows = [];
+    let totalStreak=0, withData=0, totalSurveys=0, totalWatched=0;
+    for (const [emailKey, user] of Object.entries(emailKeyToUser)) {
+      const a = academy[emailKey] || {};
+      const streak = (a.streak && a.streak.data) ? (a.streak.data.count || 0) : 0;
+      const progress = (a.progress && a.progress.data) ? a.progress.data : {};
+      const watched = Object.keys(progress).filter(k => (progress[k]||0) >= 90).length;
+      const watchlist = (a.watchlist && a.watchlist.data) ? (Array.isArray(a.watchlist.data) ? a.watchlist.data.length : 0) : 0;
+      const badges = (a.badges && a.badges.data) ? (Array.isArray(a.badges.data) ? a.badges.data.length : 0) : 0;
+      const surveys = (a.surveys && a.surveys.data) ? Object.keys(a.surveys.data).length : 0;
+      const lastTs = Math.max(
+        (a.streak && a.streak.updatedAt) || 0,
+        (a.progress && a.progress.updatedAt) || 0,
+        (a.surveys && a.surveys.updatedAt) || 0
+      );
+      const lastActive = lastTs ? new Date(lastTs).toLocaleDateString('he-IL') : '—';
+      rows.push({ user, streak, watched, watchlist, badges, surveys, lastActive, lastTs });
+      if (streak+watched+watchlist+surveys > 0) withData++;
+      totalStreak += streak; totalSurveys += surveys; totalWatched += watched;
+    }
+
+    // KPIs
+    kpis.innerHTML = `
+      <div class="ana-kpi"><div class="ana-kpi-num">${withData}</div><div class="ana-kpi-label">פעילים</div><div class="ana-kpi-sub">מתוך ${rows.length}</div></div>
+      <div class="ana-kpi gold"><div class="ana-kpi-num">${totalStreak}</div><div class="ana-kpi-label">סך streak</div><div class="ana-kpi-sub">ימי צפייה רצופים</div></div>
+      <div class="ana-kpi green"><div class="ana-kpi-num">${totalWatched}</div><div class="ana-kpi-label">סרטונים שנצפו</div><div class="ana-kpi-sub">90%+ מההתחלה</div></div>
+      <div class="ana-kpi red"><div class="ana-kpi-num">${totalSurveys}</div><div class="ana-kpi-label">סקרים מולאו</div><div class="ana-kpi-sub">סה"כ</div></div>
+    `;
+
+    rows.sort((a,b) => b.lastTs - a.lastTs);
+    body.innerHTML = rows.map(r => `
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+        <td style="padding:10px">${escapeHtml(r.user.name || '?')}<br><small style="color:rgba(255,255,255,0.4)">${escapeHtml(r.user.email||'')}</small></td>
+        <td style="text-align:center;padding:10px">${r.streak}</td>
+        <td style="text-align:center;padding:10px">${r.watched}</td>
+        <td style="text-align:center;padding:10px">${r.watchlist}</td>
+        <td style="text-align:center;padding:10px">${r.badges}</td>
+        <td style="text-align:center;padding:10px">${r.surveys}</td>
+        <td style="text-align:center;padding:10px;color:rgba(255,255,255,0.6);font-size:13px">${r.lastActive}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="7" style="padding:20px;text-align:center;color:rgba(255,255,255,0.5)">עדיין אין נתוני engagement (התחילו להצטבר אחרי פריסת היום)</td></tr>';
+  } catch (e) {
+    body.innerHTML = '<tr><td colspan="7" style="padding:20px;color:#e50914">שגיאה: ' + e.message + '</td></tr>';
+  }
+}
 
 function renderAnalytics() {
   const users = Object.values(usersData || {});
