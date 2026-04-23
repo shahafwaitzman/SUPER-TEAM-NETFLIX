@@ -2,26 +2,17 @@
 <html lang="he" dir="rtl">
 <head>
 <script>
-/* ═════ Super Team ADMIN Gate v3 — whitelist only ═════ */
-(function() {
-  // Authorized admin emails (normalized lowercase). Add more here to grant access.
-  const ADMIN_EMAILS = [
-    'shahafwai@gmail.com'
-  ];
+/* ═════ Super Team ADMIN Gate v4 — whitelist with inline login ═════ */
+window.__ADMIN_EMAILS = ['shahafwai@gmail.com'];
+window.__isAdminLoggedIn = function() {
   try {
     const saved = (localStorage.getItem('userEmail') || '').trim().toLowerCase();
     const ts = parseInt(localStorage.getItem('userEmailSavedAt') || '0', 10);
     const ageDays = ts ? (Date.now() - ts) / 86400000 : 99999;
-    const isLoggedIn = saved && ts && ageDays < 60;
-    const isAdmin = isLoggedIn && ADMIN_EMAILS.includes(saved);
-    if (!isAdmin) {
-      // Not an admin → bounce to entry. No hint that admin page exists.
-      window.location.replace('/entry.html');
-    }
-  } catch (e) {
-    window.location.replace('/entry.html');
-  }
-})();
+    return saved && ts && ageDays < 60 && window.__ADMIN_EMAILS.includes(saved);
+  } catch (e) { return false; }
+};
+/* No auto-redirect here — if not admin, we show a login form inline below. */
 </script>
 
 <meta charset="UTF-8">
@@ -466,6 +457,65 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 </style>
 </head>
 <body class="stn-bg-hero">
+
+<!-- ═════ ADMIN LOGIN OVERLAY (shown only when not logged in) ═════ -->
+<div id="adminLoginOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,10,10,0.96);z-index:99999;align-items:center;justify-content:center;font-family:'Heebo',sans-serif;backdrop-filter:blur(8px);">
+  <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:36px 32px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+    <div style="text-align:center;margin-bottom:24px;color:#e50914;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2 style="color:#fff;font-size:22px;margin:0 0 8px 0;text-align:center;font-weight:700;">כניסת מנהל</h2>
+    <p style="color:rgba(255,255,255,0.6);font-size:14px;text-align:center;margin:0 0 24px 0;">אזור מוגבל — הזן את האימייל המורשה</p>
+    <form id="adminLoginForm" onsubmit="return handleAdminLogin(event)">
+      <input type="email" id="adminEmailInput" placeholder="admin@email.com" required autocomplete="email" style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:15px;font-family:inherit;margin-bottom:12px;direction:ltr;text-align:right;">
+      <div id="adminLoginError" style="display:none;color:#e50914;font-size:13px;margin-bottom:12px;text-align:center;"></div>
+      <button type="submit" style="width:100%;padding:12px;background:#e50914;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;">כניסה</button>
+    </form>
+    <div style="text-align:center;margin-top:16px;">
+      <a href="/entry.html" style="color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;">← חזרה</a>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  function handleAdminLogin(e){
+    e.preventDefault();
+    var email = (document.getElementById('adminEmailInput').value || '').trim().toLowerCase();
+    var err = document.getElementById('adminLoginError');
+    if (!window.__ADMIN_EMAILS.includes(email)) {
+      err.textContent = 'אימייל לא מורשה';
+      err.style.display = 'block';
+      return false;
+    }
+    try {
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('userEmailSavedAt', Date.now().toString());
+    } catch(e){}
+    window.location.reload();
+    return false;
+  }
+  window.handleAdminLogin = handleAdminLogin;
+  /* On load: if not admin → show overlay, else hide it */
+  function checkGate(){
+    var overlay = document.getElementById('adminLoginOverlay');
+    if (!overlay) return;
+    if (!window.__isAdminLoggedIn()) {
+      overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      setTimeout(function(){ var inp = document.getElementById('adminEmailInput'); if(inp) inp.focus(); }, 100);
+    } else {
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkGate);
+  } else {
+    checkGate();
+  }
+})();
+</script>
+
 <div class="stn-bar" id="stnBar">
   <div class="stn-right">
     <a href="https://superteamhlf.team/dashboard.html" class="stn-logo" aria-label="Super Team ACADEMY">
