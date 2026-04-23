@@ -574,6 +574,10 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 <script>
 const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
 
+// Normalize helpers: tolerate whitespace, casing, and common typos.
+function normEmail(s) { return String(s || '').trim().toLowerCase(); }
+function normName(s)  { return String(s || '').trim().replace(/\s+/g, ' ').toLowerCase(); }
+
 async function verify() {
   const name = document.getElementById('name').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -593,21 +597,49 @@ async function verify() {
     const res = await fetch(FIREBASE_URL + '/users.json');
     const users = await res.json() || {};
 
+    const nameN  = normName(name);
+    const emailN = normEmail(email);
+    const tabN   = normEmail(tab);
+
+    // Try strict-but-normalized match first (name + email + tab)
     for (const [key, user] of Object.entries(users)) {
-      if (user.name === name &&
-          user.email === email &&
-          user.tab === tab &&
+      if (normName(user.name)   === nameN  &&
+          normEmail(user.email) === emailN &&
+          normEmail(user.tab)   === tabN   &&
           user.status === 'approved') {
-        // Auto-login: remember this user so future visits skip the form
-        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userEmail', emailN);
         localStorage.setItem('userEmailSavedAt', Date.now().toString());
         document.getElementById('message').style.display = 'none';
-        window.location.href = 'dashboard.html?user=' + encodeURIComponent(email);
+        window.location.href = 'dashboard.html?user=' + encodeURIComponent(emailN);
         return;
       }
     }
 
-    showMessage('הפרטים לא תואמים. לבדוק שוב את השדות או לפנות ל-TAB שלך', 'error');
+    // Fallback: match only by email+tab (forgive name typos — most common issue)
+    for (const [key, user] of Object.entries(users)) {
+      if (normEmail(user.email) === emailN &&
+          normEmail(user.tab)   === tabN   &&
+          user.status === 'approved') {
+        localStorage.setItem('userEmail', emailN);
+        localStorage.setItem('userEmailSavedAt', Date.now().toString());
+        document.getElementById('message').style.display = 'none';
+        window.location.href = 'dashboard.html?user=' + encodeURIComponent(emailN);
+        return;
+      }
+    }
+
+    // Helpful hint: did we find the email but status is pending?
+    let foundPending = false;
+    for (const [key, user] of Object.entries(users)) {
+      if (normEmail(user.email) === emailN && user.status !== 'approved') {
+        foundPending = true; break;
+      }
+    }
+    if (foundPending) {
+      showMessage('הבקשה שלך עדיין ממתינה לאישור הטאב. פנה אליו לזירוז.', 'error');
+    } else {
+      showMessage('הפרטים לא תואמים. בדוק שהאימייל ו-TAB זהים למה שמילאת בהרשמה.', 'error');
+    }
     btn.disabled = false;
     btn.textContent = 'כניסה';
 
