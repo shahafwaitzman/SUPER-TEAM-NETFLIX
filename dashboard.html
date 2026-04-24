@@ -2,17 +2,40 @@
 <html lang="he" dir="rtl">
 <head>
 <script>
-/* ═════ Super Team Auth Gate v2 — internal ═════ */
+/* ═════ Super Team Auth Gate v3 — localStorage + live Firebase check ═════
+   Step 1 (instant): check localStorage for a saved session.
+   Step 2 (async): verify against Firebase that the user still exists & is approved.
+   If the user was deleted or un-approved in the admin, this kicks them out on next load. */
 (function() {
+  const FB = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
+  const ADMIN_EMAILS = ['shahafwai@gmail.com'];
+  function bounce() {
+    try {
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userEmailSavedAt');
+      localStorage.removeItem('stSessionSeen');
+    } catch (e) {}
+    window.location.replace('/entry.html');
+  }
   try {
-    const saved = localStorage.getItem('userEmail');
+    const saved = (localStorage.getItem('userEmail') || '').trim().toLowerCase();
     const ts = parseInt(localStorage.getItem('userEmailSavedAt') || '0', 10);
     const ageDays = ts ? (Date.now() - ts) / 86400000 : 99999;
-    if (!saved || !ts || ageDays >= 60) {
-      window.location.replace('/entry.html');
-    }
+    if (!saved || !ts || ageDays >= 60) { bounce(); return; }
+    // Admins bypass the Firebase check (not in the /users list, but are authorized).
+    if (ADMIN_EMAILS.includes(saved)) return;
+    // Async Firebase verification (doesn't block render — but kicks out if stale)
+    fetch(FB + '/users.json').then(r => r.json()).then(users => {
+      if (!users || typeof users !== 'object') return;
+      let found = false;
+      for (const k in users) {
+        const u = users[k];
+        if (u && u.email && String(u.email).toLowerCase() === saved && u.status === 'approved') { found = true; break; }
+      }
+      if (!found) { bounce(); }
+    }).catch(() => { /* offline → allow cached session */ });
   } catch (e) {
-    window.location.replace('/entry.html');
+    bounce();
   }
 })();
 </script>
