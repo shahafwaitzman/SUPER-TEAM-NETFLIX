@@ -672,7 +672,14 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 
 <script>
 const FIREBASE_URL = 'https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app';
-const ADMIN_PASSWORD = 'superteam2026';
+/* Admin password — stored as SHA-256 hash (raw password NOT in source).
+   Change password? Run `echo -n "yourPassword" | shasum -a 256` and replace the hash. */
+const ADMIN_PASS_HASH = '5bf2c23c396002ff6d6ad55e2bac64bbcb87f58f3df7b7cd547d1fc7338eb20c';
+async function sha256(s) {
+  const buf = new TextEncoder().encode(s);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
 let currentTab = 'pending';
 let usersData = {};
@@ -696,9 +703,10 @@ async function checkAutoApprove() {
 }
 checkAutoApprove();
 
-function adminLogin() {
+async function adminLogin() {
   const pass = document.getElementById('adminPass').value;
-  if (pass === ADMIN_PASSWORD) {
+  const hash = await sha256(pass);
+  if (hash === ADMIN_PASS_HASH) {
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
     loadUsers();

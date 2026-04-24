@@ -4,43 +4,16 @@
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
   "priorities": [
-    {
-      "id": 1,
-      "title": "Sync TAB list in access.html with register.html + deploy",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 8000,
-      "checkpoint_commit": "605285c"
-    },
-    {
-      "id": 2,
-      "title": "Remove WhatsApp prompt sentence from register success dialog",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 2000,
-      "checkpoint_commit": "e8a4f96"
-    },
-    {
-      "id": 3,
-      "title": "Fix approval email link: approve-v2.html -> approve.html",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 3000,
-      "checkpoint_commit": "7345bcc"
-    },
-    {
-      "id": 4,
-      "title": "Remove 4 emojis from entry.html choice cards",
-      "status": "completed",
-      "pdr_approved": true,
-      "estimated_tokens": 2000,
-      "checkpoint_commit": "d16cda2"
-    }
+    {"id": 1, "title": "Sync TAB list", "status": "completed", "pdr_approved": true, "checkpoint_commit": "605285c"},
+    {"id": 2, "title": "Remove WhatsApp prompt sentence", "status": "completed", "pdr_approved": true, "checkpoint_commit": "e8a4f96"},
+    {"id": 3, "title": "Fix approval email link", "status": "completed", "pdr_approved": true, "checkpoint_commit": "7345bcc"},
+    {"id": 4, "title": "Remove 4 emojis from entry.html", "status": "completed", "pdr_approved": true, "checkpoint_commit": "d16cda2"},
+    {"id": 5, "title": "Global emoji-to-Lucide-SVG replacement", "status": "completed", "pdr_approved": true, "checkpoint_commit": "19336b0"},
+    {"id": 6, "title": "Admin whitelist gate", "status": "completed", "pdr_approved": true, "checkpoint_commit": "369b39f"},
+    {"id": 7, "title": "Billing/subscription audit", "status": "completed", "pdr_approved": true, "checkpoint_commit": null},
+    {"id": 8, "title": "Production hotfix: login + WhatsApp delivery", "status": "completed", "pdr_approved": true, "checkpoint_commit": "aa389f3"},
+    {"id": 9, "title": "Admin WhatsApp send button", "status": "completed", "pdr_approved": true, "checkpoint_commit": "c35dc55"},
+    {"id": 10, "title": "Firebase cleanup + cloud sync + admin tabs", "status": "completed", "pdr_approved": true, "checkpoint_commit": "de1377f"}
   ],
-  "totals": {
-    "turns": 15,
-    "estimated_tokens": 15000,
-    "budget_remaining": 265000,
-    "budget_status": "GREEN"
-  }
+  "totals": {"turns": 40, "estimated_tokens": 105000, "budget_remaining": 175000, "budget_status": "GREEN"}
 }
