@@ -3409,10 +3409,15 @@ function cleanFolderName(name) {
      renders disabled with a "זמנית לא זמין" overlay. */
 const VIDEO_REDIRECTS = {
   // broken_id → working duplicate id (both files exist on Drive, duplicate plays fine)
-  '1PgxSAvw_32unldpHHD4fHjyd_DNCzDfV': '1kqpthLMmCDy2s5cBpNKhCD5oijP3hUJc', // הפניות → TELEGRAM ARCHIVE
-  '1kNB247nxMP7Ya6sMCypU1dpdEU2co9f6': '19BdDqvs_4dWQrrUcW_o6j2neb_ImOWgJ', // זום טיפול בהתנגדויות → TELEGRAM ARCHIVE
-  '1rnX4kMtkpQq6t_hFhfYcRTBT8SJukhJn': '1lig8JhpE_i40yh86dLSG4VfOn3YpbYm5', // שגרת עבודה → TELEGRAM ARCHIVE
-  '11nKXV7u7WLLta6VAEK7OZmEzybl4i4dD': '1guwzdz3Qhruvz5e2yVhvqmveEtpGJgtZ', // זום גיוס → TELEGRAM ARCHIVE
+  // Category 1 — "unplayable due to temporary failure":
+  '1PgxSAvw_32unldpHHD4fHjyd_DNCzDfV': '1kqpthLMmCDy2s5cBpNKhCD5oijP3hUJc', // הפניות
+  '1kNB247nxMP7Ya6sMCypU1dpdEU2co9f6': '19BdDqvs_4dWQrrUcW_o6j2neb_ImOWgJ', // זום טיפול בהתנגדויות
+  '1rnX4kMtkpQq6t_hFhfYcRTBT8SJukhJn': '1lig8JhpE_i40yh86dLSG4VfOn3YpbYm5', // שגרת עבודה
+  '11nKXV7u7WLLta6VAEK7OZmEzybl4i4dD': '1guwzdz3Qhruvz5e2yVhvqmveEtpGJgtZ', // זום גיוס
+  // Category 2 — "processing slowly due to exceeding upload quota":
+  '1Xh-hH5WsT2XQJmWcrQQ3az7sbTsfMOod': '1HoYTWuUsHLOseH7aQktqRj3x2-PaBERa', // זום טיק טוק
+  '1amQlqE0dEeMSH_6dL-TutS952xNWs4dE': '1vWYlbqmTQmFHSVmQGZzcbhvt7PfJ4bix', // זום פלקס - מנהיגות HONORS
+  '1udLC3CnaONCmoXxvb2aHRh4z448efcua': '1XPhkqOOy_xSK7FWVRHm0P_4OqDqY5RTm', // הזדמנות עסקית ממוקדת אמהות
 };
 const BROKEN_VIDEOS = new Set([
   '1yjk9St6WXldNBrW4av1Trs9fwOvjolJe',  // video1770607575 — no working duplicate
