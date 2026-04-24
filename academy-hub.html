@@ -3401,17 +3401,25 @@ function cleanFolderName(name) {
     .trim();
 }
 
-/* Videos that Google Drive currently can't play (transcoding failure).
-   These cards render disabled with a "זמנית לא זמין" overlay.
-   Remove an ID once the file is re-uploaded / playable again. */
+/* Videos that Google Drive can't play (transcoding failure on its side).
+   — If we have a WORKING duplicate elsewhere on the Drive, we redirect
+     playback to the working ID via VIDEO_REDIRECTS. User sees normal card,
+     click opens the working copy transparently.
+   — If no duplicate exists, the ID appears in BROKEN_VIDEOS and the card
+     renders disabled with a "זמנית לא זמין" overlay. */
+const VIDEO_REDIRECTS = {
+  // broken_id → working duplicate id (both files exist on Drive, duplicate plays fine)
+  '1PgxSAvw_32unldpHHD4fHjyd_DNCzDfV': '1kqpthLMmCDy2s5cBpNKhCD5oijP3hUJc', // הפניות → TELEGRAM ARCHIVE
+  '1kNB247nxMP7Ya6sMCypU1dpdEU2co9f6': '19BdDqvs_4dWQrrUcW_o6j2neb_ImOWgJ', // זום טיפול בהתנגדויות → TELEGRAM ARCHIVE
+  '1rnX4kMtkpQq6t_hFhfYcRTBT8SJukhJn': '1lig8JhpE_i40yh86dLSG4VfOn3YpbYm5', // שגרת עבודה → TELEGRAM ARCHIVE
+  '11nKXV7u7WLLta6VAEK7OZmEzybl4i4dD': '1guwzdz3Qhruvz5e2yVhvqmveEtpGJgtZ', // זום גיוס → TELEGRAM ARCHIVE
+};
 const BROKEN_VIDEOS = new Set([
-  '1PgxSAvw_32unldpHHD4fHjyd_DNCzDfV',  // הפניות (מפיצים חדשים)
-  '1kNB247nxMP7Ya6sMCypU1dpdEU2co9f6',  // זום טיפול בהתנגדויות
-  '1rnX4kMtkpQq6t_hFhfYcRTBT8SJukhJn',  // שגרת עבודה
-  '11nKXV7u7WLLta6VAEK7OZmEzybl4i4dD',  // זום גיוס (HOM)
-  '1yjk9St6WXldNBrW4av1Trs9fwOvjolJe',  // video1770607575
-  '1m0HCFyF_xTURv03jQPJvebhCB2hdAcCY',  // video1720011764
+  '1yjk9St6WXldNBrW4av1Trs9fwOvjolJe',  // video1770607575 — no working duplicate
+  '1m0HCFyF_xTURv03jQPJvebhCB2hdAcCY',  // video1720011764 — no working duplicate
 ]);
+/* Translate a video id through the redirect map (or return as-is). */
+function resolveVideoId(id) { return VIDEO_REDIRECTS[id] || id; }
 
 // Gradient palette for card backgrounds (legacy, kept for fallback)
 const boxartPalette = ['boxart-1','boxart-2','boxart-3','boxart-4','boxart-5','boxart-6','boxart-7','boxart-8','boxart-9','boxart-10'];
@@ -3597,10 +3605,9 @@ function attachHandlers() {
     if (nextBtn) nextBtn.addEventListener('click', () => content.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
   });
 
-  // Card click → open video modal (skip broken videos)
+  // Card click → open video modal (skip broken, redirect if duplicate exists)
   document.querySelectorAll('.title-card-container[data-video-id]').forEach(card => {
     card.addEventListener('click', (e) => {
-      // Don't open broken videos — show toast instead
       if (card.dataset.broken === '1') {
         e.preventDefault(); e.stopPropagation();
         if (typeof showToast === 'function') {
@@ -3608,7 +3615,8 @@ function attachHandlers() {
         }
         return;
       }
-      const id = card.dataset.videoId;
+      const rawId = card.dataset.videoId;
+      const id = resolveVideoId(rawId);  // swap to working duplicate if broken
       const title = decodeURIComponent(card.dataset.videoTitle || '');
       openVideo(id, title);
     });
