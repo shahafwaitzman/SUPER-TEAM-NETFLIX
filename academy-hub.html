@@ -3338,14 +3338,15 @@ const DRIVE_CONFIG = {
 // Folders not in this list appear AFTER, sorted alphabetically
 const FOLDER_ORDER = [
   'מפיצים חדשים',          // זומים למפיצים חדשים
+  'FLOW',                   // FLOW
   'הזדמנות עסקית',          // הזדמנות עסקית - HOM
+  'שיטות עבודה',            // זומים בנושא שיטות עבודה
   'תזונה ומוצרים',          // זומים בנושא תזונה ומוצרים
-  'שיטות עבודה',            // זומים בנושא שיטות עבודה (picks both "שיטות עבודה" variants)
-  'ניהול וארגון',           // זומים בנושא ניהול וארגון
   'למפקחים',                // זומים למפקחים
+  'ניהול וארגון',           // זומים בנושא ניהול וארגון
   'WT ומעלה',               // זומים ל WT ומעלה
+  'TELEGRAM ARCHIVE',
   'קבצים ארגוניים',
-  'TELEGRAM ARCHIVE'
 ];
 
 // Natural sort comparator for video titles (handles "1.", "10.", "Copy of" etc.)
@@ -3409,20 +3410,14 @@ function cleanFolderName(name) {
      renders disabled with a "זמנית לא זמין" overlay. */
 const VIDEO_REDIRECTS = {
   // broken_id → working duplicate id (both files exist on Drive, duplicate plays fine)
-  // Category 1 — "unplayable due to temporary failure":
-  '1PgxSAvw_32unldpHHD4fHjyd_DNCzDfV': '1kqpthLMmCDy2s5cBpNKhCD5oijP3hUJc', // הפניות
-  '1kNB247nxMP7Ya6sMCypU1dpdEU2co9f6': '19BdDqvs_4dWQrrUcW_o6j2neb_ImOWgJ', // זום טיפול בהתנגדויות
-  '1rnX4kMtkpQq6t_hFhfYcRTBT8SJukhJn': '1lig8JhpE_i40yh86dLSG4VfOn3YpbYm5', // שגרת עבודה
-  '11nKXV7u7WLLta6VAEK7OZmEzybl4i4dD': '1guwzdz3Qhruvz5e2yVhvqmveEtpGJgtZ', // זום גיוס
-  // Category 2 — "processing slowly due to exceeding upload quota":
+  // Only 3 videos still have Drive "processing slowly" errors after Drive reorganization;
+  // all three have a working duplicate in TELEGRAM ARCHIVE.
   '1Xh-hH5WsT2XQJmWcrQQ3az7sbTsfMOod': '1HoYTWuUsHLOseH7aQktqRj3x2-PaBERa', // זום טיק טוק
   '1amQlqE0dEeMSH_6dL-TutS952xNWs4dE': '1vWYlbqmTQmFHSVmQGZzcbhvt7PfJ4bix', // זום פלקס - מנהיגות HONORS
   '1udLC3CnaONCmoXxvb2aHRh4z448efcua': '1XPhkqOOy_xSK7FWVRHm0P_4OqDqY5RTm', // הזדמנות עסקית ממוקדת אמהות
 };
-const BROKEN_VIDEOS = new Set([
-  '1yjk9St6WXldNBrW4av1Trs9fwOvjolJe',  // video1770607575 — no working duplicate
-  '1m0HCFyF_xTURv03jQPJvebhCB2hdAcCY',  // video1720011764 — no working duplicate
-]);
+// Empty — all currently broken videos have redirects above.
+const BROKEN_VIDEOS = new Set([]);
 /* Translate a video id through the redirect map (or return as-is). */
 function resolveVideoId(id) { return VIDEO_REDIRECTS[id] || id; }
 
@@ -3434,6 +3429,7 @@ const boxartPalette = ['boxart-1','boxart-2','boxart-3','boxart-4','boxart-5','b
 const FOLDER_STYLES = [
   // [keyword match, gradient, lucide icon path(s), label]
   { match: /מפיצים חדשים|חדשים/, grad: 'linear-gradient(135deg,#4a1a6e 0%,#2d0f45 100%)', accent:'#c084fc', icon:'<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>' },
+  { match: /^FLOW$|\bFLOW\b/,  grad: 'linear-gradient(135deg,#7c2d12 0%,#431407 100%)', accent:'#fb923c', icon:'<path d="M3 12h4l3-9 4 18 3-9h4"/>' },
   { match: /מפקחים/,          grad: 'linear-gradient(135deg,#0c4a6e 0%,#082f49 100%)', accent:'#38bdf8', icon:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>' },
   { match: /הזדמנות עסקית|HOM/, grad: 'linear-gradient(135deg,#991b1b 0%,#450a0a 100%)', accent:'#fca5a5', icon:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>' },
   { match: /WT/,              grad: 'linear-gradient(135deg,#b45309 0%,#78350f 100%)', accent:'#fbbf24', icon:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
