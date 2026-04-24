@@ -562,15 +562,13 @@ body.stn-installed { padding-top: 68px; margin: 0; }
 
 
 
-<div class="admin-login" id="adminLogin">
-  <div class="admin-login-box">
-    <h2>Admin Panel</h2>
-    <input type="password" id="adminPass" placeholder="סיסמת אדמין" onkeydown="if(event.key==='Enter')adminLogin()">
-    <button onclick="adminLogin()">כניסה</button>
-  </div>
+<!-- Legacy password gate removed — now handled by #adminLoginOverlay (email whitelist).
+     Keeping elements as hidden stubs for backwards compat with existing JS handlers. -->
+<div class="admin-login" id="adminLogin" style="display:none">
+  <input type="password" id="adminPass" style="display:none">
 </div>
 
-<div class="admin-panel" id="adminPanel">
+<div class="admin-panel" id="adminPanel" style="display:block">
   <div class="admin-header">
     <h1>Super Team Admin</h1>
     <div class="admin-stats">
@@ -702,6 +700,10 @@ async function checkAutoApprove() {
   }
 }
 checkAutoApprove();
+/* Admin panel is now always visible (legacy gate removed) — load users immediately */
+if (typeof window.__isAdminLoggedIn === 'function' && window.__isAdminLoggedIn()) {
+  loadUsers();
+}
 
 async function adminLogin() {
   const pass = document.getElementById('adminPass').value;
