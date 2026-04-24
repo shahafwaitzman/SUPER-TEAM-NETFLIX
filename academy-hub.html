@@ -1510,6 +1510,27 @@ html[dir="rtl"] .profile-panel { transform: translateX(100%); }
 .uc-play svg { width: 11px; height: 11px; color: #fff; margin-left: 2px; }
 .title-card-container:hover .uc-play { opacity: 1; }
 
+/* Broken video state — disabled + badge */
+.title-card-container.is-broken { cursor: not-allowed; }
+.title-card-container.is-broken:hover { transform: none !important; }
+.title-card.uc-broken { opacity: 0.55; filter: saturate(0.6); }
+.title-card.uc-broken .uc-title { color: rgba(255,255,255,0.55); }
+.uc-broken-badge {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(229,9,20,0.95);
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.3px;
+  border-radius: 4px;
+  text-align: center;
+  z-index: 4;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+@media (max-width: 500px) { .uc-broken-badge { font-size: 9.5px; padding: 4px 9px; } }
+
 /* Responsive — avoid text clip on smaller cards */
 @media (max-width: 1400px) {
   .title-card.uniform-card { padding: 8px 10px; gap: 4px; }
@@ -3380,6 +3401,18 @@ function cleanFolderName(name) {
     .trim();
 }
 
+/* Videos that Google Drive currently can't play (transcoding failure).
+   These cards render disabled with a "זמנית לא זמין" overlay.
+   Remove an ID once the file is re-uploaded / playable again. */
+const BROKEN_VIDEOS = new Set([
+  '1PgxSAvw_32unldpHHD4fHjyd_DNCzDfV',  // הפניות (מפיצים חדשים)
+  '1kNB247nxMP7Ya6sMCypU1dpdEU2co9f6',  // זום טיפול בהתנגדויות
+  '1rnX4kMtkpQq6t_hFhfYcRTBT8SJukhJn',  // שגרת עבודה
+  '11nKXV7u7WLLta6VAEK7OZmEzybl4i4dD',  // זום גיוס (HOM)
+  '1yjk9St6WXldNBrW4av1Trs9fwOvjolJe',  // video1770607575
+  '1m0HCFyF_xTURv03jQPJvebhCB2hdAcCY',  // video1720011764
+]);
+
 // Gradient palette for card backgrounds (legacy, kept for fallback)
 const boxartPalette = ['boxart-1','boxart-2','boxart-3','boxart-4','boxart-5','boxart-6','boxart-7','boxart-8','boxart-9','boxart-10'];
 
@@ -3414,25 +3447,28 @@ function renderRow(folderName, files) {
   const fstyle = folderStyle(folderName);
   const cards = videos.map((f, i) => {
     const title = f.name.replace(/\.(mp4|mov|avi|mkv)$/i, '').replace(/^Copy of\s*/i, '').trim();
+    const isBroken = BROKEN_VIDEOS.has(f.id);
 
     return `
       <div class="slider-item">
-        <div class="title-card-container" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}" data-modified="${f.modifiedTime || ''}" data-created="${f.createdTime || ''}" data-category="${encodeURIComponent(cleanTitle || folderName || '')}">
+        <div class="title-card-container ${isBroken ? 'is-broken' : ''}" data-video-id="${f.id}" data-video-title="${encodeURIComponent(title)}" data-modified="${f.modifiedTime || ''}" data-created="${f.createdTime || ''}" data-category="${encodeURIComponent(cleanTitle || folderName || '')}" ${isBroken ? 'data-broken="1"' : ''}>
           ${(() => {
+            if (isBroken) return '';
             const created = f.createdTime ? new Date(f.createdTime).getTime() : 0;
             const daysOld = created ? (Date.now() - created) / (24*3600*1000) : 999;
             return daysOld < 30 ? '<div class="new-badge" aria-label="חדש"><span>חדש</span></div>' : '';
           })()}
           <button type="button" class="watchlist-btn ${stHas(ST_KEYS.WATCHLIST, f.id) ? 'in-list' : ''}" data-video-id="${f.id}" aria-label="הוסף להרשימה שלי" title="הוסף להרשימה שלי">${stHas(ST_KEYS.WATCHLIST, f.id) ? '✓' : '+'}</button>
-          <div class="title-card uniform-card" style="background:${fstyle.grad};">
+          <div class="title-card uniform-card ${isBroken ? 'uc-broken' : ''}" style="background:${fstyle.grad};">
             <div class="uc-folder-label">${escapeHtml(cleanTitle)}</div>
             <div class="uc-icon" aria-hidden="true" style="color:${fstyle.accent};">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${fstyle.icon}</svg>
             </div>
             <div class="uc-title">${escapeHtml(title)}</div>
+            ${isBroken ? '<div class="uc-broken-badge">זמנית לא זמין</div>' : `
             <div class="uc-play" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 2.7a1 1 0 0 1 1.48-.88l16.93 9.3a1 1 0 0 1 0 1.76l-16.93 9.3A1 1 0 0 1 5 21.31z"/></svg>
-            </div>
+            </div>`}
             ${(() => {
               const _p = (stGet(ST_KEYS.PROGRESS, {}) || {})[f.id];
               return (_p && _p > 0) ? `<div class="card-progress"><div class="card-progress-fill" style="width:${Math.min(100,Math.max(0,_p))}%"></div></div>` : '';
@@ -3561,9 +3597,17 @@ function attachHandlers() {
     if (nextBtn) nextBtn.addEventListener('click', () => content.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
   });
 
-  // Card click → open video modal
+  // Card click → open video modal (skip broken videos)
   document.querySelectorAll('.title-card-container[data-video-id]').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      // Don't open broken videos — show toast instead
+      if (card.dataset.broken === '1') {
+        e.preventDefault(); e.stopPropagation();
+        if (typeof showToast === 'function') {
+          showToast('הוידאו בתהליך שחזור ב-Drive · יהיה זמין בקרוב');
+        }
+        return;
+      }
       const id = card.dataset.videoId;
       const title = decodeURIComponent(card.dataset.videoTitle || '');
       openVideo(id, title);
