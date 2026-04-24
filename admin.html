@@ -966,22 +966,22 @@ function sendWelcomeWA(userKey) {
   const tab = u.tabName || u.tab || '';
 
   const msg =
-    'היי ' + name + '! 🎉\n' +
-    'ברוכים הבאים ל-Super Team Academy ✨\n' +
+    'היי ' + name + '!\n' +
+    'ברוכים הבאים ל-Super Team Academy\n' +
     '\n' +
-    'לחצ/י לכניסה ישירה 🔑\n' +
+    'לחצ/י לכניסה ישירה:\n' +
     'https://superteamhlf.team/access.html\n' +
     '\n' +
-    'הפרטים שלך 📝\n' +
+    'הפרטים שלך:\n' +
     '• שם: ' + name + '\n' +
     '• אימייל: ' + email + '\n' +
     '• TAB: ' + tab + '\n' +
     '\n' +
-    'מה מחכה לך בפנים 💎\n' +
-    '• קורסים, סדרות וזומים 🎬\n' +
-    '• פלואו עסקי לפגישות 💼\n' +
+    'מה מחכה לך בפנים:\n' +
+    '• קורסים, סדרות וזומים\n' +
+    '• פלואו עסקי לפגישות\n' +
     '\n' +
-    'מחכים לך בפנים! 🚀';
+    'מחכים לך בפנים!';
 
   const url = 'https://wa.me/' + digits + '?text=' + encodeURIComponent(msg);
   window.open(url, '_blank', 'noopener');
