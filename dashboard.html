@@ -791,13 +791,16 @@ const userEmail = localStorage.getItem('userEmail');
 if (userEmail) {
   localStorage.setItem('userEmail', userEmail);
   const name = userEmail.split('@')[0];
-  document.getElementById('userName').textContent = name;
-  document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('welcomeHeading').textContent = 'שלום, ' + name;
+  const elUserName = document.getElementById('userName');
+  if (elUserName) elUserName.textContent = name;
+  const elAvatar = document.getElementById('userAvatar');
+  if (elAvatar) elAvatar.textContent = name.charAt(0).toUpperCase();
+  const elWelcome = document.getElementById('welcomeHeading');
+  if (elWelcome) elWelcome.textContent = 'שלום, ' + name;
 
   // Pass user param to academy link
   const academyCard = document.getElementById('academyCard');
-  academyCard.href = 'academy-hub.html?user=' + encodeURIComponent(userEmail);
+  if (academyCard) academyCard.href = 'academy-hub.html?user=' + encodeURIComponent(userEmail);
 } else {
   // No user identified — send back to entry
   // (commented out to allow direct access during dev)
