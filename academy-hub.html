@@ -3293,27 +3293,37 @@ async function getHeroTarget() {
       if (data && data.featured_video_id) {
         const weekTs = data.week_of ? new Date(data.week_of).getTime() : 0;
         if (!weekTs || Date.now() - weekTs < 14 * 24 * 3600 * 1000) {
-          return { id: data.featured_video_id, source: 'featured' };
+          return { id: data.featured_video_id, source: 'featured', title: data.featured_video_title || '' };
         }
       }
     }
   } catch (e) { /* file missing — fall through */ }
-  // 2. Last watched
+  // 2. PRIORITY: globally latest video (set by updateHeroFromFile)
+  if (window.__latestVideoId) {
+    return { id: window.__latestVideoId, source: 'latest', title: window.__latestVideoTitle || '' };
+  }
+  // 3. Last watched
   const lw = stGet(ST_KEYS.LAST_WATCHED, {});
   const last = Object.entries(lw).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0))[0];
-  if (last && last[0]) return { id: last[0], source: 'lastWatched' };
-  // 3. First visible card
+  if (last && last[0]) return { id: last[0], source: 'lastWatched', title: (last[1] && last[1].title) || '' };
+  // 4. First visible card
   const first = document.querySelector('.row:not(#continueWatchingRow) .title-card-container[data-video-id]');
-  if (first) return { id: first.dataset.videoId, source: 'first' };
+  if (first) return { id: first.dataset.videoId, source: 'first', title: decodeURIComponent(first.dataset.videoTitle || '') };
   return null;
 }
 async function heroPlayHandler() {
   const target = await getHeroTarget();
-  if (!target) { scrollToRows(); return; }
-  const card = document.querySelector(`.title-card-container[data-video-id="${target.id}"]`);
-  if (card) { card.click(); return; }
-  // Target not visible — fallback scroll
-  scrollToRows();
+  if (!target || !target.id) {
+    if (typeof showToast === 'function') showToast('עוד לא נטענו סרטונים · נסה/י עוד רגע');
+    return;
+  }
+  // Resolve to working duplicate if broken
+  const id = (typeof resolveVideoId === 'function') ? resolveVideoId(target.id) : target.id;
+  const title = target.title || '';
+  // Track open
+  if (typeof trackVideoOpen === 'function') trackVideoOpen(id, title);
+  // Open modal directly — no card click, no scroll
+  openVideo(id, title);
 }
 // Rebind hero play button
 document.addEventListener('click', (e) => {
