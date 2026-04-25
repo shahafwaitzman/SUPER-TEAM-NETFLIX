@@ -1760,7 +1760,12 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
   width: 100%;
   padding-top: 56.25%;
   background: #000;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
+.video-modal-content { -webkit-user-select: none; user-select: none; }
+.video-modal-content * { -webkit-user-drag: none; user-drag: none; }
 #videoFrame {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
@@ -3678,6 +3683,14 @@ function openVideo(fileId, title) {
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
+
+// Block right-click anywhere in the video modal
+document.addEventListener('contextmenu', (e) => {
+  if (e.target.closest('.video-modal-content')) {
+    e.preventDefault();
+    return false;
+  }
+}, true);
 
 function closeVideo() {
   const modal = document.getElementById('videoModal');
