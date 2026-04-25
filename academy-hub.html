@@ -195,8 +195,8 @@ img { display: block; max-width: 100%; }
 @media (max-width: 768px) {
   .billboard-row {
     padding-top: 0;
-    min-height: 320px;
-    max-height: 42vh;
+    min-height: 280px;
+    max-height: 38vh;
     margin-bottom: 8px;
   }
   .meta-layer {
@@ -205,19 +205,25 @@ img { display: block; max-width: 100%; }
     gap: 6px !important;
     padding: 0 16px !important;
   }
-  .billboard-title { font-size: 24px !important; letter-spacing: 0.5px !important; line-height: 1.1 !important; }
-  .billboard-title::after { width: 44px !important; height: 2px !important; margin: 4px auto !important; }
-  .hero-subtitle, .billboard-desc, .synopsis { font-size: 11px !important; line-height: 1.35 !important; }
-  .billboard-links { margin-top: 6px !important; gap: 6px !important; }
+  .billboard-title,
+  .billboard-title.latest-video-title { font-size: 22px !important; letter-spacing: 0.3px !important; line-height: 1.15 !important; }
+  .billboard-title::after { width: 40px !important; height: 2px !important; margin: 4px auto !important; }
+  .latest-tag { font-size: 10px !important; padding: 4px 10px !important; margin-bottom: 4px !important; }
+  .latest-meta { font-size: 11px !important; margin-bottom: 6px !important; }
+  .hero-subtitle, .billboard-desc, .synopsis { font-size: 11px !important; line-height: 1.35 !important; margin-bottom: 6px !important; }
+  .billboard-links { margin-top: 4px !important; gap: 6px !important; }
   .nflx-btn { padding: 8px 16px !important; font-size: 13px !important; }
 }
 @media (max-width: 480px) {
   .billboard-row {
-    min-height: 280px;
-    max-height: 38vh;
+    min-height: 240px;
+    max-height: 34vh;
     margin-bottom: 4px;
   }
-  .billboard-title { font-size: 20px !important; }
+  .billboard-title,
+  .billboard-title.latest-video-title { font-size: 18px !important; }
+  .latest-tag { font-size: 9px !important; }
+  .latest-meta { font-size: 10px !important; }
   .meta-layer { bottom: 8px !important; }
 }
 
