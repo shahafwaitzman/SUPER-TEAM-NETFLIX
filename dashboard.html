@@ -397,11 +397,11 @@ body::after {
 @media (max-width: 768px) {
   .main-header { padding: 0 16px; }
   .dashboard-container {
-    padding: calc(var(--nflx-header-height) + 16px) 16px 28px;
-    gap: 16px;
+    padding: calc(var(--nflx-header-height) + 4px) 16px 24px;
+    gap: 14px;
     justify-content: flex-start;
   }
-  .welcome-section { margin: 0 auto; }
+  .welcome-section { margin: 0 auto; padding: 0; }
   .welcome-eyebrow { font-size: 11px; letter-spacing: 3px; margin-bottom: 6px; }
   .welcome-title { font-size: 38px; margin-bottom: 10px; }
   .welcome-subtitle { font-size: 13px; line-height: 1.55; max-width: 92%; margin: 0 auto; opacity: 0.85; }
@@ -430,7 +430,7 @@ body::after {
 
 /* Small phones */
 @media (max-width: 420px) {
-  .dashboard-container { padding: calc(var(--nflx-header-height) + 8px) 12px 20px; gap: 16px; justify-content: flex-start; }
+  .dashboard-container { padding: calc(var(--nflx-header-height) + 4px) 12px 20px; gap: 12px; justify-content: flex-start; }
   .welcome-title { font-size: 32px; }
   .welcome-subtitle { font-size: 12px; }
   .choice-card { min-height: 160px; }
