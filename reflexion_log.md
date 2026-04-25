@@ -72,3 +72,4 @@
 - **DEPLOYMENT CRITICAL:** Netlify GitHub webhook is broken. ALL 4 priorities required manual `netlify deploy --prod` via CLI. Future sessions MUST know this.
 - **SECURITY URGENT:** GitHub PAT `ghp_V4V8...` exposed in git remote URL. Needs rotation + switch to SSH or credential helper.
 - **PATTERN:** Every priority required: commit → push → manual netlify deploy → curl to verify live. Consider a shell alias `team-ship` that does all three.
+- P1 #worked: Fixed academy-hub hero play button to play latest video directly instead of scrolling. Added window.__latestVideoId as priority 2 in getHeroTarget(). heroPlayHandler now calls openVideo() directly. Deploy via netlify CLI (webhook still broken). Commit b0784e9.
