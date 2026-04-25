@@ -2358,14 +2358,39 @@ const params = new URLSearchParams(window.location.search);
 // Auth gate at page top ensures localStorage is populated
 const userEmail = localStorage.getItem('userEmail') || params.get('user');
 if (userEmail) {
-  const userName = userEmail.split('@')[0];
+  const cachedName = localStorage.getItem('userName');
+  const fallback = userEmail.split('@')[0];
+  const initialName = cachedName || fallback;
   const indicator = document.getElementById('userIndicator');
   const nameEl = document.getElementById('userNameDisplay');
   const profileEl = document.getElementById('profileIcon');
-  if (nameEl) nameEl.textContent = userName;
+  function paintName(n) {
+    if (nameEl) nameEl.textContent = n;
+    if (profileEl) profileEl.textContent = n.charAt(0).toUpperCase();
+  }
+  paintName(initialName);
   if (indicator) indicator.style.display = 'block';
-  if (profileEl) profileEl.textContent = userName.charAt(0).toUpperCase();
   try { localStorage.setItem('userEmail', userEmail); } catch (e) {}
+
+  // Async: fetch real name from Firebase, cache, update display
+  (async () => {
+    try {
+      const r = await fetch('https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app/users.json', { cache: 'no-store' });
+      const users = await r.json();
+      if (users && typeof users === 'object') {
+        const target = String(userEmail).toLowerCase();
+        for (const k in users) {
+          const u = users[k];
+          if (u && u.email && String(u.email).toLowerCase() === target && u.name) {
+            const firstName = String(u.name).trim().split(/\s+/)[0];
+            localStorage.setItem('userName', firstName);
+            paintName(firstName);
+            break;
+          }
+        }
+      }
+    } catch (e) {}
+  })();
 }
 
 /* ═══════════════════════════════════════════

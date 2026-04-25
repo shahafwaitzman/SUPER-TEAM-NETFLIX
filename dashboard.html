@@ -173,16 +173,17 @@ body::after {
 /* Page container */
 .dashboard-container {
   position: relative; z-index: 10;
-  padding: calc(var(--nflx-header-height) + 40px) 48px 60px;
+  padding: calc(var(--nflx-header-height) + 16px) 48px 40px;
   min-height: 100vh;
   display: flex; flex-direction: column;
   align-items: center;
-  gap: 48px;
+  justify-content: center;
+  gap: 28px;
 }
 
 .welcome-section {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 8px;
   animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .welcome-eyebrow {
@@ -834,15 +835,41 @@ const params = new URLSearchParams(window.location.search);
 // Auth gate above already ensured localStorage has the user — read only from there
 const userEmail = localStorage.getItem('userEmail');
 
-if (userEmail) {
-  localStorage.setItem('userEmail', userEmail);
-  const name = userEmail.split('@')[0];
+function applyName(name) {
   const elUserName = document.getElementById('userName');
   if (elUserName) elUserName.textContent = name;
   const elAvatar = document.getElementById('userAvatar');
   if (elAvatar) elAvatar.textContent = name.charAt(0).toUpperCase();
   const elWelcome = document.getElementById('welcomeHeading');
   if (elWelcome) elWelcome.textContent = 'שלום, ' + name;
+}
+
+if (userEmail) {
+  localStorage.setItem('userEmail', userEmail);
+  // Step 1: instant fallback from cached name OR email prefix
+  const cached = localStorage.getItem('userName');
+  applyName(cached || userEmail.split('@')[0]);
+
+  // Step 2: async fetch real name from Firebase, cache, update display
+  (async () => {
+    try {
+      const r = await fetch('https://super-team-netflix-default-rtdb.europe-west1.firebasedatabase.app/users.json', { cache: 'no-store' });
+      const users = await r.json();
+      if (users && typeof users === 'object') {
+        const target = String(userEmail).toLowerCase();
+        for (const k in users) {
+          const u = users[k];
+          if (u && u.email && String(u.email).toLowerCase() === target && u.name) {
+            // Use FIRST name only (cleaner greeting)
+            const firstName = String(u.name).trim().split(/\s+/)[0];
+            localStorage.setItem('userName', firstName);
+            applyName(firstName);
+            break;
+          }
+        }
+      }
+    } catch (e) { /* offline → keep fallback */ }
+  })();
 
   // Pass user param to academy link
   const academyCard = document.getElementById('academyCard');
@@ -856,6 +883,7 @@ if (userEmail) {
 function logout() {
   if (confirm('האם לצאת מהחשבון?')) {
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
     const homeUrl = window.location.origin.includes('github.io')
       ? window.location.origin + '/SUPER-TEAM-NETFLIX/'
       : window.location.origin + '/';
