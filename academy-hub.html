@@ -194,10 +194,12 @@ img { display: block; max-width: 100%; }
 /* MOBILE — shrink hero so the first row of videos peeks above the fold */
 @media (max-width: 768px) {
   .billboard-row {
-    padding-top: 0;
-    min-height: 220px;
-    max-height: 30vh;
-    margin-bottom: 8px;
+    padding-top: 0 !important;
+    min-height: 0 !important;
+    max-height: 280px !important;
+    height: 280px !important;
+    margin-bottom: 8px !important;
+    overflow: hidden !important;
   }
   .meta-layer {
     top: 8px !important;
@@ -216,9 +218,12 @@ img { display: block; max-width: 100%; }
 }
 @media (max-width: 480px) {
   .billboard-row {
-    min-height: 200px;
-    max-height: 28vh;
-    margin-bottom: 4px;
+    min-height: 0 !important;
+    max-height: 240px !important;
+    height: 240px !important;
+    padding-top: 0 !important;
+    margin-bottom: 4px !important;
+    overflow: hidden !important;
   }
   .billboard-title,
   .billboard-title.latest-video-title { font-size: 17px !important; }
