@@ -181,14 +181,14 @@ img { display: block; max-width: 100%; }
 /* BILLBOARD HERO */
 .billboard-row {
   position: relative; width: 100%;
-  padding-top: 50%;
-  max-height: 65vh; min-height: 440px;
-  margin-bottom: 24px;
+  padding-top: 40%;
+  max-height: 50vh; min-height: 360px;
+  margin-bottom: 16px;
   background: #000;
   overflow: hidden;
 }
 @media (min-width: 950px) {
-  .billboard-row { padding-top: 36%; max-height: 60vh; min-height: 460px; }
+  .billboard-row { padding-top: 28%; max-height: 48vh; min-height: 380px; }
 }
 
 /* MOBILE — shrink hero so the first row of videos peeks above the fold */
@@ -200,8 +200,8 @@ img { display: block; max-width: 100%; }
     margin-bottom: 8px;
   }
   .meta-layer {
-    bottom: 12px !important;
-    top: auto !important;
+    top: 12px !important;
+    bottom: auto !important;
     gap: 6px !important;
     padding: 0 16px !important;
   }
@@ -224,7 +224,7 @@ img { display: block; max-width: 100%; }
   .billboard-title.latest-video-title { font-size: 18px !important; }
   .latest-tag { font-size: 9px !important; }
   .latest-meta { font-size: 10px !important; }
-  .meta-layer { bottom: 8px !important; }
+  .meta-layer { top: 10px !important; bottom: auto !important; }
 }
 
 .hero-image-wrapper { position: absolute; inset: 0; z-index: 0; }
@@ -1230,7 +1230,8 @@ html[dir="rtl"] .profile-panel { transform: translateX(100%); }
 
 .meta-layer {
   position: absolute;
-  bottom: 22%;
+  top: 24px;
+  bottom: auto;
   right: 60px;
   z-index: 10;
   max-width: 540px;
@@ -1238,17 +1239,18 @@ html[dir="rtl"] .profile-panel { transform: translateX(100%); }
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 18px;
+  gap: 14px;
   text-align: right;
 }
 @media (max-width: 950px) {
   .meta-layer {
-    bottom: 14%;
+    top: 16px;
+    bottom: auto;
     right: 16px;
     left: 16px;
     max-width: none;
     min-width: 0;
-    gap: 14px;
+    gap: 12px;
   }
 }
 
