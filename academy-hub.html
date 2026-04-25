@@ -1993,16 +1993,14 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
   .secondary-navigation { gap: 6px; }
   .streak-pill { padding: 5px 9px; font-size: 12px; }
 
-  /* Hero */
-  .billboard-row { padding-top: 0; min-height: 75vh; height: 75vh; }
+  /* Hero — sizing handled in main mobile rule (~line 195) */
   .meta-layer {
-    bottom: 12% !important;
     right: 20px; left: 20px;
     max-width: none; min-width: 0;
     text-align: center;
     align-items: center !important;
   }
-  .billboard-title { font-size: clamp(32px, 9vw, 54px) !important; text-align: center; }
+  .billboard-title { text-align: center; }
   .synopsis { font-size: 13.5px; text-align: center; }
   .billboard-links {
     flex-direction: column;
@@ -2070,7 +2068,7 @@ body::-webkit-scrollbar-thumb:hover { background: #555; }
 }
 
 @media (max-width: 480px) {
-  .billboard-title { font-size: clamp(28px, 10vw, 42px) !important; }
+  /* billboard-title size: main mobile rule above */
   .pp-badges { grid-template-columns: repeat(3, 1fr); }
   .pp-stat-num { font-size: 18px; }
 }
