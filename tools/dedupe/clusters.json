@@ -3,7 +3,7 @@
     "total_orders": 734,
     "unique_buyers_en": 138,
     "unique_recipients_he": 273,
-    "duplicates_found": 31,
+    "duplicates_found": 77,
     "distributors": 21
   },
   "en_fuzzy_clusters": [],
@@ -407,145 +407,506 @@
       "recipient_count": 3
     }
   ],
-  "he_multi_en": [
-    {
-      "recipient_he": "דביר ששון",
-      "buyers_en": [
-        "ELDAR BAN ATAR",
-        "FRIDA COHEN",
-        "LIZ MEIROVICH",
-        "MALI KUNTZ"
-      ],
-      "buyer_count": 4
-    },
-    {
-      "recipient_he": "דביר",
-      "buyers_en": [
-        "ELDAR BAN ATAR",
-        "LIZ MEIROVICH",
-        "SHELLY VIVANTE"
-      ],
-      "buyer_count": 3
-    },
+  "self_buyers": [
     {
       "recipient_he": "אתי רובין",
-      "buyers_en": [
-        "ATI ROBIN",
-        "LIZ MEIROVICH"
-      ],
-      "buyer_count": 2
+      "transliteration": "ATI ROBIN",
+      "matched_buyers": [
+        {
+          "buyer_en": "ATI ROBIN",
+          "score": 100
+        }
+      ]
     },
     {
-      "recipient_he": "לין ממן",
-      "buyers_en": [
-        "LIN MAMAN",
-        "LIZ MEIROVICH"
-      ],
-      "buyer_count": 2
+      "recipient_he": "ליז",
+      "transliteration": "LIZ",
+      "matched_buyers": [
+        {
+          "buyer_en": "LIZ MEIROVICH",
+          "score": 100
+        }
+      ]
     },
     {
-      "recipient_he": "אושרי שלי",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "OSHRY SHELLY"
-      ],
-      "buyer_count": 2
+      "recipient_he": "נירית סוטו",
+      "transliteration": "NIRIT SOTO",
+      "matched_buyers": [
+        {
+          "buyer_en": "NIRIT SOTO",
+          "score": 100
+        }
+      ]
     },
     {
-      "recipient_he": "אושרה פינחסי",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "OSHRA PINCHASI"
-      ],
-      "buyer_count": 2
+      "recipient_he": "פיני מחלוף",
+      "transliteration": "PINI MCHLOF",
+      "matched_buyers": [
+        {
+          "buyer_en": "PINI MACHLOF",
+          "score": 95
+        }
+      ]
     },
     {
-      "recipient_he": "אודיה דוידוב",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "ODAYA DAVIDOV"
-      ],
-      "buyer_count": 2
+      "recipient_he": "רותם ליאני",
+      "transliteration": "ROTM LIANI",
+      "matched_buyers": [
+        {
+          "buyer_en": "ROTEM LIANI",
+          "score": 95
+        }
+      ]
     },
     {
-      "recipient_he": "קרן טל קישנר",
-      "buyers_en": [
-        "KEREN TAL KISHNER",
-        "LIZ MEIROVICH"
-      ],
-      "buyer_count": 2
+      "recipient_he": "ניר גורן",
+      "transliteration": "NIR GORN",
+      "matched_buyers": [
+        {
+          "buyer_en": "NIR GOREN",
+          "score": 94
+        }
+      ]
     },
     {
-      "recipient_he": "ליז מאירוביץ",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "SHELLY VIVANTE"
-      ],
-      "buyer_count": 2
-    },
-    {
-      "recipient_he": "רחלי נומברג",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "RACHELI MELZER"
-      ],
-      "buyer_count": 2
-    },
-    {
-      "recipient_he": "אורלי ברודו",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "ORLY BRUDO"
-      ],
-      "buyer_count": 2
-    },
-    {
-      "recipient_he": "מיכל מלמוד",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "MICHAL MELAMUD"
-      ],
-      "buyer_count": 2
-    },
-    {
-      "recipient_he": "הילה אברגיל",
-      "buyers_en": [
-        "HILA ABARGIL",
-        "LIZ MEIROVICH"
-      ],
-      "buyer_count": 2
-    },
-    {
-      "recipient_he": "רותם עמרן",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "ROTEM AMRAN"
-      ],
-      "buyer_count": 2
-    },
-    {
-      "recipient_he": "אלכסנדרה אהרון",
-      "buyers_en": [
-        "ALEXANDRA AHARON",
-        "LIZ MEIROVICH"
-      ],
-      "buyer_count": 2
+      "recipient_he": "סיגל סיני",
+      "transliteration": "SIGL SINI",
+      "matched_buyers": [
+        {
+          "buyer_en": "SIGAL SINI",
+          "score": 94
+        }
+      ]
     },
     {
       "recipient_he": "ליז עוז",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "LIZ OZ"
-      ],
-      "buyer_count": 2
+      "transliteration": "LIZ AOZ",
+      "matched_buyers": [
+        {
+          "buyer_en": "LIZ OZ",
+          "score": 92
+        }
+      ]
+    },
+    {
+      "recipient_he": "נועה הרניק",
+      "transliteration": "NOAH HRNIK",
+      "matched_buyers": [
+        {
+          "buyer_en": "NOA HERNIK",
+          "score": 90
+        }
+      ]
+    },
+    {
+      "recipient_he": "ניקול פרץ",
+      "transliteration": "NIKOL PRTZ",
+      "matched_buyers": [
+        {
+          "buyer_en": "NIKOL PERETZ",
+          "score": 90
+        }
+      ]
+    },
+    {
+      "recipient_he": "עדי ביסמוט",
+      "transliteration": "ADI BISMOT",
+      "matched_buyers": [
+        {
+          "buyer_en": "ADI BISMUT",
+          "score": 90
+        }
+      ]
+    },
+    {
+      "recipient_he": "עדי גלעדי",
+      "transliteration": "ADI GLADI",
+      "matched_buyers": [
+        {
+          "buyer_en": "ADII GILADI",
+          "score": 90
+        }
+      ]
+    },
+    {
+      "recipient_he": "רותם עמרן",
+      "transliteration": "ROTM AMRN",
+      "matched_buyers": [
+        {
+          "buyer_en": "ROTEM AMRAN",
+          "score": 90
+        }
+      ]
+    },
+    {
+      "recipient_he": "קארן מוגרבי",
+      "transliteration": "KARN MOGRBI",
+      "matched_buyers": [
+        {
+          "buyer_en": "KAREEN MOGRABI",
+          "score": 88
+        }
+      ]
+    },
+    {
+      "recipient_he": "לין ממן",
+      "transliteration": "LIN MMN",
+      "matched_buyers": [
+        {
+          "buyer_en": "LIN MAMAN",
+          "score": 87
+        }
+      ]
+    },
+    {
+      "recipient_he": "הילה אברגיל",
+      "transliteration": "HILH ABRGIL",
+      "matched_buyers": [
+        {
+          "buyer_en": "HILA ABARGIL",
+          "score": 86
+        }
+      ]
+    },
+    {
+      "recipient_he": "אושרה פינחסי",
+      "transliteration": "AOSHRH PINCHSI",
+      "matched_buyers": [
+        {
+          "buyer_en": "OSHRA PINCHASI",
+          "score": 85
+        }
+      ]
+    },
+    {
+      "recipient_he": "נופר דיגהורקר",
+      "transliteration": "NOPR DIGHORKR",
+      "matched_buyers": [
+        {
+          "buyer_en": "NOFAR DIGHORKAR",
+          "score": 85
+        }
+      ]
     },
     {
       "recipient_he": "צליל דדון",
-      "buyers_en": [
-        "LIZ MEIROVICH",
-        "TSLIL DADON"
-      ],
-      "buyer_count": 2
+      "transliteration": "TZLIL DDON",
+      "matched_buyers": [
+        {
+          "buyer_en": "TSLIL DADON",
+          "score": 85
+        }
+      ]
+    },
+    {
+      "recipient_he": "רן בר חי",
+      "transliteration": "RN BR CHI",
+      "matched_buyers": [
+        {
+          "buyer_en": "REN BAR CHAI",
+          "score": 85
+        }
+      ]
+    },
+    {
+      "recipient_he": "שקד ברטי",
+      "transliteration": "SHKD BRTI",
+      "matched_buyers": [
+        {
+          "buyer_en": "SHAKED BERTI",
+          "score": 85
+        }
+      ]
+    },
+    {
+      "recipient_he": "גבריאל גיטמן",
+      "transliteration": "GBRIAL GITMN",
+      "matched_buyers": [
+        {
+          "buyer_en": "GABRIEL GITMAN",
+          "score": 84
+        }
+      ]
+    },
+    {
+      "recipient_he": "דניאל ארדיטי",
+      "transliteration": "DNIAL ARDITI",
+      "matched_buyers": [
+        {
+          "buyer_en": "DANIEL ARDITTI",
+          "score": 84
+        }
+      ]
+    },
+    {
+      "recipient_he": "ירין נעים",
+      "transliteration": "IRIN NAIM",
+      "matched_buyers": [
+        {
+          "buyer_en": "YARIN NAIM",
+          "score": 84
+        }
+      ]
+    },
+    {
+      "recipient_he": "מלי קונץ",
+      "transliteration": "MLI KONTZ",
+      "matched_buyers": [
+        {
+          "buyer_en": "MALI KUNTZ",
+          "score": 84
+        }
+      ]
+    },
+    {
+      "recipient_he": "עדי אלפסי",
+      "transliteration": "ADI ALPSI",
+      "matched_buyers": [
+        {
+          "buyer_en": "ADI ALFASI",
+          "score": 84
+        }
+      ]
+    },
+    {
+      "recipient_he": "אנואר חסנין",
+      "transliteration": "ANOAR CHSNIN",
+      "matched_buyers": [
+        {
+          "buyer_en": "ANUAR HASNIN",
+          "score": 83
+        }
+      ]
+    },
+    {
+      "recipient_he": "לוטם בן אבו",
+      "transliteration": "LOTM BN ABO",
+      "matched_buyers": [
+        {
+          "buyer_en": "LOTEM BEN ABU",
+          "score": 83
+        }
+      ]
+    },
+    {
+      "recipient_he": "קארין ליזרוביץ",
+      "transliteration": "KARIN LIZROBITZ",
+      "matched_buyers": [
+        {
+          "buyer_en": "KARIN LIZARIVITZ",
+          "score": 83
+        }
+      ]
+    },
+    {
+      "recipient_he": "דנה סוטו",
+      "transliteration": "DNH SOTO",
+      "matched_buyers": [
+        {
+          "buyer_en": "DANA SOTO",
+          "score": 82
+        }
+      ]
+    },
+    {
+      "recipient_he": "עדי דואק",
+      "transliteration": "ADI DOAK",
+      "matched_buyers": [
+        {
+          "buyer_en": "ADI DOUEK",
+          "score": 82
+        }
+      ]
+    },
+    {
+      "recipient_he": "דניאל סלען",
+      "transliteration": "DNIAL SLAN",
+      "matched_buyers": [
+        {
+          "buyer_en": "DANIEL SALAN",
+          "score": 81
+        }
+      ]
+    },
+    {
+      "recipient_he": "פרח מורדיאן",
+      "transliteration": "PRCH MORDIAN",
+      "matched_buyers": [
+        {
+          "buyer_en": "PIRHIA MORADIAN",
+          "score": 81
+        }
+      ]
+    },
+    {
+      "recipient_he": "שירן טקיה",
+      "transliteration": "SHIRN TKIH",
+      "matched_buyers": [
+        {
+          "buyer_en": "SHIRAN TAKIA",
+          "score": 81
+        }
+      ]
+    },
+    {
+      "recipient_he": "דגנית לוי",
+      "transliteration": "DGNIT LOI",
+      "matched_buyers": [
+        {
+          "buyer_en": "DGANIT LEVI",
+          "score": 80
+        }
+      ]
+    },
+    {
+      "recipient_he": "הילה גרזי",
+      "transliteration": "HILH GRZI",
+      "matched_buyers": [
+        {
+          "buyer_en": "HILA GARAZI",
+          "score": 80
+        }
+      ]
+    },
+    {
+      "recipient_he": "טל גולמבו",
+      "transliteration": "TL GOLMBO",
+      "matched_buyers": [
+        {
+          "buyer_en": "TAL GOLENBO",
+          "score": 80
+        }
+      ]
+    },
+    {
+      "recipient_he": "לי גולדבלט",
+      "transliteration": "LI GOLDBLT",
+      "matched_buyers": [
+        {
+          "buyer_en": "LEIGH GOLDBLATT",
+          "score": 80
+        }
+      ]
+    },
+    {
+      "recipient_he": "לירז פינחסוב",
+      "transliteration": "LIRZ PINCHSOB",
+      "matched_buyers": [
+        {
+          "buyer_en": "LIRAZ PINHASSOV",
+          "score": 78
+        }
+      ]
+    },
+    {
+      "recipient_he": "שרית סטפנסקי",
+      "transliteration": "SHRIT STPNSKI",
+      "matched_buyers": [
+        {
+          "buyer_en": "SARIT STEPANSKY",
+          "score": 78
+        }
+      ]
+    },
+    {
+      "recipient_he": "דנה למפל",
+      "transliteration": "DNH LMPL",
+      "matched_buyers": [
+        {
+          "buyer_en": "DANA LEMPL",
+          "score": 77
+        }
+      ]
+    },
+    {
+      "recipient_he": "אופיר אלגרסי",
+      "transliteration": "AOPIR ALGRSI",
+      "matched_buyers": [
+        {
+          "buyer_en": "OFIR ALGREESIE",
+          "score": 76
+        }
+      ]
+    },
+    {
+      "recipient_he": "אלונה בליאסני",
+      "transliteration": "ALONH BLIASNI",
+      "matched_buyers": [
+        {
+          "buyer_en": "ALONA BALASNY",
+          "score": 76
+        }
+      ]
+    },
+    {
+      "recipient_he": "מלי איסקוב",
+      "transliteration": "MLI AISKOB",
+      "matched_buyers": [
+        {
+          "buyer_en": "MALI ISAKOV",
+          "score": 76
+        }
+      ]
+    },
+    {
+      "recipient_he": "נועה מנשה",
+      "transliteration": "NOAH MNSHH",
+      "matched_buyers": [
+        {
+          "buyer_en": "NOA MENASHE",
+          "score": 76
+        }
+      ]
+    },
+    {
+      "recipient_he": "סיון סובעי",
+      "transliteration": "SION SOBAI",
+      "matched_buyers": [
+        {
+          "buyer_en": "SIVAN SUBAI",
+          "score": 76
+        }
+      ]
+    },
+    {
+      "recipient_he": "ענת אוחנה",
+      "transliteration": "ANT AOCHNH",
+      "matched_buyers": [
+        {
+          "buyer_en": "ANAT OCHANA",
+          "score": 76
+        }
+      ]
+    },
+    {
+      "recipient_he": "חני רוטלוי",
+      "transliteration": "CHNI ROTLOI",
+      "matched_buyers": [
+        {
+          "buyer_en": "HANNI ROTLEVI",
+          "score": 75
+        }
+      ]
+    },
+    {
+      "recipient_he": "ליאן רפאלוב",
+      "transliteration": "LIAN RPALOB",
+      "matched_buyers": [
+        {
+          "buyer_en": "LIAN REFAELOV",
+          "score": 75
+        }
+      ]
+    },
+    {
+      "recipient_he": "לינור חבורה",
+      "transliteration": "LINOR CHBORH",
+      "matched_buyers": [
+        {
+          "buyer_en": "LINOR HABURA",
+          "score": 75
+        }
+      ]
     }
   ]
 }

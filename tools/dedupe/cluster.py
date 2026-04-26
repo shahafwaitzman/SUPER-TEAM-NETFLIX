@@ -31,6 +31,35 @@ OUT_DATA_JSON = OUT_DIR / "clusters.json"
 
 SIMILARITY_THRESHOLD = 82
 MIN_GROUP_SIZE = 2
+TRANSLIT_THRESHOLD = 70  # Hebrew↔English transliteration match threshold
+
+# Basic Hebrew → Latin transliteration map (best-effort phonetic).
+# Multiple Latin variants per Hebrew letter are joined with the most common.
+HE_TO_LAT = {
+    'א': 'A', 'ב': 'B', 'ג': 'G', 'ד': 'D', 'ה': 'H', 'ו': 'O', 'ז': 'Z',
+    'ח': 'CH', 'ט': 'T', 'י': 'I', 'כ': 'K', 'ך': 'K', 'ל': 'L',
+    'מ': 'M', 'ם': 'M', 'נ': 'N', 'ן': 'N', 'ס': 'S', 'ע': 'A',
+    'פ': 'P', 'ף': 'F', 'צ': 'TZ', 'ץ': 'TZ', 'ק': 'K', 'ר': 'R',
+    'ש': 'SH', 'ת': 'T', '"': '', "'": '', '״': '', '׳': '',
+}
+
+
+def is_hebrew(s):
+    """True if string contains any Hebrew characters."""
+    return any('\u0590' <= ch <= '\u05FF' for ch in str(s))
+
+
+def he_to_latin(s):
+    """Phonetic transliteration of Hebrew to Latin (uppercase). Best-effort."""
+    out = []
+    for ch in str(s):
+        if ch in HE_TO_LAT:
+            out.append(HE_TO_LAT[ch])
+        elif ch == ' ':
+            out.append(' ')
+        elif ch.isascii():
+            out.append(ch.upper())
+    return "".join(out).strip()
 
 
 def load_orders():
@@ -103,17 +132,36 @@ def build_clusters(df):
     ]
     distributor_groups.sort(key=lambda x: -x["recipient_count"])
 
-    he_to_en = defaultdict(set)
-    for _, row in df.iterrows():
-        en, he = row["buyer_en_norm"], row["recipient_he_norm"]
-        if en and he:
-            he_to_en[he].add(en)
-    he_with_multi_en = [
-        {"recipient_he": he, "buyers_en": sorted(ens), "buyer_count": len(ens)}
-        for he, ens in he_to_en.items()
-        if len(ens) >= 2
-    ]
-    he_with_multi_en.sort(key=lambda x: -x["buyer_count"])
+    # Section 4: REAL same-person across languages.
+    # Find cases where a Hebrew recipient name transliterates to an English buyer
+    # name AND that English buyer ordered for that exact recipient (= self-buyer).
+    he_recipients = sorted(set(df["recipient_he_norm"].dropna().tolist()))
+    en_buyers = sorted(set(df["buyer_en_norm"].dropna().tolist()))
+    he_translit = {he: he_to_latin(he) for he in he_recipients if he}
+
+    self_buyers = []
+    for he in he_recipients:
+        if not he or not is_hebrew(he):
+            continue  # skip recipients that are already in Latin script
+        he_lat = he_translit[he]
+        if not he_lat:
+            continue
+        buyers_for_he = set(df[df["recipient_he_norm"] == he]["buyer_en_norm"].dropna())
+        matches = []
+        for buyer in buyers_for_he:
+            if not buyer:
+                continue
+            score = fuzz.token_set_ratio(he_lat, buyer)
+            if score >= TRANSLIT_THRESHOLD:
+                matches.append({"buyer_en": buyer, "score": int(score)})
+        if matches:
+            matches.sort(key=lambda m: -m["score"])
+            self_buyers.append({
+                "recipient_he": he,
+                "transliteration": he_lat,
+                "matched_buyers": matches,
+            })
+    self_buyers.sort(key=lambda x: -max(m["score"] for m in x["matched_buyers"]))
 
     en_counts = df["buyer_en_norm"].value_counts().to_dict()
     he_counts = df["recipient_he_norm"].value_counts().to_dict()
@@ -123,7 +171,7 @@ def build_clusters(df):
             "total_orders": int(len(df)),
             "unique_buyers_en": len(en_names),
             "unique_recipients_he": len(he_names),
-            "duplicates_found": len(en_clusters) + len(he_clusters) + len(he_with_multi_en),
+            "duplicates_found": len(en_clusters) + len(he_clusters) + len(self_buyers),
             "distributors": len(distributor_groups),
         },
         "en_fuzzy_clusters": [
@@ -135,7 +183,7 @@ def build_clusters(df):
             for c in he_clusters
         ],
         "distributor_groups": distributor_groups[:30],
-        "he_multi_en": he_with_multi_en[:30],
+        "self_buyers": self_buyers[:50],
     }
 
 
@@ -332,10 +380,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   </div>
   <div id="distributors">__DISTRIBUTORS_HTML__</div>
 
-  <!-- ── Section 4: HE with multi EN ── -->
+  <!-- ── Section 4: Self-buyers (HE recipient = transliteration of EN buyer) ── -->
   <div class="section">
-    <h2>אותו שם עברית · איותי אנגלית מרובים <span class="badge-count">__HEMULTI_COUNT__</span></h2>
-    <div class="desc">נמען עברי אחד עם מספר איותי אנגלית — סביר שזה אותו אדם עם איותים שונים.</div>
+    <h2>קונה לעצמו · עברית = תעתיק אנגלית <span class="badge-count">__HEMULTI_COUNT__</span></h2>
+    <div class="desc">נמען עברי שגם הופיע כקונה אנגלית עם תעתיק תואם. הציון מציין דמיון בין השם בעברית לתעתיק האנגלי.</div>
   </div>
   <div id="heMultiEn">__HE_MULTI_EN_HTML__</div>
 </main>
@@ -397,11 +445,13 @@ function exportDecisions() {
       merged.push({ canonical, aliases: c.names.slice(1), source: 'en_fuzzy' });
     }
   });
-  // HE → multi EN
-  clusters.he_multi_en.forEach((g, i) => {
-    const id = 'hemulti_' + i;
+  // Self-buyers (HE recipient = transliteration of EN buyer)
+  clusters.self_buyers.forEach((g, i) => {
+    const id = 'selfbuy_' + i;
     if (decisions[id] === 'merge') {
-      merged.push({ canonical_he: g.recipient_he, en_aliases: g.buyers_en, source: 'he_multi_en' });
+      const en_aliases = g.matched_buyers.map(m => m.buyer_en);
+      en_aliases.forEach(en => mapping[en] = g.recipient_he);
+      merged.push({ canonical_he: g.recipient_he, en_aliases, source: 'self_buyer' });
     }
   });
 
@@ -468,14 +518,18 @@ def render_distributor(idx, group, dup_names):
 </details>'''
 
 
-def render_he_multi_en(idx, group):
-    cid = f"hemulti_{idx}"
-    en_pills = "".join(f'<span class="name-pill">{n}</span>' for n in group["buyers_en"])
+def render_self_buyer(idx, group):
+    cid = f"selfbuy_{idx}"
+    matches_html = "".join(
+        f'<span class="name-pill">{m["buyer_en"]} <span class="count">{m["score"]}%</span></span>'
+        for m in group["matched_buyers"]
+    )
     return f'''<div class="cluster" id="{cid}">
   <div class="names">
     <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">{group["recipient_he"]}</span>
-    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
-    {en_pills}
+    <span style="color:var(--muted);font-size:11px;align-self:center;">תעתיק: {group["transliteration"]}</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">↔</span>
+    {matches_html}
   </div>
   <div class="actions">
     <button class="btn btn-merge" onclick="decide('{cid}', 'merge')">✓ אותו אדם — אחד</button>
@@ -514,7 +568,7 @@ def main():
     for c in data["he_fuzzy_clusters"]:
         for name in c["names"]:
             dup_names.add(name)
-    for g in data["he_multi_en"]:
+    for g in data["self_buyers"]:
         dup_names.add(g["recipient_he"])
 
     dist_html = "".join(
@@ -523,15 +577,15 @@ def main():
     ) or '<p class="empty">אין מפיצים</p>'
 
     hemulti_html = "".join(
-        render_he_multi_en(i, g) for i, g in enumerate(data["he_multi_en"])
-    ) or '<p class="empty">אין כפילויות עברית→אנגלית</p>'
+        render_self_buyer(i, g) for i, g in enumerate(data["self_buyers"])
+    ) or '<p class="empty">לא נמצאו תעתיקים תואמים</p>'
 
     html = (HTML_TEMPLATE
             .replace("__STATS_HTML__", stats_html)
             .replace("__EN_COUNT__", str(len(data["en_fuzzy_clusters"])))
             .replace("__HE_COUNT__", str(len(data["he_fuzzy_clusters"])))
             .replace("__DIST_COUNT__", str(len(data["distributor_groups"])))
-            .replace("__HEMULTI_COUNT__", str(len(data["he_multi_en"])))
+            .replace("__HEMULTI_COUNT__", str(len(data["self_buyers"])))
             .replace("__EN_CLUSTERS_HTML__", en_html)
             .replace("__HE_CLUSTERS_HTML__", he_html)
             .replace("__DISTRIBUTORS_HTML__", dist_html)
