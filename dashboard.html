@@ -218,7 +218,7 @@ body::after {
   gap: 6px;
 }
 
-/* Choice cards */
+/* Choice cards — proportional scaling: card aspect-ratio stays constant, text fits at all viewports */
 .choice-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -228,12 +228,13 @@ body::after {
   margin-top: 20px;
   animation: fadeInUp 1s 0.2s both cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-@media (max-width: 1100px) { .choice-grid { grid-template-columns: repeat(2, 1fr); } }
+/* 4 cards only on very wide screens where each card is ≥360px wide */
+@media (max-width: 1700px) { .choice-grid { grid-template-columns: repeat(2, 1fr); max-width: 1100px; } }
+@media (max-width: 900px)  { .choice-grid { grid-template-columns: 1fr; max-width: 520px; } }
 
 .choice-card {
   position: relative;
-  aspect-ratio: 16 / 10;
-  max-height: 420px;
+  aspect-ratio: 4 / 3;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -384,10 +385,10 @@ body::after {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive — keep 3 in a row on desktop/laptop, stack on tablet+mobile */
+/* Responsive — single column with shorter cards on tablet/mobile-landscape */
 @media (max-width: 900px) {
-  .choice-grid { grid-template-columns: 1fr; gap: 12px; max-width: 520px; margin-top: 8px; }
-  .choice-card { aspect-ratio: 16 / 10; max-height: 280px; }
+  .choice-grid { gap: 12px; margin-top: 8px; }
+  .choice-card { aspect-ratio: 16 / 11; }
   .choice-icon { font-size: 80px; top: 38%; }
   .choice-title { font-size: 26px; }
   .choice-description { font-size: 13.5px; }
