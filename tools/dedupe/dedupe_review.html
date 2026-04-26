@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Dedupe Review — OrdersHistory</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Heebo, sans-serif; background: #0d1117; color: #e6edf3; padding: 24px; max-width: 1200px; margin: 0 auto; }
+  h1 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 8px; }
+  h2 { color: #f0883e; margin-top: 32px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
+  .stats { background: #161b22; padding: 16px; border-radius: 8px; margin: 16px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .stat { text-align: center; }
+  .stat .num { font-size: 28px; font-weight: 700; color: #58a6ff; display: block; }
+  .stat .label { font-size: 12px; color: #8b949e; }
+  .cluster { background: #161b22; padding: 14px 18px; border-radius: 8px; margin: 12px 0; border-right: 4px solid #30363d; }
+  .cluster.merged { border-color: #46d369; background: #0a2818; }
+  .cluster.kept { border-color: #f85149; background: #2a0e0e; opacity: 0.5; }
+  .cluster .names { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+  .name-pill { background: #21262d; padding: 4px 10px; border-radius: 16px; font-size: 14px; }
+  .name-pill .count { color: #8b949e; font-size: 11px; margin-right: 4px; }
+  .actions { display: flex; gap: 8px; margin-top: 8px; }
+  button { background: #21262d; color: #e6edf3; border: 1px solid #30363d; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  button:hover { background: #30363d; }
+  button.merge { background: #1f6feb; border-color: #1f6feb; }
+  button.merge:hover { background: #388bfd; }
+  button.keep { background: #6e7681; }
+  .export-bar { position: sticky; top: 0; background: #0d1117; padding: 12px 0; z-index: 10; border-bottom: 1px solid #30363d; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
+  .progress { color: #8b949e; font-size: 13px; }
+  .meta { color: #8b949e; font-size: 12px; margin-top: 4px; }
+  details { background: #161b22; padding: 8px 14px; border-radius: 8px; margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; color: #58a6ff; }
+  details ul { margin: 8px 0 0; padding-right: 20px; }
+  details li { margin: 2px 0; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>סקירת כפילויות — OrdersHistory</h1>
+
+<div class="stats"><div class="stat"><span class="num">734</span><span class="label">total orders</span></div><div class="stat"><span class="num">138</span><span class="label">unique en buyers</span></div><div class="stat"><span class="num">273</span><span class="label">unique he recipients</span></div><div class="stat"><span class="num">0</span><span class="label">en fuzzy clusters</span></div><div class="stat"><span class="num">14</span><span class="label">he fuzzy clusters</span></div><div class="stat"><span class="num">21</span><span class="label">distributor groups</span></div></div>
+
+<div class="export-bar">
+  <button onclick="exportDecisions()">📥 ייצא JSON עם החלטות</button>
+  <span class="progress" id="progressLabel">0 החלטות נשמרו</span>
+</div>
+
+<h2>1. שמות אנגלית — וריאציות איות (fuzzy match)</h2>
+<p class="meta">קבוצות שמות אנגלית עם דמיון ≥82%. סקור והחלט אם זה אותו אדם.</p>
+<div id="enClusters"><p>אין וריאציות אנגלית</p></div>
+
+<h2>2. שמות עברית — וריאציות איות (fuzzy match)</h2>
+<p class="meta">קבוצות שמות עברית עם דמיון ≥82%.</p>
+<div id="heClusters"><div class="cluster" id="he_0">
+  <div class="names"><span class="name-pill"><span class="count">1</span>K cohen</span><span class="name-pill"><span class="count">1</span>frida cohen</span><span class="name-pill"><span class="count">1</span>maor cohen</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_0', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_0', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_1">
+  <div class="names"><span class="name-pill"><span class="count">5</span>אופיר אלגריסי</span><span class="name-pill"><span class="count">2</span>אופיר אלגרסי</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_1', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_1', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_2">
+  <div class="names"><span class="name-pill"><span class="count">5</span>אור לורדו</span><span class="name-pill"><span class="count">1</span>אור לרדו</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_2', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_2', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_3">
+  <div class="names"><span class="name-pill"><span class="count">1</span>בינה ששון ליז</span><span class="name-pill"><span class="count">7</span>ליז</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_3', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_3', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_4">
+  <div class="names"><span class="name-pill"><span class="count">10</span>דביר</span><span class="name-pill"><span class="count">17</span>דביר ששון</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_4', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_4', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_5">
+  <div class="names"><span class="name-pill"><span class="count">3</span>דודו יצחקי</span><span class="name-pill"><span class="count">1</span>ורד יצחקי</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_5', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_5', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_6">
+  <div class="names"><span class="name-pill"><span class="count">1</span>דיאנה</span><span class="name-pill"><span class="count">2</span>דיאנה תמר ליבוביץ</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_6', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_6', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_7">
+  <div class="names"><span class="name-pill"><span class="count">2</span>יעל</span><span class="name-pill"><span class="count">2</span>יעל הנדרי</span><span class="name-pill"><span class="count">1</span>יעל פרינץ</span><span class="name-pill"><span class="count">4</span>יעל צרפתי</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_7', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_7', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_8">
+  <div class="names"><span class="name-pill"><span class="count">3</span>מלי איסקוב</span><span class="name-pill"><span class="count">1</span>מלי יסאקוב</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_8', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_8', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_9">
+  <div class="names"><span class="name-pill"><span class="count">2</span>סוזי</span><span class="name-pill"><span class="count">4</span>סוזי והבה</span><span class="name-pill"><span class="count">3</span>סוזי ליה והבה</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_9', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_9', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_10">
+  <div class="names"><span class="name-pill"><span class="count">6</span>סיוון סובעי</span><span class="name-pill"><span class="count">1</span>סיון סובעי</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_10', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_10', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_11">
+  <div class="names"><span class="name-pill"><span class="count">1</span>עמיחי בן אביר</span><span class="name-pill"><span class="count">1</span>עמיחי וקוני בן אביר</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_11', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_11', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_12">
+  <div class="names"><span class="name-pill"><span class="count">10</span>רוני לביא</span><span class="name-pill"><span class="count">1</span>רוני לוי</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_12', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_12', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="he_13">
+  <div class="names"><span class="name-pill"><span class="count">1</span>שירן גאוטה</span><span class="name-pill"><span class="count">1</span>שירן גואטה</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('he_13', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('he_13', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div></div>
+
+<h2>3. מפיצים שמזמינים עבור אחרים (1 קונה → מספר נמענים)</h2>
+<p class="meta">מקרה ה-LIZ MEIROVICH — קונה אחד עם 3+ נמענים שונים. אלו המפיצים.</p>
+<div id="distributors"><div class="cluster" id="dist_0">
+  <div><strong>LIZ MEIROVICH</strong> — 47 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Herbalife International of America, Inc. California, USA</li><li>LIZ MEIROVICH</li><li>SHAHF WAITZMAN</li><li>liz</li><li>אביטל מטטוב פורטנוי</li><li>אודיה דוידוב</li><li>אור לרדו</li><li>אורלי ברודו</li><li>אושרה פינחסי</li><li>אושרי שלי</li><li>אילה אילה</li><li>אלה מיטשניקחיים</li><li>אלכסנדרה אהרון</li><li>אתי רובין</li><li>בינה ששון ליז</li><li>בת אל יטיאו</li><li>בתאל שריקי</li><li>גל ברקת</li><li>דביר</li><li>דביר ששון</li><li>דריה זיגונוב</li><li>הילה אברגיל</li><li>חן זיתוני</li><li>יעל פרינץ</li><li>לי וגנר</li><li>ליהיא בנימין</li><li>ליז</li><li>ליז מאירוביץ</li><li>ליז עוז</li><li>לין ממן</li><li>מיכל מלמוד</li><li>מרגי נוקריאן</li><li>נטלי אילרוב</li><li>סגא קאסם</li><li>סונדוס אסד</li><li>עמית אפשטיין</li><li>צליל דדון</li><li>קרן טל קישנר</li><li>רויטל רויטל</li><li>רוני לוי</li><li>רועי סלם</li><li>רותם עמרן</li><li>רחלי נומברג</li><li>רינת בדחה</li><li>שהם קנקין</li><li>שובל אסרף</li><li>תמרה רצאבי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_0', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_0', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_1">
+  <div><strong>RONI LAVIE BITTON</strong> — 11 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>roni lavie bitton</li><li>אביטל גונן</li><li>איילת בר</li><li>אילת מוזס</li><li>מאור כהן</li><li>נאוה לביא</li><li>סבינה סטלמוצ׳נקו</li><li>רוני לביא</li><li>רעיה סימקין</li><li>שרון דלל</li><li>תמר אבצן</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_1', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_1', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_2">
+  <div><strong>RENATA LEVI</strong> — 5 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>אילנה אנדרייב</li><li>דנה קור</li><li>סיגל לוי</li><li>קארינה פרנקו</li><li>רנטה לוי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_2', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_2', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_3">
+  <div><strong>SHELLY VIVANTE</strong> — 4 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Shelly vivante</li><li>דביר</li><li>ליז מאירוביץ</li><li>שלי ויונטה</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_3', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_3', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_4">
+  <div><strong>YAEL ZARFATI</strong> — 4 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>YAEL ZARFATI</li><li>Yael Zarfati</li><li>יעל</li><li>יעל צרפתי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_4', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_4', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_5">
+  <div><strong>SUZIE LIA VAHABA</strong> — 4 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Suzie Lia Vahaba</li><li>סוזי</li><li>סוזי והבה</li><li>סוזי ליה והבה</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_5', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_5', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_6">
+  <div><strong>DANA SOTO</strong> — 4 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Dana Soto</li><li>Daniel Dali</li><li>דנה סוטו</li><li>עמיחי בן אביר</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_6', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_6', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_7">
+  <div><strong>DAVID ITZHAKI</strong> — 4 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>DAVID ITZHAKI</li><li>david itzhaki</li><li>דודו יצחקי</li><li>ורד יצחקי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_7', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_7', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_8">
+  <div><strong>ELDAR BAN ATAR</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>דביר</li><li>דביר ששון</li><li>שרון בן עטר</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_8', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_8', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_9">
+  <div><strong>MALI KUNTZ</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Mali Kuntz</li><li>דביר ששון</li><li>מלי קונץ</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_9', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_9', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_10">
+  <div><strong>SIVAN SUBAI</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>sivan subai</li><li>סיוון סובעי</li><li>סיון סובעי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_10', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_10', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_11">
+  <div><strong>MEYTAR MORNO</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>MEYTAR MORNO</li><li>Meytar Morno</li><li>מיתר זיקרי מורנו</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_11', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_11', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_12">
+  <div><strong>DIANA TAMAR LEIBOVICH</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Diana Tamar leibovich</li><li>דיאנה</li><li>דיאנה תמר ליבוביץ</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_12', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_12', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_13">
+  <div><strong>MARINA YAGUDAYEV</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Marina Yagudayev</li><li>מלי יסאקוב</li><li>מרינה יגודייב</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_13', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_13', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_14">
+  <div><strong>TAL GOLENBO</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Tal golenbo</li><li>גליה שיפיצין שוורץ</li><li>טל גולמבו</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_14', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_14', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_15">
+  <div><strong>SHAKED BERTI</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>חן כהן</li><li>ליאור סהר</li><li>שקד ברטי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_15', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_15', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_16">
+  <div><strong>LIRAZ GOLAN</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>LIRAZ GOLAN</li><li>Liraz Golan</li><li>לירז דאלי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_16', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_16', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_17">
+  <div><strong>SHIRAN DAHARY</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Shiran Dahary</li><li>שירן גאוטה</li><li>שירן גואטה</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_17', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_17', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_18">
+  <div><strong>OFIR ALGREESIE</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>OFIR ALGREESIE</li><li>אופיר אלגריסי</li><li>אופיר אלגרסי</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_18', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_18', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_19">
+  <div><strong>MEYTAL COHEN</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>Meytal Cohen</li><li>ליז (מיטל)</li><li>מיטל כהן</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_19', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_19', 'keep')">✕ דלג</button>
+  </div>
+</div><div class="cluster" id="dist_20">
+  <div><strong>GABRIEL GITMAN</strong> — 3 נמענים שונים</div>
+  <details><summary>הצג נמענים</summary><ul><li>GABRIEL GITMAN</li><li>Gabriel Gitman</li><li>גבריאל גיטמן</li></ul></details>
+  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+  <div class="actions">
+    <button class="merge" onclick="decide('dist_20', 'mark_distributor')">📌 סמן כמפיץ</button>
+    <button class="keep" onclick="decide('dist_20', 'keep')">✕ דלג</button>
+  </div>
+</div></div>
+
+<h2>4. שמות עברית עם איותי אנגלית מרובים</h2>
+<p class="meta">אותו נמען בעברית, מספר איותים שונים באנגלית — אותו אדם.</p>
+<div id="heMultiEn"><div class="cluster" id="hemulti_0">
+  <div><strong>דביר ששון</strong> = 4 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">FRIDA COHEN</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MALI KUNTZ</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_0', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_0', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_1">
+  <div><strong>דביר</strong> = 3 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_1', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_1', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_2">
+  <div><strong>אתי רובין</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">ATI ROBIN</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_2', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_2', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_3">
+  <div><strong>לין ממן</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIN MAMAN</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_3', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_3', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_4">
+  <div><strong>אושרי שלי</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRY SHELLY</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_4', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_4', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_5">
+  <div><strong>אושרה פינחסי</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRA PINCHASI</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_5', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_5', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_6">
+  <div><strong>אודיה דוידוב</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ODAYA DAVIDOV</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_6', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_6', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_7">
+  <div><strong>קרן טל קישנר</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">KEREN TAL KISHNER</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_7', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_7', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_8">
+  <div><strong>ליז מאירוביץ</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_8', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_8', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_9">
+  <div><strong>רחלי נומברג</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">RACHELI MELZER</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_9', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_9', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_10">
+  <div><strong>אורלי ברודו</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ORLY BRUDO</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_10', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_10', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_11">
+  <div><strong>מיכל מלמוד</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MICHAL MELAMUD</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_11', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_11', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_12">
+  <div><strong>הילה אברגיל</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">HILA ABARGIL</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_12', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_12', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_13">
+  <div><strong>רותם עמרן</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ROTEM AMRAN</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_13', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_13', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_14">
+  <div><strong>אלכסנדרה אהרון</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">ALEXANDRA AHARON</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_14', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_14', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_15">
+  <div><strong>ליז עוז</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">LIZ OZ</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_15', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_15', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div><div class="cluster" id="hemulti_16">
+  <div><strong>צליל דדון</strong> = 2 איותי אנגלית:</div>
+  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">TSLIL DADON</span></div>
+  <div class="actions">
+    <button class="merge" onclick="decide('hemulti_16', 'merge')">✓ אותו אדם</button>
+    <button class="keep" onclick="decide('hemulti_16', 'keep')">✕ אנשים נפרדים</button>
+  </div>
+</div></div>
+
+<script>
+const decisions = JSON.parse(localStorage.getItem('dedupe_decisions') || '{}');
+
+function decide(clusterId, action) {
+  decisions[clusterId] = action;
+  localStorage.setItem('dedupe_decisions', JSON.stringify(decisions));
+  const el = document.getElementById(clusterId);
+  if (el) {
+    el.classList.remove('merged', 'kept');
+    if (action === 'merge') el.classList.add('merged');
+    else if (action === 'keep') el.classList.add('kept');
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const n = Object.keys(decisions).length;
+  document.getElementById('progressLabel').textContent = `${n} החלטות נשמרו`;
+}
+
+function exportDecisions() {
+  const blob = new Blob([JSON.stringify(decisions, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dedupe_decisions.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Restore visual state from saved decisions
+window.addEventListener('DOMContentLoaded', () => {
+  Object.entries(decisions).forEach(([id, action]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add(action === 'merge' ? 'merged' : 'kept');
+  });
+  updateProgress();
+});
+</script>
+</body>
+</html>
