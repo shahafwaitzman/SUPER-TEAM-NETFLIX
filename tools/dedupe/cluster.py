@@ -1,37 +1,38 @@
 #!/usr/bin/env python3
 """
-OrdersHistory de-duplication clusterer.
+OrdersHistory de-duplication clusterer (v2 — customer-centric).
 
-Reads OrdersHistory.xlsx, finds groups of names that are likely the same human:
-  - Same English name with multiple Hebrew transliterations
-  - Same Hebrew name with multiple English transliterations
-  - Distributors who order on behalf of many customers (1 buyer → many recipients)
-  - Spelling variants (Levenshtein-close)
+Reads OrdersHistory.xlsx, builds a unified customer list where each customer
+appears once with all their order history aggregated.
 
-Outputs a single self-contained dedupe_review.html that the user can open in a
-browser to manually confirm/reject each suggested cluster. Decisions are saved
-in localStorage and exportable as JSON.
+Detects:
+  - Distributors who order on behalf of others (1 buyer → many recipients)
+  - Hebrew name variants of the same customer (fuzzy match)
+  - English-name variations for the same Hebrew recipient
+
+Output:
+  - dedupe_review.html — customer-centric grid: each customer as a compact
+    card showing canonical name + "הוזמן ע״י X" + order count + total spent.
+  - clusters.json — raw analysis data.
 """
 
 import json
-import sys
+import re
 from collections import defaultdict
 from pathlib import Path
 
 import pandas as pd
-from rapidfuzz import fuzz, process
+from rapidfuzz import fuzz
 
-# ---------- Configuration ----------
 XLSX_PATH = Path("/Users/shahafwaitzman/Desktop/OrdersHistory (4).xlsx")
 OUT_DIR = Path(__file__).parent
 OUT_HTML = OUT_DIR / "dedupe_review.html"
 OUT_DATA_JSON = OUT_DIR / "clusters.json"
 
-# Fuzzy match thresholds (0-100). Higher = stricter.
 SIMILARITY_THRESHOLD = 82
-MIN_GROUP_SIZE = 2  # only show clusters with at least 2 different name forms
+DISTRIBUTOR_MIN_RECIPIENTS = 3
 
-# ---------- Load data ----------
+
 def load_orders():
     df = pd.read_excel(XLSX_PATH, header=4)
     df = df.dropna(subset=[df.columns[0]])
@@ -48,22 +49,30 @@ def load_orders():
         df.columns[9]: "total",
     })
 
-# ---------- Normalization ----------
+
 def norm_en(s):
     if pd.isna(s):
         return ""
     return " ".join(str(s).upper().strip().split())
 
+
 def norm_he(s):
     if pd.isna(s):
         return ""
-    s = str(s).strip()
-    s = " ".join(s.split())
-    return s
+    return " ".join(str(s).strip().split())
 
-# ---------- Fuzzy clustering ----------
-def cluster_names(names, threshold=SIMILARITY_THRESHOLD):
-    """Greedy single-link clustering by token-set ratio."""
+
+def parse_total(val):
+    if pd.isna(val):
+        return 0.0
+    s = str(val).replace("ILS", "").replace(",", "").strip()
+    try:
+        return float(s)
+    except ValueError:
+        return 0.0
+
+
+def cluster_he_names(names, threshold=SIMILARITY_THRESHOLD):
     names = sorted(set(n for n in names if n))
     clusters = []
     seen = set()
@@ -75,261 +84,389 @@ def cluster_names(names, threshold=SIMILARITY_THRESHOLD):
         for other in names:
             if other in seen:
                 continue
-            score = fuzz.token_set_ratio(n, other)
-            if score >= threshold:
+            if fuzz.token_set_ratio(n, other) >= threshold:
                 cluster.append(other)
                 seen.add(other)
         clusters.append(cluster)
-    return [c for c in clusters if len(c) >= MIN_GROUP_SIZE]
+    return clusters
 
-# ---------- Build cluster report ----------
-def build_clusters(df):
+
+def build_customer_view(df):
+    """Customer-centric: each Hebrew recipient name = one row.
+    Shows their order count, total, and which distributors ordered for them."""
     df["buyer_en_norm"] = df["buyer_en"].apply(norm_en)
     df["recipient_he_norm"] = df["recipient_he"].apply(norm_he)
+    df["total_num"] = df["total"].apply(parse_total)
 
-    # 1. English name fuzzy clusters
-    en_names = df["buyer_en_norm"].unique().tolist()
-    en_clusters = cluster_names(en_names)
+    # Identify distributors: buyers with 3+ different recipients
+    buyer_to_recipients = defaultdict(set)
+    for _, r in df.iterrows():
+        if r["buyer_en_norm"] and r["recipient_he_norm"]:
+            buyer_to_recipients[r["buyer_en_norm"]].add(r["recipient_he_norm"])
+    distributors = {b for b, recipients in buyer_to_recipients.items()
+                    if len(recipients) >= DISTRIBUTOR_MIN_RECIPIENTS}
 
-    # 2. Hebrew name fuzzy clusters
-    he_names = df["recipient_he_norm"].unique().tolist()
-    he_clusters = cluster_names(he_names)
+    # Aggregate per recipient (customer)
+    customers = []
+    grouped = df.groupby("recipient_he_norm")
+    for he_name, group in grouped:
+        if not he_name or he_name == "Herbalife International of America, Inc. California, USA":
+            continue
+        unique_buyers = group["buyer_en_norm"].dropna().unique().tolist()
+        unique_buyers = [b for b in unique_buyers if b]
+        # Distinguish distributors from "self-buyers"
+        ordered_via = sorted([b for b in unique_buyers if b in distributors])
+        self_orders = sorted([b for b in unique_buyers if b not in distributors])
+        customers.append({
+            "canonical_he": he_name,
+            "english_variants": sorted(unique_buyers),
+            "ordered_via": ordered_via,
+            "self_orders_en": self_orders,
+            "order_count": int(len(group)),
+            "total_spent": round(float(group["total_num"].sum()), 2),
+            "is_distributor": he_name in distributors,  # rare — most distributors only have EN name
+        })
+    customers.sort(key=lambda c: -c["order_count"])
 
-    # 3. English-name → Hebrew-recipients mapping (distributors-on-behalf)
-    en_to_he = defaultdict(set)
-    for _, row in df.iterrows():
-        en, he = row["buyer_en_norm"], row["recipient_he_norm"]
-        if en and he:
-            en_to_he[en].add(he)
-    distributor_groups = [
-        {"buyer_en": en, "recipients_he": sorted(hes), "recipient_count": len(hes)}
-        for en, hes in en_to_he.items()
-        if len(hes) >= 3  # distributor threshold
-    ]
-    distributor_groups.sort(key=lambda x: -x["recipient_count"])
+    # Hebrew fuzzy clusters (potential same-person variants)
+    he_clusters = cluster_he_names([c["canonical_he"] for c in customers])
+    he_cluster_lookup = {}
+    for ci, cluster in enumerate(he_clusters):
+        if len(cluster) >= 2:
+            for name in cluster:
+                he_cluster_lookup[name] = ci
 
-    # 4. Hebrew name → English variants
-    he_to_en = defaultdict(set)
-    for _, row in df.iterrows():
-        en, he = row["buyer_en_norm"], row["recipient_he_norm"]
-        if en and he:
-            he_to_en[he].add(en)
-    he_with_multi_en = [
-        {"recipient_he": he, "buyers_en": sorted(ens), "buyer_count": len(ens)}
-        for he, ens in he_to_en.items()
-        if len(ens) >= 2
-    ]
-    he_with_multi_en.sort(key=lambda x: -x["buyer_count"])
+    # Annotate each customer with cluster id (if any)
+    for c in customers:
+        c["cluster_id"] = he_cluster_lookup.get(c["canonical_he"])
 
-    # Order counts per name
-    en_counts = df["buyer_en_norm"].value_counts().to_dict()
-    he_counts = df["recipient_he_norm"].value_counts().to_dict()
+    # Distributor summary — for the "מפיצים" tab
+    distributor_summary = []
+    for dist in sorted(distributors):
+        recipients = sorted(buyer_to_recipients[dist])
+        dist_orders = df[df["buyer_en_norm"] == dist]
+        distributor_summary.append({
+            "name_en": dist,
+            "recipient_count": len(recipients),
+            "order_count": int(len(dist_orders)),
+            "total_facilitated": round(float(dist_orders["total_num"].sum()), 2),
+        })
+    distributor_summary.sort(key=lambda d: -d["order_count"])
 
     return {
+        "customers": customers,
+        "distributors": distributor_summary,
+        "he_clusters": [c for c in he_clusters if len(c) >= 2],
         "stats": {
             "total_orders": int(len(df)),
-            "unique_en_buyers": len(en_names),
-            "unique_he_recipients": len(he_names),
-            "en_fuzzy_clusters": len(en_clusters),
-            "he_fuzzy_clusters": len(he_clusters),
-            "distributor_groups": len(distributor_groups),
+            "unique_customers": len(customers),
+            "distributors": len(distributor_summary),
+            "fuzzy_dup_groups": len([c for c in he_clusters if len(c) >= 2]),
         },
-        "en_fuzzy_clusters": [
-            {"names": c, "counts": [en_counts.get(n, 0) for n in c]}
-            for c in en_clusters
-        ],
-        "he_fuzzy_clusters": [
-            {"names": c, "counts": [he_counts.get(n, 0) for n in c]}
-            for c in he_clusters
-        ],
-        "distributor_groups": distributor_groups[:30],  # top 30
-        "he_multi_en": he_with_multi_en[:30],
     }
 
-# ---------- HTML generator ----------
+
+def html_escape(s):
+    return (str(s).replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;").replace("'", "&#39;"))
+
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Dedupe Review — OrdersHistory</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סקירת לקוחות — OrdersHistory</title>
 <style>
-  body { font-family: -apple-system, "Segoe UI", Heebo, sans-serif; background: #0d1117; color: #e6edf3; padding: 24px; max-width: 1200px; margin: 0 auto; }
-  h1 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 8px; }
-  h2 { color: #f0883e; margin-top: 32px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
-  .stats { background: #161b22; padding: 16px; border-radius: 8px; margin: 16px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-  .stat { text-align: center; }
-  .stat .num { font-size: 28px; font-weight: 700; color: #58a6ff; display: block; }
-  .stat .label { font-size: 12px; color: #8b949e; }
-  .cluster { background: #161b22; padding: 14px 18px; border-radius: 8px; margin: 12px 0; border-right: 4px solid #30363d; }
-  .cluster.merged { border-color: #46d369; background: #0a2818; }
-  .cluster.kept { border-color: #f85149; background: #2a0e0e; opacity: 0.5; }
-  .cluster .names { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
-  .name-pill { background: #21262d; padding: 4px 10px; border-radius: 16px; font-size: 14px; }
-  .name-pill .count { color: #8b949e; font-size: 11px; margin-right: 4px; }
-  .actions { display: flex; gap: 8px; margin-top: 8px; }
-  button { background: #21262d; color: #e6edf3; border: 1px solid #30363d; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  button:hover { background: #30363d; }
-  button.merge { background: #1f6feb; border-color: #1f6feb; }
-  button.merge:hover { background: #388bfd; }
-  button.keep { background: #6e7681; }
-  .export-bar { position: sticky; top: 0; background: #0d1117; padding: 12px 0; z-index: 10; border-bottom: 1px solid #30363d; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
-  .progress { color: #8b949e; font-size: 13px; }
-  .meta { color: #8b949e; font-size: 12px; margin-top: 4px; }
-  details { background: #161b22; padding: 8px 14px; border-radius: 8px; margin: 8px 0; }
-  details summary { cursor: pointer; font-weight: 600; color: #58a6ff; }
-  details ul { margin: 8px 0 0; padding-right: 20px; }
-  details li { margin: 2px 0; font-size: 13px; }
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #58a6ff; --good: #46d369; --warn: #f0883e;
+    --bad: #f85149; --pill: #21262d;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Heebo, sans-serif; background: var(--bg);
+         color: var(--text); padding: 24px; max-width: 1400px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: center;
+           border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
+  h1 { color: var(--accent); margin: 0; font-size: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+           gap: 10px; margin-bottom: 20px; }
+  .stat { background: var(--panel); padding: 14px; border-radius: 8px; text-align: center;
+          border: 1px solid var(--border); }
+  .stat .num { font-size: 24px; font-weight: 700; color: var(--accent); display: block; }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .toolbar { background: var(--panel); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+             display: flex; gap: 10px; flex-wrap: wrap; align-items: center; border: 1px solid var(--border); }
+  .toolbar input { background: var(--bg); color: var(--text); border: 1px solid var(--border);
+                   padding: 7px 12px; border-radius: 6px; font-size: 14px; flex: 1; min-width: 200px; }
+  .toolbar button { background: var(--pill); color: var(--text); border: 1px solid var(--border);
+                    padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .toolbar button:hover { background: var(--border); }
+  .toolbar button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toolbar select { background: var(--bg); color: var(--text); border: 1px solid var(--border);
+                    padding: 7px 10px; border-radius: 6px; font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border);
+          border-right-width: 4px; transition: transform 0.15s; }
+  .card:hover { transform: translateY(-2px); }
+  .card.merged { border-right-color: var(--good); background: rgba(70,211,105,0.06); }
+  .card.flagged-distributor { border-right-color: var(--warn); }
+  .card .name-he { font-size: 16px; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+  .card .name-en { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .card .ordered-via { font-size: 13px; color: var(--accent); margin: 6px 0 4px;
+                       padding: 4px 8px; background: rgba(88,166,255,0.10); border-radius: 4px; }
+  .card .stats-row { display: flex; gap: 12px; font-size: 12px; color: var(--muted);
+                     border-top: 1px solid var(--border); padding-top: 6px; margin-top: 6px; }
+  .card .stats-row b { color: var(--text); font-weight: 600; }
+  .card .actions { margin-top: 6px; display: flex; gap: 4px; }
+  .card .actions button { font-size: 11px; padding: 3px 8px; background: var(--pill);
+                          color: var(--muted); border: 1px solid var(--border); border-radius: 4px;
+                          cursor: pointer; }
+  .card .actions button:hover { color: var(--text); background: var(--border); }
+  .card .actions button.active { background: var(--good); color: #fff; border-color: var(--good); }
+  .cluster-link { font-size: 11px; color: var(--warn); margin-top: 4px;
+                  background: rgba(240,136,62,0.10); padding: 3px 6px; border-radius: 4px;
+                  display: inline-block; }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
+  .tab-bar button { background: transparent; color: var(--muted); border: none; padding: 10px 18px;
+                    cursor: pointer; font-size: 14px; border-bottom: 3px solid transparent;
+                    margin-bottom: -2px; }
+  .tab-bar button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 8px; overflow: hidden; }
+  th { background: var(--bg); padding: 10px 12px; text-align: right; color: var(--muted); font-size: 12px;
+       text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .progress-pill { font-size: 12px; color: var(--muted); }
+  .empty { text-align: center; padding: 40px; color: var(--muted); }
 </style>
 </head>
 <body>
-<h1>סקירת כפילויות — OrdersHistory</h1>
+
+<header>
+  <h1>סקירת לקוחות — OrdersHistory</h1>
+  <span class="progress-pill" id="progressLabel">0 החלטות</span>
+</header>
 
 <div class="stats">__STATS_HTML__</div>
 
-<div class="export-bar">
-  <button onclick="exportDecisions()">📥 ייצא JSON עם החלטות</button>
-  <span class="progress" id="progressLabel">0 החלטות נשמרו</span>
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="customers">לקוחות (__CUSTOMER_COUNT__)</button>
+  <button class="tab-btn" data-tab="distributors">מפיצים (__DISTRIBUTOR_COUNT__)</button>
+  <button class="tab-btn" data-tab="clusters">כפילויות חשודות (__CLUSTER_COUNT__)</button>
 </div>
 
-<h2>1. שמות אנגלית — וריאציות איות (fuzzy match)</h2>
-<p class="meta">קבוצות שמות אנגלית עם דמיון ≥82%. סקור והחלט אם זה אותו אדם.</p>
-<div id="enClusters">__EN_CLUSTERS_HTML__</div>
+<div class="tab-content active" id="tab-customers">
+  <div class="toolbar">
+    <input type="search" id="searchBox" placeholder="חיפוש לפי שם...">
+    <select id="filterSelect">
+      <option value="all">כולם</option>
+      <option value="via">רק שהוזמנו ע״י מפיץ</option>
+      <option value="self">רק שהזמינו לעצמם</option>
+      <option value="multi-en">עם מספר איותי אנגלית</option>
+      <option value="cluster">בקבוצת כפילות חשודה</option>
+    </select>
+    <button onclick="exportDecisions()" class="primary">📥 ייצא JSON</button>
+  </div>
+  <div class="grid" id="customerGrid">__CUSTOMER_CARDS__</div>
+</div>
 
-<h2>2. שמות עברית — וריאציות איות (fuzzy match)</h2>
-<p class="meta">קבוצות שמות עברית עם דמיון ≥82%.</p>
-<div id="heClusters">__HE_CLUSTERS_HTML__</div>
+<div class="tab-content" id="tab-distributors">
+  <table>
+    <thead>
+      <tr><th>שם המפיץ (אנגלית)</th><th>הזמנות</th><th>נמענים</th><th>סה״כ ₪</th></tr>
+    </thead>
+    <tbody>__DISTRIBUTOR_ROWS__</tbody>
+  </table>
+</div>
 
-<h2>3. מפיצים שמזמינים עבור אחרים (1 קונה → מספר נמענים)</h2>
-<p class="meta">מקרה ה-LIZ MEIROVICH — קונה אחד עם 3+ נמענים שונים. אלו המפיצים.</p>
-<div id="distributors">__DISTRIBUTORS_HTML__</div>
-
-<h2>4. שמות עברית עם איותי אנגלית מרובים</h2>
-<p class="meta">אותו נמען בעברית, מספר איותים שונים באנגלית — אותו אדם.</p>
-<div id="heMultiEn">__HE_MULTI_EN_HTML__</div>
+<div class="tab-content" id="tab-clusters">
+  <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">
+    קבוצות שמות עברית עם דמיון גבוה. כברירת מחדל סומנו כ"אותו אדם".
+  </p>
+  <div id="clusterList">__CLUSTER_LIST__</div>
+</div>
 
 <script>
-const decisions = JSON.parse(localStorage.getItem('dedupe_decisions') || '{}');
+const decisions = JSON.parse(localStorage.getItem('dedupe_decisions_v2') || '{}');
 
-function decide(clusterId, action) {
-  decisions[clusterId] = action;
-  localStorage.setItem('dedupe_decisions', JSON.stringify(decisions));
-  const el = document.getElementById(clusterId);
+// Pre-fill default decisions: all clusters are "merged" by default per user feedback
+__CLUSTER_DEFAULTS__
+
+function decide(id, action) {
+  decisions[id] = action;
+  localStorage.setItem('dedupe_decisions_v2', JSON.stringify(decisions));
+  refreshUI(id);
+}
+
+function refreshUI(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
   if (el) {
-    el.classList.remove('merged', 'kept');
-    if (action === 'merge') el.classList.add('merged');
-    else if (action === 'keep') el.classList.add('kept');
+    el.classList.toggle('merged', decisions[id] === 'merge');
+    el.querySelectorAll('button[data-action]').forEach(b => {
+      b.classList.toggle('active', b.dataset.action === decisions[id]);
+    });
   }
   updateProgress();
 }
 
 function updateProgress() {
-  const n = Object.keys(decisions).length;
-  document.getElementById('progressLabel').textContent = `${n} החלטות נשמרו`;
+  document.getElementById('progressLabel').textContent =
+    `${Object.keys(decisions).length} החלטות נשמרו`;
 }
 
 function exportDecisions() {
   const blob = new Blob([JSON.stringify(decisions, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'dedupe_decisions.json';
-  a.click();
+  a.href = url; a.download = 'dedupe_decisions.json'; a.click();
   URL.revokeObjectURL(url);
 }
 
-// Restore visual state from saved decisions
-window.addEventListener('DOMContentLoaded', () => {
-  Object.entries(decisions).forEach(([id, action]) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add(action === 'merge' ? 'merged' : 'kept');
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
   });
+});
+
+// Search + filter
+function applyFilter() {
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  const filter = document.getElementById('filterSelect').value;
+  document.querySelectorAll('#customerGrid .card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const matchesSearch = !q || text.includes(q);
+    let matchesFilter = true;
+    if (filter === 'via')      matchesFilter = card.dataset.viaCount > 0;
+    else if (filter === 'self') matchesFilter = card.dataset.selfCount > 0 && card.dataset.viaCount == 0;
+    else if (filter === 'multi-en') matchesFilter = card.dataset.enCount > 1;
+    else if (filter === 'cluster')  matchesFilter = card.dataset.clusterId !== '';
+    card.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+  });
+}
+document.getElementById('searchBox').addEventListener('input', applyFilter);
+document.getElementById('filterSelect').addEventListener('change', applyFilter);
+
+// Restore decisions visually on load
+window.addEventListener('DOMContentLoaded', () => {
+  Object.keys(decisions).forEach(id => refreshUI(id));
   updateProgress();
 });
 </script>
 </body>
 </html>"""
 
-def render_cluster(prefix, idx, names, counts, extra=""):
+
+def render_customer_card(c):
+    cid = f"cust_{c['canonical_he']}"
+    via = ""
+    if c["ordered_via"]:
+        via_names = ", ".join(c["ordered_via"])
+        via = f'<div class="ordered-via">📦 הוזמן ע״י: {html_escape(via_names)}</div>'
+    en_name = ""
+    if c["english_variants"]:
+        # Show English if it differs from "ordered_via" buyers (i.e., they bought themselves too)
+        non_dist_en = [e for e in c["english_variants"] if e in c["self_orders_en"]]
+        if non_dist_en:
+            en_name = f'<div class="name-en">EN: {html_escape(", ".join(non_dist_en))}</div>'
+    cluster_link = ""
+    if c["cluster_id"] is not None:
+        cluster_link = '<span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>'
+
+    via_count = len(c["ordered_via"])
+    self_count = len(c["self_orders_en"])
+    en_count = len(c["english_variants"])
+    cluster_id = c["cluster_id"] if c["cluster_id"] is not None else ""
+
+    return f'''<div class="card" data-id="{html_escape(cid)}"
+              data-via-count="{via_count}" data-self-count="{self_count}"
+              data-en-count="{en_count}" data-cluster-id="{cluster_id}">
+  <div class="name-he">{html_escape(c["canonical_he"])}</div>
+  {en_name}
+  {via}
+  {cluster_link}
+  <div class="stats-row">
+    <span><b>{c["order_count"]}</b> הזמנות</span>
+    <span><b>{c["total_spent"]:,.0f}</b> ₪</span>
+  </div>
+</div>'''
+
+
+def render_distributor_row(d):
+    return f'''<tr>
+  <td><strong>{html_escape(d["name_en"])}</strong></td>
+  <td>{d["order_count"]}</td>
+  <td>{d["recipient_count"]}</td>
+  <td>{d["total_facilitated"]:,.0f}</td>
+</tr>'''
+
+
+def render_cluster_card(idx, names):
+    cid = f"cluster_{idx}"
     pills = "".join(
-        f'<span class="name-pill"><span class="count">{c}</span>{n}</span>'
-        for n, c in zip(names, counts)
+        f'<span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">{html_escape(n)}</span>'
+        for n in names
     )
-    cid = f"{prefix}_{idx}"
-    return f'''<div class="cluster" id="{cid}">
-  <div class="names">{pills}</div>{extra}
+    return f'''<div class="card" data-id="{cid}" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;">{pills}</div>
   <div class="actions">
-    <button class="merge" onclick="decide('{cid}', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('{cid}', 'keep')">✕ אנשים נפרדים</button>
+    <button data-action="merge" onclick="decide('{cid}', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('{cid}', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div>'''
 
-def render_distributor(idx, group):
-    cid = f"dist_{idx}"
-    recipients_html = "".join(f'<li>{r}</li>' for r in group["recipients_he"])
-    return f'''<div class="cluster" id="{cid}">
-  <div><strong>{group["buyer_en"]}</strong> — {group["recipient_count"]} נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul>{recipients_html}</ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('{cid}', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('{cid}', 'keep')">✕ דלג</button>
-  </div>
-</div>'''
-
-def render_he_multi_en(idx, group):
-    cid = f"hemulti_{idx}"
-    en_pills = "".join(f'<span class="name-pill">{n}</span>' for n in group["buyers_en"])
-    return f'''<div class="cluster" id="{cid}">
-  <div><strong>{group["recipient_he"]}</strong> = {group["buyer_count"]} איותי אנגלית:</div>
-  <div class="names">{en_pills}</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('{cid}', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('{cid}', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div>'''
 
 def main():
     print(f"Loading {XLSX_PATH}...")
     df = load_orders()
     print(f"Loaded {len(df)} orders")
-    print("Building clusters...")
-    data = build_clusters(df)
 
+    data = build_customer_view(df)
     s = data["stats"]
-    print(f"\nStats: {s}")
+    print(f"Stats: {s}")
 
     OUT_DATA_JSON.write_text(json.dumps(data, ensure_ascii=False, indent=2))
     print(f"Wrote {OUT_DATA_JSON}")
 
     stats_html = "".join(
-        f'<div class="stat"><span class="num">{v}</span><span class="label">{k.replace("_", " ")}</span></div>'
+        f'<div class="stat"><span class="num">{v:,}</span><span class="label">{k.replace("_", " ")}</span></div>'
         for k, v in s.items()
     )
-    en_html = "".join(
-        render_cluster("en", i, c["names"], c["counts"])
-        for i, c in enumerate(data["en_fuzzy_clusters"])
-    ) or "<p>אין וריאציות אנגלית</p>"
-    he_html = "".join(
-        render_cluster("he", i, c["names"], c["counts"])
-        for i, c in enumerate(data["he_fuzzy_clusters"])
-    ) or "<p>אין וריאציות עברית</p>"
-    dist_html = "".join(
-        render_distributor(i, g) for i, g in enumerate(data["distributor_groups"])
-    ) or "<p>אין מפיצים</p>"
-    hemulti_html = "".join(
-        render_he_multi_en(i, g) for i, g in enumerate(data["he_multi_en"])
-    ) or "<p>אין כפילויות עברית→אנגלית</p>"
+    customer_cards = "\n".join(render_customer_card(c) for c in data["customers"])
+    distributor_rows = "\n".join(render_distributor_row(d) for d in data["distributors"])
+
+    cluster_list_html = "\n".join(
+        render_cluster_card(i, names) for i, names in enumerate(data["he_clusters"])
+    ) or '<p class="empty">אין כפילויות חשודות</p>'
+
+    # Pre-fill all clusters as "merge" (per user feedback: all variations are same person)
+    cluster_defaults_js = "\n".join(
+        f"if (decisions['cluster_{i}'] === undefined) decisions['cluster_{i}'] = 'merge';"
+        for i in range(len(data["he_clusters"]))
+    )
+    if cluster_defaults_js:
+        cluster_defaults_js += "\nlocalStorage.setItem('dedupe_decisions_v2', JSON.stringify(decisions));"
 
     html = (HTML_TEMPLATE
             .replace("__STATS_HTML__", stats_html)
-            .replace("__EN_CLUSTERS_HTML__", en_html)
-            .replace("__HE_CLUSTERS_HTML__", he_html)
-            .replace("__DISTRIBUTORS_HTML__", dist_html)
-            .replace("__HE_MULTI_EN_HTML__", hemulti_html))
+            .replace("__CUSTOMER_COUNT__", str(len(data["customers"])))
+            .replace("__DISTRIBUTOR_COUNT__", str(len(data["distributors"])))
+            .replace("__CLUSTER_COUNT__", str(len(data["he_clusters"])))
+            .replace("__CUSTOMER_CARDS__", customer_cards)
+            .replace("__DISTRIBUTOR_ROWS__", distributor_rows)
+            .replace("__CLUSTER_LIST__", cluster_list_html)
+            .replace("__CLUSTER_DEFAULTS__", cluster_defaults_js))
 
     OUT_HTML.write_text(html, encoding="utf-8")
     print(f"Wrote {OUT_HTML}")
-    print(f"\nOpen in browser: file://{OUT_HTML.resolve()}")
+    print(f"Open: file://{OUT_HTML.resolve()}")
+
 
 if __name__ == "__main__":
     main()

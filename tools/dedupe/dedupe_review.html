@@ -2,469 +2,3686 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Dedupe Review — OrdersHistory</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סקירת לקוחות — OrdersHistory</title>
 <style>
-  body { font-family: -apple-system, "Segoe UI", Heebo, sans-serif; background: #0d1117; color: #e6edf3; padding: 24px; max-width: 1200px; margin: 0 auto; }
-  h1 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 8px; }
-  h2 { color: #f0883e; margin-top: 32px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
-  .stats { background: #161b22; padding: 16px; border-radius: 8px; margin: 16px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-  .stat { text-align: center; }
-  .stat .num { font-size: 28px; font-weight: 700; color: #58a6ff; display: block; }
-  .stat .label { font-size: 12px; color: #8b949e; }
-  .cluster { background: #161b22; padding: 14px 18px; border-radius: 8px; margin: 12px 0; border-right: 4px solid #30363d; }
-  .cluster.merged { border-color: #46d369; background: #0a2818; }
-  .cluster.kept { border-color: #f85149; background: #2a0e0e; opacity: 0.5; }
-  .cluster .names { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
-  .name-pill { background: #21262d; padding: 4px 10px; border-radius: 16px; font-size: 14px; }
-  .name-pill .count { color: #8b949e; font-size: 11px; margin-right: 4px; }
-  .actions { display: flex; gap: 8px; margin-top: 8px; }
-  button { background: #21262d; color: #e6edf3; border: 1px solid #30363d; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  button:hover { background: #30363d; }
-  button.merge { background: #1f6feb; border-color: #1f6feb; }
-  button.merge:hover { background: #388bfd; }
-  button.keep { background: #6e7681; }
-  .export-bar { position: sticky; top: 0; background: #0d1117; padding: 12px 0; z-index: 10; border-bottom: 1px solid #30363d; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
-  .progress { color: #8b949e; font-size: 13px; }
-  .meta { color: #8b949e; font-size: 12px; margin-top: 4px; }
-  details { background: #161b22; padding: 8px 14px; border-radius: 8px; margin: 8px 0; }
-  details summary { cursor: pointer; font-weight: 600; color: #58a6ff; }
-  details ul { margin: 8px 0 0; padding-right: 20px; }
-  details li { margin: 2px 0; font-size: 13px; }
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #58a6ff; --good: #46d369; --warn: #f0883e;
+    --bad: #f85149; --pill: #21262d;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Heebo, sans-serif; background: var(--bg);
+         color: var(--text); padding: 24px; max-width: 1400px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: center;
+           border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
+  h1 { color: var(--accent); margin: 0; font-size: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+           gap: 10px; margin-bottom: 20px; }
+  .stat { background: var(--panel); padding: 14px; border-radius: 8px; text-align: center;
+          border: 1px solid var(--border); }
+  .stat .num { font-size: 24px; font-weight: 700; color: var(--accent); display: block; }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .toolbar { background: var(--panel); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+             display: flex; gap: 10px; flex-wrap: wrap; align-items: center; border: 1px solid var(--border); }
+  .toolbar input { background: var(--bg); color: var(--text); border: 1px solid var(--border);
+                   padding: 7px 12px; border-radius: 6px; font-size: 14px; flex: 1; min-width: 200px; }
+  .toolbar button { background: var(--pill); color: var(--text); border: 1px solid var(--border);
+                    padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .toolbar button:hover { background: var(--border); }
+  .toolbar button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toolbar select { background: var(--bg); color: var(--text); border: 1px solid var(--border);
+                    padding: 7px 10px; border-radius: 6px; font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border);
+          border-right-width: 4px; transition: transform 0.15s; }
+  .card:hover { transform: translateY(-2px); }
+  .card.merged { border-right-color: var(--good); background: rgba(70,211,105,0.06); }
+  .card.flagged-distributor { border-right-color: var(--warn); }
+  .card .name-he { font-size: 16px; font-weight: 700; margin-bottom: 2px; color: var(--text); }
+  .card .name-en { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .card .ordered-via { font-size: 13px; color: var(--accent); margin: 6px 0 4px;
+                       padding: 4px 8px; background: rgba(88,166,255,0.10); border-radius: 4px; }
+  .card .stats-row { display: flex; gap: 12px; font-size: 12px; color: var(--muted);
+                     border-top: 1px solid var(--border); padding-top: 6px; margin-top: 6px; }
+  .card .stats-row b { color: var(--text); font-weight: 600; }
+  .card .actions { margin-top: 6px; display: flex; gap: 4px; }
+  .card .actions button { font-size: 11px; padding: 3px 8px; background: var(--pill);
+                          color: var(--muted); border: 1px solid var(--border); border-radius: 4px;
+                          cursor: pointer; }
+  .card .actions button:hover { color: var(--text); background: var(--border); }
+  .card .actions button.active { background: var(--good); color: #fff; border-color: var(--good); }
+  .cluster-link { font-size: 11px; color: var(--warn); margin-top: 4px;
+                  background: rgba(240,136,62,0.10); padding: 3px 6px; border-radius: 4px;
+                  display: inline-block; }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
+  .tab-bar button { background: transparent; color: var(--muted); border: none; padding: 10px 18px;
+                    cursor: pointer; font-size: 14px; border-bottom: 3px solid transparent;
+                    margin-bottom: -2px; }
+  .tab-bar button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 8px; overflow: hidden; }
+  th { background: var(--bg); padding: 10px 12px; text-align: right; color: var(--muted); font-size: 12px;
+       text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .progress-pill { font-size: 12px; color: var(--muted); }
+  .empty { text-align: center; padding: 40px; color: var(--muted); }
 </style>
 </head>
 <body>
-<h1>סקירת כפילויות — OrdersHistory</h1>
 
-<div class="stats"><div class="stat"><span class="num">734</span><span class="label">total orders</span></div><div class="stat"><span class="num">138</span><span class="label">unique en buyers</span></div><div class="stat"><span class="num">273</span><span class="label">unique he recipients</span></div><div class="stat"><span class="num">0</span><span class="label">en fuzzy clusters</span></div><div class="stat"><span class="num">14</span><span class="label">he fuzzy clusters</span></div><div class="stat"><span class="num">21</span><span class="label">distributor groups</span></div></div>
+<header>
+  <h1>סקירת לקוחות — OrdersHistory</h1>
+  <span class="progress-pill" id="progressLabel">0 החלטות</span>
+</header>
 
-<div class="export-bar">
-  <button onclick="exportDecisions()">📥 ייצא JSON עם החלטות</button>
-  <span class="progress" id="progressLabel">0 החלטות נשמרו</span>
+<div class="stats"><div class="stat"><span class="num">734</span><span class="label">total orders</span></div><div class="stat"><span class="num">272</span><span class="label">unique customers</span></div><div class="stat"><span class="num">21</span><span class="label">distributors</span></div><div class="stat"><span class="num">14</span><span class="label">fuzzy dup groups</span></div></div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="customers">לקוחות (272)</button>
+  <button class="tab-btn" data-tab="distributors">מפיצים (21)</button>
+  <button class="tab-btn" data-tab="clusters">כפילויות חשודות (14)</button>
 </div>
 
-<h2>1. שמות אנגלית — וריאציות איות (fuzzy match)</h2>
-<p class="meta">קבוצות שמות אנגלית עם דמיון ≥82%. סקור והחלט אם זה אותו אדם.</p>
-<div id="enClusters"><p>אין וריאציות אנגלית</p></div>
-
-<h2>2. שמות עברית — וריאציות איות (fuzzy match)</h2>
-<p class="meta">קבוצות שמות עברית עם דמיון ≥82%.</p>
-<div id="heClusters"><div class="cluster" id="he_0">
-  <div class="names"><span class="name-pill"><span class="count">1</span>K cohen</span><span class="name-pill"><span class="count">1</span>frida cohen</span><span class="name-pill"><span class="count">1</span>maor cohen</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_0', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_0', 'keep')">✕ אנשים נפרדים</button>
+<div class="tab-content active" id="tab-customers">
+  <div class="toolbar">
+    <input type="search" id="searchBox" placeholder="חיפוש לפי שם...">
+    <select id="filterSelect">
+      <option value="all">כולם</option>
+      <option value="via">רק שהוזמנו ע״י מפיץ</option>
+      <option value="self">רק שהזמינו לעצמם</option>
+      <option value="multi-en">עם מספר איותי אנגלית</option>
+      <option value="cluster">בקבוצת כפילות חשודה</option>
+    </select>
+    <button onclick="exportDecisions()" class="primary">📥 ייצא JSON</button>
   </div>
-</div><div class="cluster" id="he_1">
-  <div class="names"><span class="name-pill"><span class="count">5</span>אופיר אלגריסי</span><span class="name-pill"><span class="count">2</span>אופיר אלגרסי</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_1', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_1', 'keep')">✕ אנשים נפרדים</button>
+  <div class="grid" id="customerGrid"><div class="card" data-id="cust_סתיו חברה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סתיו חברה</div>
+  <div class="name-en">EN: STAV HABRA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>23</b> הזמנות</span>
+    <span><b>24,968</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_2">
-  <div class="names"><span class="name-pill"><span class="count">5</span>אור לורדו</span><span class="name-pill"><span class="count">1</span>אור לרדו</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_2', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_2', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_LIZ MEIROVICH"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">LIZ MEIROVICH</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>21</b> הזמנות</span>
+    <span><b>40,560</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_3">
-  <div class="names"><span class="name-pill"><span class="count">1</span>בינה ששון ליז</span><span class="name-pill"><span class="count">7</span>ליז</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_3', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_3', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_דביר ששון"
+              data-via-count="3" data-self-count="1"
+              data-en-count="4" data-cluster-id="133">
+  <div class="name-he">דביר ששון</div>
+  <div class="name-en">EN: FRIDA COHEN</div>
+  <div class="ordered-via">📦 הוזמן ע״י: ELDAR BAN ATAR, LIZ MEIROVICH, MALI KUNTZ</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>17</b> הזמנות</span>
+    <span><b>32,163</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_4">
-  <div class="names"><span class="name-pill"><span class="count">10</span>דביר</span><span class="name-pill"><span class="count">17</span>דביר ששון</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_4', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_4', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_אורנית בלולו"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אורנית בלולו</div>
+  <div class="name-en">EN: ORANIT BALULU</div>
+  
+  
+  <div class="stats-row">
+    <span><b>12</b> הזמנות</span>
+    <span><b>9,587</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_5">
-  <div class="names"><span class="name-pill"><span class="count">3</span>דודו יצחקי</span><span class="name-pill"><span class="count">1</span>ורד יצחקי</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_5', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_5', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_קארין ליזרוביץ"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">קארין ליזרוביץ</div>
+  <div class="name-en">EN: KARIN LIZARIVITZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>11</b> הזמנות</span>
+    <span><b>9,803</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_6">
-  <div class="names"><span class="name-pill"><span class="count">1</span>דיאנה</span><span class="name-pill"><span class="count">2</span>דיאנה תמר ליבוביץ</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_6', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_6', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_Anna Brem Brigar"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Anna Brem Brigar</div>
+  <div class="name-en">EN: ANNA BREM BRIGAR</div>
+  
+  
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>0</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_7">
-  <div class="names"><span class="name-pill"><span class="count">2</span>יעל</span><span class="name-pill"><span class="count">2</span>יעל הנדרי</span><span class="name-pill"><span class="count">1</span>יעל פרינץ</span><span class="name-pill"><span class="count">4</span>יעל צרפתי</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_7', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_7', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_אושרי שלי"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">אושרי שלי</div>
+  <div class="name-en">EN: OSHRY SHELLY</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>6,034</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_8">
-  <div class="names"><span class="name-pill"><span class="count">3</span>מלי איסקוב</span><span class="name-pill"><span class="count">1</span>מלי יסאקוב</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_8', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_8', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_דביר"
+              data-via-count="3" data-self-count="0"
+              data-en-count="3" data-cluster-id="133">
+  <div class="name-he">דביר</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: ELDAR BAN ATAR, LIZ MEIROVICH, SHELLY VIVANTE</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>6,970</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_9">
-  <div class="names"><span class="name-pill"><span class="count">2</span>סוזי</span><span class="name-pill"><span class="count">4</span>סוזי והבה</span><span class="name-pill"><span class="count">3</span>סוזי ליה והבה</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_9', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_9', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_לין ממן"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">לין ממן</div>
+  <div class="name-en">EN: LIN MAMAN</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>12,856</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_10">
-  <div class="names"><span class="name-pill"><span class="count">6</span>סיוון סובעי</span><span class="name-pill"><span class="count">1</span>סיון סובעי</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_10', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_10', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_נטליה סנצ&#39;ז"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נטליה סנצ&#39;ז</div>
+  <div class="name-en">EN: NATALIA SHNCHEZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>5,974</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_11">
-  <div class="names"><span class="name-pill"><span class="count">1</span>עמיחי בן אביר</span><span class="name-pill"><span class="count">1</span>עמיחי וקוני בן אביר</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_11', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_11', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_סיגל לוי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סיגל לוי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RENATA LEVI</div>
+  
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>4,856</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_12">
-  <div class="names"><span class="name-pill"><span class="count">10</span>רוני לביא</span><span class="name-pill"><span class="count">1</span>רוני לוי</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_12', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_12', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_רוני לביא"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="229">
+  <div class="name-he">רוני לביא</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>14,531</b> ₪</span>
   </div>
-</div><div class="cluster" id="he_13">
-  <div class="names"><span class="name-pill"><span class="count">1</span>שירן גאוטה</span><span class="name-pill"><span class="count">1</span>שירן גואטה</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('he_13', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_13', 'keep')">✕ אנשים נפרדים</button>
+</div>
+<div class="card" data-id="cust_רנטה לוי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">רנטה לוי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RENATA LEVI</div>
+  
+  <div class="stats-row">
+    <span><b>10</b> הזמנות</span>
+    <span><b>10,148</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אושרה פינחסי"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">אושרה פינחסי</div>
+  <div class="name-en">EN: OSHRA PINCHASI</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>9</b> הזמנות</span>
+    <span><b>16,177</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עדי ביסמוט"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עדי ביסמוט</div>
+  <div class="name-en">EN: ADI BISMUT</div>
+  
+  
+  <div class="stats-row">
+    <span><b>9</b> הזמנות</span>
+    <span><b>28,148</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שאנל אלימלך"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שאנל אלימלך</div>
+  <div class="name-en">EN: SHANEL ELIMELECH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>9</b> הזמנות</span>
+    <span><b>5,260</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אילנה חבסוב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אילנה חבסוב</div>
+  <div class="name-en">EN: ILANA HAVASOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>8</b> הזמנות</span>
+    <span><b>5,463</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מיתר זיקרי מורנו"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מיתר זיקרי מורנו</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MEYTAR MORNO</div>
+  
+  <div class="stats-row">
+    <span><b>8</b> הזמנות</span>
+    <span><b>10,493</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נירית סוטו"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נירית סוטו</div>
+  <div class="name-en">EN: NIRIT SOTO</div>
+  
+  
+  <div class="stats-row">
+    <span><b>8</b> הזמנות</span>
+    <span><b>4,929</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סיגל סיני"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סיגל סיני</div>
+  <div class="name-en">EN: SIGAL SINI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>8</b> הזמנות</span>
+    <span><b>4,780</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ענת אוחנה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ענת אוחנה</div>
+  <div class="name-en">EN: ANAT OCHANA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>8</b> הזמנות</span>
+    <span><b>5,798</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ורד יאנובר"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ורד יאנובר</div>
+  <div class="name-en">EN: VERED YANOVER</div>
+  
+  
+  <div class="stats-row">
+    <span><b>7</b> הזמנות</span>
+    <span><b>4,319</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליז"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="127">
+  <div class="name-he">ליז</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>7</b> הזמנות</span>
+    <span><b>13,143</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נועה הרניק"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נועה הרניק</div>
+  <div class="name-en">EN: NOA HERNIK</div>
+  
+  
+  <div class="stats-row">
+    <span><b>7</b> הזמנות</span>
+    <span><b>4,052</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נטלי מדהלה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נטלי מדהלה</div>
+  <div class="name-en">EN: NATALI MADHALA BOTVINIKOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>7</b> הזמנות</span>
+    <span><b>5,688</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עדי גלעדי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עדי גלעדי</div>
+  <div class="name-en">EN: ADII GILADI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>7</b> הזמנות</span>
+    <span><b>3,262</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שרון בן עטר"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שרון בן עטר</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: ELDAR BAN ATAR</div>
+  
+  <div class="stats-row">
+    <span><b>7</b> הזמנות</span>
+    <span><b>3,278</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דנה סוטו"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">דנה סוטו</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DANA SOTO</div>
+  
+  <div class="stats-row">
+    <span><b>6</b> הזמנות</span>
+    <span><b>9,965</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דניאל ארדיטי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">דניאל ארדיטי</div>
+  <div class="name-en">EN: DANIEL ARDITTI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>6</b> הזמנות</span>
+    <span><b>4,309</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ניקול פרץ"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ניקול פרץ</div>
+  <div class="name-en">EN: NIKOL PERETZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>6</b> הזמנות</span>
+    <span><b>8,158</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סיוון סובעי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="203">
+  <div class="name-he">סיוון סובעי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SIVAN SUBAI</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>6</b> הזמנות</span>
+    <span><b>5,788</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עומר מלמד"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עומר מלמד</div>
+  <div class="name-en">EN: OMER MELAMED</div>
+  
+  
+  <div class="stats-row">
+    <span><b>6</b> הזמנות</span>
+    <span><b>4,739</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_קשת אוליאל"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">קשת אוליאל</div>
+  <div class="name-en">EN: KESHET OLIEL</div>
+  
+  
+  <div class="stats-row">
+    <span><b>6</b> הזמנות</span>
+    <span><b>3,054</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שלי ויונטה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שלי ויונטה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHELLY VIVANTE</div>
+  
+  <div class="stats-row">
+    <span><b>6</b> הזמנות</span>
+    <span><b>9,060</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_REVITAL ASSOLIN"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">REVITAL ASSOLIN</div>
+  <div class="name-en">EN: REVITAL ASSOLIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>3,047</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אודיה דוידוב"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">אודיה דוידוב</div>
+  <div class="name-en">EN: ODAYA DAVIDOV</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>3,310</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אופיר אלגריסי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="101">
+  <div class="name-he">אופיר אלגריסי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: OFIR ALGREESIE</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>16,968</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אור לורדו"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="104">
+  <div class="name-he">אור לורדו</div>
+  <div class="name-en">EN: OR LAREDO</div>
+  
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>2,559</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דניאל סלען"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">דניאל סלען</div>
+  <div class="name-en">EN: DANIEL SALAN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>4,637</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_לוטם בן אבו"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">לוטם בן אבו</div>
+  <div class="name-en">EN: LOTEM BEN ABU</div>
+  
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>6,453</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מיה אלבכרי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מיה אלבכרי</div>
+  <div class="name-en">EN: MAYA ALBACHARI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>7,565</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נטלי הרנוי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נטלי הרנוי</div>
+  <div class="name-en">EN: NATALI CHEYNI HARNOY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>10,326</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רותם ליאני"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">רותם ליאני</div>
+  <div class="name-en">EN: ROTEM LIANI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>3,861</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שני סנדברג"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שני סנדברג</div>
+  <div class="name-en">EN: SHANI SANDBERG</div>
+  
+  
+  <div class="stats-row">
+    <span><b>5</b> הזמנות</span>
+    <span><b>3,425</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_BAR ODEDA"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">BAR ODEDA</div>
+  <div class="name-en">EN: BAR ODEDA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>2,037</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_YAEL ZARFATI"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">YAEL ZARFATI</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: YAEL ZARFATI</div>
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>1,571</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_sharon vaknin"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">sharon vaknin</div>
+  <div class="name-en">EN: SHARON VAKNIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>3,586</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אבלין צלר"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אבלין צלר</div>
+  <div class="name-en">EN: EVELYN CHERNIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>2,037</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אתי רובין"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">אתי רובין</div>
+  <div class="name-en">EN: ATI ROBIN</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>2,375</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_הילה אברגיל"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">הילה אברגיל</div>
+  <div class="name-en">EN: HILA ABARGIL</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>4,515</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_יעל צרפתי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="151">
+  <div class="name-he">יעל צרפתי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: YAEL ZARFATI</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>4,414</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סוזי והבה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="197">
+  <div class="name-he">סוזי והבה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SUZIE LIA VAHABA</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>7,794</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רועי סלם"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">רועי סלם</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>4,080</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רן בר חי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">רן בר חי</div>
+  <div class="name-en">EN: REN BAR CHAI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>3,179</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שירה לוי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שירה לוי</div>
+  <div class="name-en">EN: SHIRA LEVY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>2,726</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שקד ברטי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שקד ברטי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHAKED BERTI</div>
+  
+  <div class="stats-row">
+    <span><b>4</b> הזמנות</span>
+    <span><b>8,266</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ETTY AHARONOVITCH"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ETTY AHARONOVITCH</div>
+  <div class="name-en">EN: ETTY AHARONOVITCH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,066</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_OFIR ALGREESIE"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">OFIR ALGREESIE</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: OFIR ALGREESIE</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,735</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אביבית עובד"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אביבית עובד</div>
+  <div class="name-en">EN: AVIVIT OVED</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>2,901</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אילנה אנדרייב"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אילנה אנדרייב</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RENATA LEVI</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,386</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_בת אל יטיאו"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">בת אל יטיאו</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,214</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דודו יצחקי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="135">
+  <div class="name-he">דודו יצחקי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DAVID ITZHAKI</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>950</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דנה קור"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">דנה קור</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RENATA LEVI</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>2,019</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_טל גולמבו"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">טל גולמבו</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: TAL GOLENBO</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>4,201</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ירדן יוסף"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ירדן יוסף</div>
+  <div class="name-en">EN: YARDEN YOSEF</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>880</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_לי גולדבלט"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">לי גולדבלט</div>
+  <div class="name-en">EN: LEIGH GOLDBLATT</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,512</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליאן רפאלוב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ליאן רפאלוב</div>
+  <div class="name-en">EN: LIAN REFAELOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>3,558</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליז מאירוביץ"
+              data-via-count="2" data-self-count="0"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">ליז מאירוביץ</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH, SHELLY VIVANTE</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,728</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_לינור חבורה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">לינור חבורה</div>
+  <div class="name-en">EN: LINOR HABURA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,400</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מאור כהן"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מאור כהן</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,510</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מיכל מלמוד"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">מיכל מלמוד</div>
+  <div class="name-en">EN: MICHAL MELAMUD</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>2,271</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מלי איסקוב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="178">
+  <div class="name-he">מלי איסקוב</div>
+  <div class="name-en">EN: MALI ISAKOV</div>
+  
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>2,903</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מרינה יגודייב"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מרינה יגודייב</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MARINA YAGUDAYEV</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>4,632</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נועה מאיר"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נועה מאיר</div>
+  <div class="name-en">EN: NOA TCHIYA MEIR</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>3,732</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נועה מנשה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נועה מנשה</div>
+  <div class="name-en">EN: NOA MENASHE</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>6,267</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נופר דיגהורקר"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נופר דיגהורקר</div>
+  <div class="name-en">EN: NOFAR DIGHORKAR</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>2,407</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סוזי ליה והבה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="197">
+  <div class="name-he">סוזי ליה והבה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SUZIE LIA VAHABA</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>14,526</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סונדוס אסד"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סונדוס אסד</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,894</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סיוון דוידוביץ"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סיוון דוידוביץ</div>
+  <div class="name-en">EN: SIVAN DAVIDOVICH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,102</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עדי אלפסי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עדי אלפסי</div>
+  <div class="name-en">EN: ADI ALFASI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,916</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ענבל גזית"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ענבל גזית</div>
+  <div class="name-en">EN: INBAL GAZIT</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,650</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_פיני מחלוף"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">פיני מחלוף</div>
+  <div class="name-en">EN: PINI MACHLOF</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>8,632</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_קלרה כהן"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">קלרה כהן</div>
+  <div class="name-en">EN: KLARA COHEN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>4,004</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_קרן טל קישנר"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">קרן טל קישנר</div>
+  <div class="name-en">EN: KEREN TAL KISHNER</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>893</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רחלי נומברג"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">רחלי נומברג</div>
+  <div class="name-en">EN: RACHELI MELZER</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>3,460</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שרית סטפנסקי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שרית סטפנסקי</div>
+  <div class="name-en">EN: SARIT STEPANSKY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>3</b> הזמנות</span>
+    <span><b>1,047</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_AMIT VAZANA"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">AMIT VAZANA</div>
+  <div class="name-en">EN: AMIT VAZANA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>734</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_AVIV MOSHE"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">AVIV MOSHE</div>
+  <div class="name-en">EN: AVIV MOSHE</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>2,181</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_DAVID ITZHAKI"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">DAVID ITZHAKI</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DAVID ITZHAKI</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>378</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_EDZIEL HOLGADO"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">EDZIEL HOLGADO</div>
+  <div class="name-en">EN: EDZIEL HOLGADO</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>0</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_NOA MENASHE"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">NOA MENASHE</div>
+  <div class="name-en">EN: NOA MENASHE</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,191</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_SHAHF WAITZMAN"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">SHAHF WAITZMAN</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>0</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Yael Prince"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Yael Prince</div>
+  <div class="name-en">EN: YAEL PRINCE</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>2,197</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אופיר אלגרסי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="101">
+  <div class="name-he">אופיר אלגרסי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: OFIR ALGREESIE</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>793</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אור יוכפז"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אור יוכפז</div>
+  <div class="name-en">EN: OR YOCHPAZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,994</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אורלי ברודו"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">אורלי ברודו</div>
+  <div class="name-en">EN: ORLY BRUDO</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,444</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אושרת סמדזה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אושרת סמדזה</div>
+  <div class="name-en">EN: OSHRAT SMADGA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>723</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אילנה גזל"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אילנה גזל</div>
+  <div class="name-en">EN: ELANA GAZEL</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,507</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אלכסנדרה אהרון"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">אלכסנדרה אהרון</div>
+  <div class="name-en">EN: ALEXANDRA AHARON</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,832</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_גליה שיפיצין שוורץ"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">גליה שיפיצין שוורץ</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: TAL GOLENBO</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>799</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דיאנה תמר ליבוביץ"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="136">
+  <div class="name-he">דיאנה תמר ליבוביץ</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DIANA TAMAR LEIBOVICH</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,182</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דנה למפל"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">דנה למפל</div>
+  <div class="name-en">EN: DANA LEMPL</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,039</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_טל יונה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">טל יונה</div>
+  <div class="name-en">EN: TAL YONA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>760</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_יעל"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="151">
+  <div class="name-he">יעל</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: YAEL ZARFATI</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>388</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_יעל הנדרי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="151">
+  <div class="name-he">יעל הנדרי</div>
+  <div class="name-en">EN: YAEL HENDRY</div>
+  
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>2,410</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ירונה מחפוץ"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ירונה מחפוץ</div>
+  <div class="name-en">EN: YARONA MAHPUTZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>2,666</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ירין אילוז"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ירין אילוז</div>
+  <div class="name-en">EN: YARIN ILUZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,748</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ירין נעים"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ירין נעים</div>
+  <div class="name-en">EN: YARIN NAIM</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>848</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליאל בבייב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ליאל בבייב</div>
+  <div class="name-en">EN: LIEL ARIELA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,234</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליז עוז"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">ליז עוז</div>
+  <div class="name-en">EN: LIZ OZ</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,914</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מלי קונץ"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מלי קונץ</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MALI KUNTZ</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>584</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סוזי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="197">
+  <div class="name-he">סוזי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SUZIE LIA VAHABA</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>460</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_צליל דדון"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">צליל דדון</div>
+  <div class="name-en">EN: TSLIL DADON</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,460</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_קארן מוגרבי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">קארן מוגרבי</div>
+  <div class="name-en">EN: KAREEN MOGRABI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>2,316</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רותם עמרן"
+              data-via-count="1" data-self-count="1"
+              data-en-count="2" data-cluster-id="">
+  <div class="name-he">רותם עמרן</div>
+  <div class="name-en">EN: ROTEM AMRAN</div>
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,584</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רעיה סימקין"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">רעיה סימקין</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,633</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שירן טקיה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שירן טקיה</div>
+  <div class="name-en">EN: SHIRAN TAKIA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,631</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שרון דלל"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שרון דלל</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,428</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_תמר אבצן"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">תמר אבצן</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>2</b> הזמנות</span>
+    <span><b>1,823</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Adi Alfasi"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Adi Alfasi</div>
+  <div class="name-en">EN: ADI ALFASI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Adi Bismut"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Adi Bismut</div>
+  <div class="name-en">EN: ADI BISMUT</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Alexandra Aharon"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Alexandra Aharon</div>
+  <div class="name-en">EN: ALEXANDRA AHARON</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Asmara Awaka"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Asmara Awaka</div>
+  <div class="name-en">EN: ASMARA AWAKA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>25</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Ati Robin"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Ati Robin</div>
+  <div class="name-en">EN: ATI ROBIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_CHEN AFARGAN"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">CHEN AFARGAN</div>
+  <div class="name-en">EN: CHEN AFARGAN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>622</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Connie Benabir"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Connie Benabir</div>
+  <div class="name-en">EN: CONNIE BENABIR</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Dana Soto"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Dana Soto</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DANA SOTO</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Daniel Dali"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Daniel Dali</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DANA SOTO</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>0</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Diana Tamar leibovich"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Diana Tamar leibovich</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DIANA TAMAR LEIBOVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_EVELYN CHERNIN"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">EVELYN CHERNIN</div>
+  <div class="name-en">EN: EVELYN CHERNIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>233</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_GABRIEL GITMAN"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">GABRIEL GITMAN</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: GABRIEL GITMAN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>126</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Gabriel Gitman"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Gabriel Gitman</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: GABRIEL GITMAN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_HILA GARAZI"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">HILA GARAZI</div>
+  <div class="name-en">EN: HILA GARAZI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>49</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Hadar Klimovski"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Hadar Klimovski</div>
+  <div class="name-en">EN: HADAR KLIMOVSKI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>25</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ILONA BOUNER"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ILONA BOUNER</div>
+  <div class="name-en">EN: ILONA BOUNER</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Ilana Havasov"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Ilana Havasov</div>
+  <div class="name-en">EN: ILANA HAVASOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Inbal Itah"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Inbal Itah</div>
+  <div class="name-en">EN: INBAL ITAH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Irena Yanishev"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Irena Yanishev</div>
+  <div class="name-en">EN: IRENA YANISHEV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_K cohen"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="26">
+  <div class="name-he">K cohen</div>
+  <div class="name-en">EN: KLARA COHEN</div>
+  
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_LIRAZ GOLAN"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">LIRAZ GOLAN</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIRAZ GOLAN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>603</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Liah Eleff"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Liah Eleff</div>
+  <div class="name-en">EN: LIAH ELEFF</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Lian Refaelov"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Lian Refaelov</div>
+  <div class="name-en">EN: LIAN REFAELOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Liel ARIELA"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Liel ARIELA</div>
+  <div class="name-en">EN: LIEL ARIELA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Liraz Golan"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Liraz Golan</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIRAZ GOLAN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Liraz Pinhassov"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Liraz Pinhassov</div>
+  <div class="name-en">EN: LIRAZ PINHASSOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Liz Oz"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Liz Oz</div>
+  <div class="name-en">EN: LIZ OZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_MEYTAR MORNO"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">MEYTAR MORNO</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MEYTAR MORNO</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>2,297</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_MICHAL NEZLIN"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">MICHAL NEZLIN</div>
+  <div class="name-en">EN: MICHAL NEZLIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>198</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Maayan Shimon"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Maayan Shimon</div>
+  <div class="name-en">EN: MAAYAN SHIMON</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Mali Isakov"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Mali Isakov</div>
+  <div class="name-en">EN: MALI ISAKOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Mali Kuntz"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Mali Kuntz</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MALI KUNTZ</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Marina Yagudayev"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Marina Yagudayev</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MARINA YAGUDAYEV</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Meytal Cohen"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Meytal Cohen</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MEYTAL COHEN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Meytar Morno"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Meytar Morno</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MEYTAR MORNO</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Michal Melamud"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Michal Melamud</div>
+  <div class="name-en">EN: MICHAL MELAMUD</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_NAOMI GORODESKI"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">NAOMI GORODESKI</div>
+  <div class="name-en">EN: NAOMI GORODESKI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>895</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Natali Cheyni Harnoy"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Natali Cheyni Harnoy</div>
+  <div class="name-en">EN: NATALI CHEYNI HARNOY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Natali Madhala botvinikov"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Natali Madhala botvinikov</div>
+  <div class="name-en">EN: NATALI MADHALA BOTVINIKOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Nir goren"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Nir goren</div>
+  <div class="name-en">EN: NIR GOREN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Nirit Soto"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Nirit Soto</div>
+  <div class="name-en">EN: NIRIT SOTO</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ORANIT BALULU"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ORANIT BALULU</div>
+  <div class="name-en">EN: ORANIT BALULU</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>240</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Odaya davidov"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Odaya davidov</div>
+  <div class="name-en">EN: ODAYA DAVIDOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>258</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Ofek Tal"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Ofek Tal</div>
+  <div class="name-en">EN: OFEK TAL</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Or laredo"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Or laredo</div>
+  <div class="name-en">EN: OR LAREDO</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Orly Brudo"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Orly Brudo</div>
+  <div class="name-en">EN: ORLY BRUDO</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Oshra Pinchasi"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Oshra Pinchasi</div>
+  <div class="name-en">EN: OSHRA PINCHASI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Pini Machlof"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Pini Machlof</div>
+  <div class="name-en">EN: PINI MACHLOF</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_REN BAR CHAI"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">REN BAR CHAI</div>
+  <div class="name-en">EN: REN BAR CHAI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>233</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Rotem Amran"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Rotem Amran</div>
+  <div class="name-en">EN: ROTEM AMRAN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_STAV HABRA"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">STAV HABRA</div>
+  <div class="name-en">EN: STAV HABRA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Shaked Peretz"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Shaked Peretz</div>
+  <div class="name-en">EN: SHAKED PERETZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Shelly vivante"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Shelly vivante</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHELLY VIVANTE</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Shiran Dahary"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Shiran Dahary</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHIRAN DAHARY</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Suzie Lia Vahaba"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Suzie Lia Vahaba</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SUZIE LIA VAHABA</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Tal golenbo"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Tal golenbo</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: TAL GOLENBO</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>258</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Thea yakobi"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Thea yakobi</div>
+  <div class="name-en">EN: THEA YAKOBI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_YARONA MAHPUTZ"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">YARONA MAHPUTZ</div>
+  <div class="name-en">EN: YARONA MAHPUTZ</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>233</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_Yael Zarfati"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">Yael Zarfati</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: YAEL ZARFATI</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>258</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_adi yona"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">adi yona</div>
+  <div class="name-en">EN: ADI YONA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ahuva salilih"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ahuva salilih</div>
+  <div class="name-en">EN: AHUVA SALILIH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ayelet yofis"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ayelet yofis</div>
+  <div class="name-en">EN: AYELET YOFIS</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_daniel arditti"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">daniel arditti</div>
+  <div class="name-en">EN: DANIEL ARDITTI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_daniel salan"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">daniel salan</div>
+  <div class="name-en">EN: DANIEL SALAN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>266</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_david itzhaki"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">david itzhaki</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DAVID ITZHAKI</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_frida cohen"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="26">
+  <div class="name-he">frida cohen</div>
+  <div class="name-en">EN: FRIDA COHEN</div>
+  
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_hila abargil"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">hila abargil</div>
+  <div class="name-en">EN: HILA ABARGIL</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_keren tal kishner"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">keren tal kishner</div>
+  <div class="name-en">EN: KEREN TAL KISHNER</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_lin maman"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">lin maman</div>
+  <div class="name-en">EN: LIN MAMAN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_liz"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">liz</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>0</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_maor cohen"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="26">
+  <div class="name-he">maor cohen</div>
+  <div class="name-en">EN: MAOR COHEN</div>
+  
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_natali aliarov"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">natali aliarov</div>
+  <div class="name-en">EN: NATALI ALIAROV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>25</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_oshry shelly"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">oshry shelly</div>
+  <div class="name-en">EN: OSHRY SHELLY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_racheli melzer"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">racheli melzer</div>
+  <div class="name-en">EN: RACHELI MELZER</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_roni lavie bitton"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">roni lavie bitton</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_sivan davidovich"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">sivan davidovich</div>
+  <div class="name-en">EN: SIVAN DAVIDOVICH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_sivan subai"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">sivan subai</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SIVAN SUBAI</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_talia goren"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">talia goren</div>
+  <div class="name-en">EN: TALIA GOREN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>296</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_tslil dadon"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">tslil dadon</div>
+  <div class="name-en">EN: TSLIL DADON</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_yael hendry"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">yael hendry</div>
+  <div class="name-en">EN: YAEL HENDRY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>288</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_yarden yosef"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">yarden yosef</div>
+  <div class="name-en">EN: YARDEN YOSEF</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>258</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אביב משה CIS"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אביב משה CIS</div>
+  <div class="name-en">EN: AVIV MOSHE</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>0</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אביטל גונן"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אביטל גונן</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>800</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אביטל מטטוב פורטנוי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אביטל מטטוב פורטנוי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>709</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אהובה סליליך"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אהובה סליליך</div>
+  <div class="name-en">EN: AHUVA SALILIH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>2,944</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אופק טל"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אופק טל</div>
+  <div class="name-en">EN: OFEK TAL</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>615</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אור לרדו"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="104">
+  <div class="name-he">אור לרדו</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>555</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_איילת בר"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">איילת בר</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>709</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_איילת יופיס"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">איילת יופיס</div>
+  <div class="name-en">EN: AYELET YOFIS</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>625</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אילה אילה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אילה אילה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>318</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אילונה בוינרלוי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אילונה בוינרלוי</div>
+  <div class="name-en">EN: ILONA BOUNER</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>240</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אילת מוזס"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אילת מוזס</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>432</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אלה גורן"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אלה גורן</div>
+  <div class="name-en">EN: TALIA GOREN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>1,004</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אלה מיטשניקחיים"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אלה מיטשניקחיים</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>709</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אלה קנדוב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אלה קנדוב</div>
+  <div class="name-en">EN: ELLA KANDOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>899</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אלונה בליאסני"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אלונה בליאסני</div>
+  <div class="name-en">EN: ALONA BALASNY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>901</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אנואר חסנין"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אנואר חסנין</div>
+  <div class="name-en">EN: ANUAR HASNIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>801</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אסמרה אווקא 309734952"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אסמרה אווקא 309734952</div>
+  <div class="name-en">EN: ASMARA AWAKA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>474</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_אתי חרילקר"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">אתי חרילקר</div>
+  <div class="name-en">EN: RACHEL REBACH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>1,183</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_בינה ששון ליז"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="127">
+  <div class="name-he">בינה ששון ליז</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>4,878</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_בתאל שריקי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">בתאל שריקי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>432</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_גבריאל גיטמן"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">גבריאל גיטמן</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: GABRIEL GITMAN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>1,482</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_גל ברקת"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">גל ברקת</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>234</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דגנית לוי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">דגנית לוי</div>
+  <div class="name-en">EN: DGANIT LEVI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>547</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דיאנה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="136">
+  <div class="name-he">דיאנה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DIANA TAMAR LEIBOVICH</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>1,982</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_דריה זיגונוב"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">דריה זיגונוב</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>310</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_הילה גרזי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">הילה גרזי</div>
+  <div class="name-en">EN: HILA GARAZI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>631</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ורד יצחקי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="135">
+  <div class="name-he">ורד יצחקי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DAVID ITZHAKI</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>434</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_חן זיתוני"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">חן זיתוני</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>812</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_חן כהן"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">חן כהן</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHAKED BERTI</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>361</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_חני רוטלוי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">חני רוטלוי</div>
+  <div class="name-en">EN: HANNI ROTLEVI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>48</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_יעל פרינץ"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="151">
+  <div class="name-he">יעל פרינץ</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>723</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_יפית אלג׳ם"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">יפית אלג׳ם</div>
+  <div class="name-en">EN: YAFIT ALADJEM</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>538</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_לי וגנר"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">לי וגנר</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>723</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליאור סהר"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ליאור סהר</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHAKED BERTI</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>546</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליהיא בנימין"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ליהיא בנימין</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>709</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ליז (מיטל)"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ליז (מיטל)</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MEYTAL COHEN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>1,066</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_לירז דאלי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">לירז דאלי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIRAZ GOLAN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>517</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_לירז פינחסוב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">לירז פינחסוב</div>
+  <div class="name-en">EN: LIRAZ PINHASSOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>240</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מורן יעקובוב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מורן יעקובוב</div>
+  <div class="name-en">EN: LARISA YAKOBOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>614</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מיטל כהן"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מיטל כהן</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MEYTAL COHEN</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>409</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מירב חי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מירב חי</div>
+  <div class="name-en">EN: MERAV HAY</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>545</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מלי יסאקוב"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="178">
+  <div class="name-he">מלי יסאקוב</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: MARINA YAGUDAYEV</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>1,038</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מעיין שמעון"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מעיין שמעון</div>
+  <div class="name-en">EN: MAAYAN SHIMON</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>653</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_מרגי נוקריאן"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">מרגי נוקריאן</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>541</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נאוה לביא"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נאוה לביא</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>558</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_נטלי אילרוב"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">נטלי אילרוב</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>504</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ניר גורן"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ניר גורן</div>
+  <div class="name-en">EN: NIR GOREN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>652</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סבינה סטלמוצ׳נקו"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סבינה סטלמוצ׳נקו</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RONI LAVIE BITTON</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>791</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סגא קאסם"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סגא קאסם</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>310</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סופי סיאנוב"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">סופי סיאנוב</div>
+  <div class="name-en">EN: EDEN SIANOV</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>651</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_סיון סובעי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="203">
+  <div class="name-he">סיון סובעי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SIVAN SUBAI</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>251</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עדי דואק"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עדי דואק</div>
+  <div class="name-en">EN: ADI DOUEK</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>901</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עדי יונה"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עדי יונה</div>
+  <div class="name-en">EN: ADI YONA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>415</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עודדה בר"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עודדה בר</div>
+  <div class="name-en">EN: BAR ODEDA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>49</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עומרי מזרחי"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עומרי מזרחי</div>
+  <div class="name-en">EN: TAIR DARAB FADIDA</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>405</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עמיחי בן אביר"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="213">
+  <div class="name-he">עמיחי בן אביר</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: DANA SOTO</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>920</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עמיחי וקוני בן אביר"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="213">
+  <div class="name-he">עמיחי וקוני בן אביר</div>
+  <div class="name-en">EN: CONNIE BENABIR</div>
+  
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>675</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_עמית אפשטיין"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">עמית אפשטיין</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>541</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ענבל היטח"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ענבל היטח</div>
+  <div class="name-en">EN: INBAL ITAH</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>862</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_ענת וייס"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">ענת וייס</div>
+  <div class="name-en">EN: YAEL HURI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>1,500</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_פרח מורדיאן"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">פרח מורדיאן</div>
+  <div class="name-en">EN: PIRHIA MORADIAN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>614</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_קארינה פרנקו"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">קארינה פרנקו</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: RENATA LEVI</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>880</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רויטל רויטל"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">רויטל רויטל</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>709</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רוני לוי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="229">
+  <div class="name-he">רוני לוי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>723</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_רינת בדחה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">רינת בדחה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>709</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שהם קנקין"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שהם קנקין</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>730</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שובל אסרף"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">שובל אסרף</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>709</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שירן גאוטה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="242">
+  <div class="name-he">שירן גאוטה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHIRAN DAHARY</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>482</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_שירן גואטה"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="242">
+  <div class="name-he">שירן גואטה</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: SHIRAN DAHARY</div>
+  <span class="cluster-link">⚠ כפילות חשודה — בדוק לשונית "כפילויות"</span>
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>666</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_תאה יעקבח"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">תאה יעקבח</div>
+  <div class="name-en">EN: THEA YAKOBI</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>695</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_תמר לבשטיין"
+              data-via-count="0" data-self-count="1"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">תמר לבשטיין</div>
+  <div class="name-en">EN: TAMAR LEVSHTEIN</div>
+  
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>637</b> ₪</span>
+  </div>
+</div>
+<div class="card" data-id="cust_תמרה רצאבי"
+              data-via-count="1" data-self-count="0"
+              data-en-count="1" data-cluster-id="">
+  <div class="name-he">תמרה רצאבי</div>
+  
+  <div class="ordered-via">📦 הוזמן ע״י: LIZ MEIROVICH</div>
+  
+  <div class="stats-row">
+    <span><b>1</b> הזמנות</span>
+    <span><b>261</b> ₪</span>
   </div>
 </div></div>
+</div>
 
-<h2>3. מפיצים שמזמינים עבור אחרים (1 קונה → מספר נמענים)</h2>
-<p class="meta">מקרה ה-LIZ MEIROVICH — קונה אחד עם 3+ נמענים שונים. אלו המפיצים.</p>
-<div id="distributors"><div class="cluster" id="dist_0">
-  <div><strong>LIZ MEIROVICH</strong> — 47 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Herbalife International of America, Inc. California, USA</li><li>LIZ MEIROVICH</li><li>SHAHF WAITZMAN</li><li>liz</li><li>אביטל מטטוב פורטנוי</li><li>אודיה דוידוב</li><li>אור לרדו</li><li>אורלי ברודו</li><li>אושרה פינחסי</li><li>אושרי שלי</li><li>אילה אילה</li><li>אלה מיטשניקחיים</li><li>אלכסנדרה אהרון</li><li>אתי רובין</li><li>בינה ששון ליז</li><li>בת אל יטיאו</li><li>בתאל שריקי</li><li>גל ברקת</li><li>דביר</li><li>דביר ששון</li><li>דריה זיגונוב</li><li>הילה אברגיל</li><li>חן זיתוני</li><li>יעל פרינץ</li><li>לי וגנר</li><li>ליהיא בנימין</li><li>ליז</li><li>ליז מאירוביץ</li><li>ליז עוז</li><li>לין ממן</li><li>מיכל מלמוד</li><li>מרגי נוקריאן</li><li>נטלי אילרוב</li><li>סגא קאסם</li><li>סונדוס אסד</li><li>עמית אפשטיין</li><li>צליל דדון</li><li>קרן טל קישנר</li><li>רויטל רויטל</li><li>רוני לוי</li><li>רועי סלם</li><li>רותם עמרן</li><li>רחלי נומברג</li><li>רינת בדחה</li><li>שהם קנקין</li><li>שובל אסרף</li><li>תמרה רצאבי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+<div class="tab-content" id="tab-distributors">
+  <table>
+    <thead>
+      <tr><th>שם המפיץ (אנגלית)</th><th>הזמנות</th><th>נמענים</th><th>סה״כ ₪</th></tr>
+    </thead>
+    <tbody><tr>
+  <td><strong>LIZ MEIROVICH</strong></td>
+  <td>108</td>
+  <td>47</td>
+  <td>122,976</td>
+</tr>
+<tr>
+  <td><strong>RENATA LEVI</strong></td>
+  <td>27</td>
+  <td>5</td>
+  <td>19,289</td>
+</tr>
+<tr>
+  <td><strong>RONI LAVIE BITTON</strong></td>
+  <td>25</td>
+  <td>11</td>
+  <td>24,504</td>
+</tr>
+<tr>
+  <td><strong>ELDAR BAN ATAR</strong></td>
+  <td>13</td>
+  <td>3</td>
+  <td>5,008</td>
+</tr>
+<tr>
+  <td><strong>YAEL ZARFATI</strong></td>
+  <td>11</td>
+  <td>4</td>
+  <td>6,631</td>
+</tr>
+<tr>
+  <td><strong>MEYTAR MORNO</strong></td>
+  <td>10</td>
+  <td>3</td>
+  <td>13,078</td>
+</tr>
+<tr>
+  <td><strong>OFIR ALGREESIE</strong></td>
+  <td>10</td>
+  <td>3</td>
+  <td>19,497</td>
+</tr>
+<tr>
+  <td><strong>SUZIE LIA VAHABA</strong></td>
+  <td>10</td>
+  <td>4</td>
+  <td>23,067</td>
+</tr>
+<tr>
+  <td><strong>DANA SOTO</strong></td>
+  <td>9</td>
+  <td>4</td>
+  <td>11,174</td>
+</tr>
+<tr>
+  <td><strong>SHELLY VIVANTE</strong></td>
+  <td>9</td>
+  <td>4</td>
+  <td>10,629</td>
+</tr>
+<tr>
+  <td><strong>SIVAN SUBAI</strong></td>
+  <td>8</td>
+  <td>3</td>
+  <td>6,328</td>
+</tr>
+<tr>
+  <td><strong>DAVID ITZHAKI</strong></td>
+  <td>7</td>
+  <td>4</td>
+  <td>2,050</td>
+</tr>
+<tr>
+  <td><strong>SHAKED BERTI</strong></td>
+  <td>6</td>
+  <td>3</td>
+  <td>9,174</td>
+</tr>
+<tr>
+  <td><strong>TAL GOLENBO</strong></td>
+  <td>6</td>
+  <td>3</td>
+  <td>5,258</td>
+</tr>
+<tr>
+  <td><strong>MALI KUNTZ</strong></td>
+  <td>5</td>
+  <td>3</td>
+  <td>1,877</td>
+</tr>
+<tr>
+  <td><strong>MARINA YAGUDAYEV</strong></td>
+  <td>5</td>
+  <td>3</td>
+  <td>5,959</td>
+</tr>
+<tr>
+  <td><strong>DIANA TAMAR LEIBOVICH</strong></td>
+  <td>4</td>
+  <td>3</td>
+  <td>3,453</td>
+</tr>
+<tr>
+  <td><strong>GABRIEL GITMAN</strong></td>
+  <td>3</td>
+  <td>3</td>
+  <td>1,896</td>
+</tr>
+<tr>
+  <td><strong>LIRAZ GOLAN</strong></td>
+  <td>3</td>
+  <td>3</td>
+  <td>1,408</td>
+</tr>
+<tr>
+  <td><strong>MEYTAL COHEN</strong></td>
+  <td>3</td>
+  <td>3</td>
+  <td>1,762</td>
+</tr>
+<tr>
+  <td><strong>SHIRAN DAHARY</strong></td>
+  <td>3</td>
+  <td>3</td>
+  <td>1,436</td>
+</tr></tbody>
+  </table>
+</div>
+
+<div class="tab-content" id="tab-clusters">
+  <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">
+    קבוצות שמות עברית עם דמיון גבוה. כברירת מחדל סומנו כ"אותו אדם".
+  </p>
+  <div id="clusterList"><div class="card" data-id="cluster_0" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">K cohen</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">frida cohen</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">maor cohen</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_0', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_0', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_0', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_0', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_1">
-  <div><strong>RONI LAVIE BITTON</strong> — 11 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>roni lavie bitton</li><li>אביטל גונן</li><li>איילת בר</li><li>אילת מוזס</li><li>מאור כהן</li><li>נאוה לביא</li><li>סבינה סטלמוצ׳נקו</li><li>רוני לביא</li><li>רעיה סימקין</li><li>שרון דלל</li><li>תמר אבצן</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_1" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">אופיר אלגריסי</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">אופיר אלגרסי</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_1', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_1', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_1', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_1', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_2">
-  <div><strong>RENATA LEVI</strong> — 5 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>אילנה אנדרייב</li><li>דנה קור</li><li>סיגל לוי</li><li>קארינה פרנקו</li><li>רנטה לוי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_2" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">אור לורדו</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">אור לרדו</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_2', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_2', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_2', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_2', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_3">
-  <div><strong>SHELLY VIVANTE</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Shelly vivante</li><li>דביר</li><li>ליז מאירוביץ</li><li>שלי ויונטה</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_3" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">בינה ששון ליז</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">ליז</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_3', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_3', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_3', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_3', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_4">
-  <div><strong>YAEL ZARFATI</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>YAEL ZARFATI</li><li>Yael Zarfati</li><li>יעל</li><li>יעל צרפתי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_4" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">דביר</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">דביר ששון</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_4', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_4', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_4', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_4', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_5">
-  <div><strong>SUZIE LIA VAHABA</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Suzie Lia Vahaba</li><li>סוזי</li><li>סוזי והבה</li><li>סוזי ליה והבה</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_5" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">דודו יצחקי</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">ורד יצחקי</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_5', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_5', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_5', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_5', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_6">
-  <div><strong>DANA SOTO</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Dana Soto</li><li>Daniel Dali</li><li>דנה סוטו</li><li>עמיחי בן אביר</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_6" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">דיאנה</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">דיאנה תמר ליבוביץ</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_6', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_6', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_6', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_6', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_7">
-  <div><strong>DAVID ITZHAKI</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>DAVID ITZHAKI</li><li>david itzhaki</li><li>דודו יצחקי</li><li>ורד יצחקי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_7" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">יעל</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">יעל הנדרי</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">יעל פרינץ</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">יעל צרפתי</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_7', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_7', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_7', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_7', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_8">
-  <div><strong>ELDAR BAN ATAR</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>דביר</li><li>דביר ששון</li><li>שרון בן עטר</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_8" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">מלי איסקוב</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">מלי יסאקוב</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_8', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_8', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_8', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_8', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_9">
-  <div><strong>MALI KUNTZ</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Mali Kuntz</li><li>דביר ששון</li><li>מלי קונץ</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_9" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">סוזי</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">סוזי והבה</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">סוזי ליה והבה</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_9', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_9', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_9', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_9', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_10">
-  <div><strong>SIVAN SUBAI</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>sivan subai</li><li>סיוון סובעי</li><li>סיון סובעי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_10" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">סיוון סובעי</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">סיון סובעי</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_10', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_10', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_10', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_10', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_11">
-  <div><strong>MEYTAR MORNO</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>MEYTAR MORNO</li><li>Meytar Morno</li><li>מיתר זיקרי מורנו</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_11" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">עמיחי בן אביר</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">עמיחי וקוני בן אביר</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_11', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_11', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_11', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_11', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_12">
-  <div><strong>DIANA TAMAR LEIBOVICH</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Diana Tamar leibovich</li><li>דיאנה</li><li>דיאנה תמר ליבוביץ</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_12" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">רוני לביא</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">רוני לוי</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_12', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_12', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_12', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_12', 'keep')">✕ אנשים נפרדים</button>
   </div>
-</div><div class="cluster" id="dist_13">
-  <div><strong>MARINA YAGUDAYEV</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Marina Yagudayev</li><li>מלי יסאקוב</li><li>מרינה יגודייב</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
+</div>
+<div class="card" data-id="cluster_13" style="margin-bottom:8px;">
+  <div style="margin-bottom:6px;"><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">שירן גאוטה</span><span style="background:var(--pill);padding:4px 10px;border-radius:14px;font-size:13px;margin:2px;display:inline-block;">שירן גואטה</span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('dist_13', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_13', 'keep')">✕ דלג</button>
-  </div>
-</div><div class="cluster" id="dist_14">
-  <div><strong>TAL GOLENBO</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Tal golenbo</li><li>גליה שיפיצין שוורץ</li><li>טל גולמבו</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('dist_14', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_14', 'keep')">✕ דלג</button>
-  </div>
-</div><div class="cluster" id="dist_15">
-  <div><strong>SHAKED BERTI</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>חן כהן</li><li>ליאור סהר</li><li>שקד ברטי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('dist_15', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_15', 'keep')">✕ דלג</button>
-  </div>
-</div><div class="cluster" id="dist_16">
-  <div><strong>LIRAZ GOLAN</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>LIRAZ GOLAN</li><li>Liraz Golan</li><li>לירז דאלי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('dist_16', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_16', 'keep')">✕ דלג</button>
-  </div>
-</div><div class="cluster" id="dist_17">
-  <div><strong>SHIRAN DAHARY</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Shiran Dahary</li><li>שירן גאוטה</li><li>שירן גואטה</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('dist_17', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_17', 'keep')">✕ דלג</button>
-  </div>
-</div><div class="cluster" id="dist_18">
-  <div><strong>OFIR ALGREESIE</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>OFIR ALGREESIE</li><li>אופיר אלגריסי</li><li>אופיר אלגרסי</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('dist_18', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_18', 'keep')">✕ דלג</button>
-  </div>
-</div><div class="cluster" id="dist_19">
-  <div><strong>MEYTAL COHEN</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Meytal Cohen</li><li>ליז (מיטל)</li><li>מיטל כהן</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('dist_19', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_19', 'keep')">✕ דלג</button>
-  </div>
-</div><div class="cluster" id="dist_20">
-  <div><strong>GABRIEL GITMAN</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>GABRIEL GITMAN</li><li>Gabriel Gitman</li><li>גבריאל גיטמן</li></ul></details>
-  <div class="meta">סביר שזה מפיץ. החלטה תקבע אם להחזיק רק אותו או גם את כל הנמענים בנפרד.</div>
-  <div class="actions">
-    <button class="merge" onclick="decide('dist_20', 'mark_distributor')">📌 סמן כמפיץ</button>
-    <button class="keep" onclick="decide('dist_20', 'keep')">✕ דלג</button>
+    <button data-action="merge" onclick="decide('cluster_13', 'merge')">✓ אותו אדם</button>
+    <button data-action="keep" onclick="decide('cluster_13', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div></div>
-
-<h2>4. שמות עברית עם איותי אנגלית מרובים</h2>
-<p class="meta">אותו נמען בעברית, מספר איותים שונים באנגלית — אותו אדם.</p>
-<div id="heMultiEn"><div class="cluster" id="hemulti_0">
-  <div><strong>דביר ששון</strong> = 4 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">FRIDA COHEN</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MALI KUNTZ</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_0', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_0', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_1">
-  <div><strong>דביר</strong> = 3 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_1', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_1', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_2">
-  <div><strong>אתי רובין</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ATI ROBIN</span><span class="name-pill">LIZ MEIROVICH</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_2', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_2', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_3">
-  <div><strong>לין ממן</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIN MAMAN</span><span class="name-pill">LIZ MEIROVICH</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_3', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_3', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_4">
-  <div><strong>אושרי שלי</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRY SHELLY</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_4', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_4', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_5">
-  <div><strong>אושרה פינחסי</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRA PINCHASI</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_5', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_5', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_6">
-  <div><strong>אודיה דוידוב</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ODAYA DAVIDOV</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_6', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_6', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_7">
-  <div><strong>קרן טל קישנר</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">KEREN TAL KISHNER</span><span class="name-pill">LIZ MEIROVICH</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_7', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_7', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_8">
-  <div><strong>ליז מאירוביץ</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_8', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_8', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_9">
-  <div><strong>רחלי נומברג</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">RACHELI MELZER</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_9', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_9', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_10">
-  <div><strong>אורלי ברודו</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ORLY BRUDO</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_10', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_10', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_11">
-  <div><strong>מיכל מלמוד</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MICHAL MELAMUD</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_11', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_11', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_12">
-  <div><strong>הילה אברגיל</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">HILA ABARGIL</span><span class="name-pill">LIZ MEIROVICH</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_12', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_12', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_13">
-  <div><strong>רותם עמרן</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ROTEM AMRAN</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_13', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_13', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_14">
-  <div><strong>אלכסנדרה אהרון</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ALEXANDRA AHARON</span><span class="name-pill">LIZ MEIROVICH</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_14', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_14', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_15">
-  <div><strong>ליז עוז</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">LIZ OZ</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_15', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_15', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div><div class="cluster" id="hemulti_16">
-  <div><strong>צליל דדון</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">TSLIL DADON</span></div>
-  <div class="actions">
-    <button class="merge" onclick="decide('hemulti_16', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_16', 'keep')">✕ אנשים נפרדים</button>
-  </div>
-</div></div>
+</div>
 
 <script>
-const decisions = JSON.parse(localStorage.getItem('dedupe_decisions') || '{}');
+const decisions = JSON.parse(localStorage.getItem('dedupe_decisions_v2') || '{}');
 
-function decide(clusterId, action) {
-  decisions[clusterId] = action;
-  localStorage.setItem('dedupe_decisions', JSON.stringify(decisions));
-  const el = document.getElementById(clusterId);
+// Pre-fill default decisions: all clusters are "merged" by default per user feedback
+if (decisions['cluster_0'] === undefined) decisions['cluster_0'] = 'merge';
+if (decisions['cluster_1'] === undefined) decisions['cluster_1'] = 'merge';
+if (decisions['cluster_2'] === undefined) decisions['cluster_2'] = 'merge';
+if (decisions['cluster_3'] === undefined) decisions['cluster_3'] = 'merge';
+if (decisions['cluster_4'] === undefined) decisions['cluster_4'] = 'merge';
+if (decisions['cluster_5'] === undefined) decisions['cluster_5'] = 'merge';
+if (decisions['cluster_6'] === undefined) decisions['cluster_6'] = 'merge';
+if (decisions['cluster_7'] === undefined) decisions['cluster_7'] = 'merge';
+if (decisions['cluster_8'] === undefined) decisions['cluster_8'] = 'merge';
+if (decisions['cluster_9'] === undefined) decisions['cluster_9'] = 'merge';
+if (decisions['cluster_10'] === undefined) decisions['cluster_10'] = 'merge';
+if (decisions['cluster_11'] === undefined) decisions['cluster_11'] = 'merge';
+if (decisions['cluster_12'] === undefined) decisions['cluster_12'] = 'merge';
+if (decisions['cluster_13'] === undefined) decisions['cluster_13'] = 'merge';
+localStorage.setItem('dedupe_decisions_v2', JSON.stringify(decisions));
+
+function decide(id, action) {
+  decisions[id] = action;
+  localStorage.setItem('dedupe_decisions_v2', JSON.stringify(decisions));
+  refreshUI(id);
+}
+
+function refreshUI(id) {
+  const el = document.querySelector(`[data-id="${id}"]`);
   if (el) {
-    el.classList.remove('merged', 'kept');
-    if (action === 'merge') el.classList.add('merged');
-    else if (action === 'keep') el.classList.add('kept');
+    el.classList.toggle('merged', decisions[id] === 'merge');
+    el.querySelectorAll('button[data-action]').forEach(b => {
+      b.classList.toggle('active', b.dataset.action === decisions[id]);
+    });
   }
   updateProgress();
 }
 
 function updateProgress() {
-  const n = Object.keys(decisions).length;
-  document.getElementById('progressLabel').textContent = `${n} החלטות נשמרו`;
+  document.getElementById('progressLabel').textContent =
+    `${Object.keys(decisions).length} החלטות נשמרו`;
 }
 
 function exportDecisions() {
   const blob = new Blob([JSON.stringify(decisions, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'dedupe_decisions.json';
-  a.click();
+  a.href = url; a.download = 'dedupe_decisions.json'; a.click();
   URL.revokeObjectURL(url);
 }
 
-// Restore visual state from saved decisions
-window.addEventListener('DOMContentLoaded', () => {
-  Object.entries(decisions).forEach(([id, action]) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add(action === 'merge' ? 'merged' : 'kept');
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
   });
+});
+
+// Search + filter
+function applyFilter() {
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  const filter = document.getElementById('filterSelect').value;
+  document.querySelectorAll('#customerGrid .card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const matchesSearch = !q || text.includes(q);
+    let matchesFilter = true;
+    if (filter === 'via')      matchesFilter = card.dataset.viaCount > 0;
+    else if (filter === 'self') matchesFilter = card.dataset.selfCount > 0 && card.dataset.viaCount == 0;
+    else if (filter === 'multi-en') matchesFilter = card.dataset.enCount > 1;
+    else if (filter === 'cluster')  matchesFilter = card.dataset.clusterId !== '';
+    card.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
+  });
+}
+document.getElementById('searchBox').addEventListener('input', applyFilter);
+document.getElementById('filterSelect').addEventListener('change', applyFilter);
+
+// Restore decisions visually on load
+window.addEventListener('DOMContentLoaded', () => {
+  Object.keys(decisions).forEach(id => refreshUI(id));
   updateProgress();
 });
 </script>
