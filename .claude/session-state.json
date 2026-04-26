@@ -1,13 +1,60 @@
 {
-  "session_start": "2026-04-25T13:17:26Z",
+  "session_start": "2026-04-26T06:03:23Z",
   "budget_total": 280000,
   "budget_overhead": 30000,
   "budget_per_priority": 60000,
-  "priorities": [],
+  "priorities": [
+    {
+      "id": "P1",
+      "title": "Fix dashboard.html choice cards cut-off at 1100-1600px",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 12000,
+      "checkpoint_commit": "1d5a1ad"
+    },
+    {
+      "id": "P2",
+      "title": "Per-user Continue Watching in academy-hub.html",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 18000,
+      "checkpoint_commit": "cdf2cea",
+      "decision_migration": "reset_all_users"
+    },
+    {
+      "id": "P3",
+      "title": "OrdersHistory dedupe analysis + review UI (P4a)",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 38000,
+      "checkpoint_commit": "0762e6b"
+    },
+    {
+      "id": "P4",
+      "title": "Per-user dedupe.html web app + Firebase storage (Phase 1)",
+      "status": "completed",
+      "pdr_approved": true,
+      "estimated_tokens": 50000,
+      "checkpoint_commit": "df38f66",
+      "deferred_p4_cleanup": "PAT rotation + approve-v2.html — moved to next session",
+      "deferred_phase_2": "herbalife-retention cross-link + ⚠ badges — needs source repo access"
+    }
+  ],
   "totals": {
     "turns": 0,
     "estimated_tokens": 0,
     "budget_remaining": 280000,
     "budget_status": "GREEN"
+  },
+  "p5_scope_expansion": {
+    "id": "P5",
+    "title": "Port dedupe to retention Next.js site (Phase 2 + 3)",
+    "status": "completed",
+    "pdr_approved": true,
+    "estimated_tokens": 70000,
+    "checkpoint_commit_retention": "b159f38",
+    "checkpoint_commit_academy": "cc525e4",
+    "phase_3_done": "customer_aliases now flow into computeKPIs + computeCustomerSummary; GitMerge icon in customer list; degrades gracefully if migration not yet applied",
+    "user_action_needed": "Apply migration 0006_customer_aliases.sql via supabase db push or SQL editor"
   }
 }
