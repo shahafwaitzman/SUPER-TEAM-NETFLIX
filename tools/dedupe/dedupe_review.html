@@ -2,389 +2,714 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Dedupe Review — OrdersHistory</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סקירת כפילויות — Super Team Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-  body { font-family: -apple-system, "Segoe UI", Heebo, sans-serif; background: #0d1117; color: #e6edf3; padding: 24px; max-width: 1200px; margin: 0 auto; }
-  h1 { color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 8px; }
-  h2 { color: #f0883e; margin-top: 32px; border-bottom: 1px solid #30363d; padding-bottom: 6px; }
-  .stats { background: #161b22; padding: 16px; border-radius: 8px; margin: 16px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-  .stat { text-align: center; }
-  .stat .num { font-size: 28px; font-weight: 700; color: #58a6ff; display: block; }
-  .stat .label { font-size: 12px; color: #8b949e; }
-  .cluster { background: #161b22; padding: 14px 18px; border-radius: 8px; margin: 12px 0; border-right: 4px solid #30363d; }
-  .cluster.merged { border-color: #46d369; background: #0a2818; }
-  .cluster.kept { border-color: #f85149; background: #2a0e0e; opacity: 0.5; }
-  .cluster .names { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
-  .name-pill { background: #21262d; padding: 4px 10px; border-radius: 16px; font-size: 14px; }
-  .name-pill .count { color: #8b949e; font-size: 11px; margin-right: 4px; }
+  :root {
+    --nflx-red: #E50914;
+    --nflx-red-dark: #B9090B;
+    --bg-base: #0a0a0a;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #232323;
+    --border: rgba(255,255,255,0.08);
+    --text: #fff;
+    --muted: rgba(255,255,255,0.6);
+    --good: #46d369;
+    --warn: #f0883e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', -apple-system, sans-serif;
+    background: var(--bg-base);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── Header — Netflix-style ── */
+  .top-header {
+    background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px);
+  }
+  .brand { display: flex; align-items: baseline; gap: 8px; }
+  .brand .super { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: #fff; }
+  .brand .academy { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--nflx-red); }
+  .progress-pill {
+    background: rgba(229,9,20,0.12); color: var(--nflx-red);
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    border: 1px solid rgba(229,9,20,0.3);
+  }
+
+  main { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
+
+  /* ── Hero / page title ── */
+  .page-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 4vw, 56px);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .page-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  /* ── Stats row ── */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .stat {
+    background: var(--bg-card); padding: 18px 16px; border-radius: 8px;
+    text-align: center; border: 1px solid var(--border);
+  }
+  .stat .num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--nflx-red); display: block; line-height: 1; }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; display: block; }
+
+  /* ── Section headers ── */
+  .section { margin: 36px 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .section h2 {
+    font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1.5px;
+    color: var(--text); display: flex; align-items: center; gap: 12px;
+  }
+  .section h2 .badge-count {
+    background: var(--nflx-red); color: #fff; font-family: 'Heebo', sans-serif;
+    font-size: 12px; padding: 2px 10px; border-radius: 12px; font-weight: 700; letter-spacing: 0;
+  }
+  .section .desc { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+  /* ── Cluster cards ── */
+  .cluster {
+    background: var(--bg-card); padding: 16px 20px; border-radius: 8px; margin: 10px 0;
+    border-right: 4px solid var(--border); transition: all 0.2s;
+  }
+  .cluster:hover { background: var(--bg-card-hover); }
+  .cluster.merged { border-right-color: var(--good); background: rgba(70,211,105,0.06); }
+  .cluster.kept { border-right-color: rgba(255,255,255,0.3); opacity: 0.55; }
+  .cluster .names { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+  .name-pill {
+    background: rgba(255,255,255,0.06); padding: 5px 12px; border-radius: 16px;
+    font-size: 14px; color: var(--text);
+  }
+  .name-pill .count {
+    color: var(--nflx-red); font-size: 11px; margin-left: 6px; font-weight: 700;
+  }
   .actions { display: flex; gap: 8px; margin-top: 8px; }
-  button { background: #21262d; color: #e6edf3; border: 1px solid #30363d; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  button:hover { background: #30363d; }
-  button.merge { background: #1f6feb; border-color: #1f6feb; }
-  button.merge:hover { background: #388bfd; }
-  button.keep { background: #6e7681; }
-  .export-bar { position: sticky; top: 0; background: #0d1117; padding: 12px 0; z-index: 10; border-bottom: 1px solid #30363d; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
-  .progress { color: #8b949e; font-size: 13px; }
-  .meta { color: #8b949e; font-size: 12px; margin-top: 4px; }
-  details { background: #161b22; padding: 8px 14px; border-radius: 8px; margin: 8px 0; }
-  details summary { cursor: pointer; font-weight: 600; color: #58a6ff; }
-  details ul { margin: 8px 0 0; padding-right: 20px; }
-  details li { margin: 4px 0; font-size: 13px; }
-  .warn-badge { background: rgba(240,136,62,0.15); color: #f0883e; font-size: 11px;
-                padding: 2px 8px; border-radius: 4px; margin-right: 6px; font-weight: 500; }
+  .btn {
+    padding: 7px 16px; border-radius: 4px; font-size: 13px; font-weight: 700;
+    cursor: pointer; border: 1px solid transparent; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn-merge { background: var(--nflx-red); color: #fff; border-color: var(--nflx-red); }
+  .btn-merge:hover { background: var(--nflx-red-dark); }
+  .btn-keep { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-keep:hover { background: rgba(255,255,255,0.06); }
+  .btn-export { background: #fff; color: #000; padding: 10px 22px; font-size: 14px; }
+  .btn-export:hover { background: rgba(255,255,255,0.85); }
+
+  /* ── Distributor section ── */
+  .meta-info {
+    background: rgba(229,9,20,0.06); border-right: 3px solid var(--nflx-red);
+    padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;
+    color: var(--muted); font-size: 13px;
+  }
+  .meta-info b { color: var(--text); }
+  details { background: var(--bg-card); padding: 0; border-radius: 8px; margin: 8px 0;
+            border: 1px solid var(--border); }
+  details summary {
+    cursor: pointer; padding: 14px 18px; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Heebo', sans-serif; list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: "▾"; color: var(--nflx-red); font-size: 14px; transition: transform 0.2s; }
+  details[open] summary::after { transform: rotate(180deg); }
+  details summary .right { display: flex; gap: 14px; align-items: baseline; }
+  details summary .name-en { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; }
+  details summary .recipient-count { color: var(--nflx-red); font-size: 13px; }
+  details ul { margin: 0; padding: 0 24px 14px 18px; list-style: none; }
+  details li {
+    padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  details li:last-child { border-bottom: none; }
+  .warn-badge {
+    background: rgba(240,136,62,0.15); color: var(--warn); font-size: 11px;
+    padding: 3px 9px; border-radius: 10px; font-weight: 600;
+  }
+
+  /* ── Floating action bar ── */
+  .floating-bar {
+    position: fixed; bottom: 24px; right: 50%; transform: translateX(50%);
+    background: rgba(0,0,0,0.95); border: 1px solid var(--border);
+    padding: 14px 20px; border-radius: 50px; backdrop-filter: blur(12px);
+    display: flex; gap: 16px; align-items: center; z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+  .floating-bar .info { color: var(--muted); font-size: 13px; }
+  .floating-bar .info b { color: var(--text); font-weight: 700; }
+
+  .empty { padding: 24px; color: var(--muted); text-align: center; font-size: 14px; }
 </style>
 </head>
 <body>
-<h1>סקירת כפילויות — OrdersHistory</h1>
 
-<div class="stats"><div class="stat"><span class="num">734</span><span class="label">total orders</span></div><div class="stat"><span class="num">138</span><span class="label">unique en buyers</span></div><div class="stat"><span class="num">273</span><span class="label">unique he recipients</span></div><div class="stat"><span class="num">0</span><span class="label">en fuzzy clusters</span></div><div class="stat"><span class="num">14</span><span class="label">he fuzzy clusters</span></div><div class="stat"><span class="num">21</span><span class="label">distributor groups</span></div></div>
+<header class="top-header">
+  <div class="brand">
+    <span class="super">SUPER TEAM</span>
+    <span class="academy">ACADEMY</span>
+  </div>
+  <span class="progress-pill" id="progressLabel">0 החלטות</span>
+</header>
 
-<div class="export-bar">
-  <button onclick="exportDecisions()">📥 ייצא JSON עם החלטות</button>
-  <span class="progress" id="progressLabel">0 החלטות נשמרו</span>
-</div>
+<main>
+  <h1 class="page-title">סקירת כפילויות</h1>
+  <p class="page-subtitle">איחוד שמות לקוחות מתוך OrdersHistory · אישור / שמירה בנפרד</p>
 
-<h2>1. שמות אנגלית — וריאציות איות (fuzzy match)</h2>
-<p class="meta">קבוצות שמות אנגלית עם דמיון ≥82%. סקור והחלט אם זה אותו אדם.</p>
-<div id="enClusters"><p>אין וריאציות אנגלית</p></div>
+  <div class="stats"><div class="stat"><span class="num">734</span><span class="label">total orders</span></div><div class="stat"><span class="num">138</span><span class="label">unique buyers en</span></div><div class="stat"><span class="num">273</span><span class="label">unique recipients he</span></div><div class="stat"><span class="num">31</span><span class="label">duplicates found</span></div><div class="stat"><span class="num">21</span><span class="label">distributors</span></div></div>
 
-<h2>2. שמות עברית — וריאציות איות (fuzzy match)</h2>
-<p class="meta">קבוצות שמות עברית עם דמיון ≥82%.</p>
-<div id="heClusters"><div class="cluster" id="he_0">
-  <div class="names"><span class="name-pill"><span class="count">1</span>K cohen</span><span class="name-pill"><span class="count">1</span>frida cohen</span><span class="name-pill"><span class="count">1</span>maor cohen</span></div>
+  <!-- ── Section 1: English fuzzy clusters ── -->
+  <div class="section">
+    <h2>וריאציות איות באנגלית <span class="badge-count">0</span></h2>
+    <div class="desc">קבוצות שמות אנגלית עם דמיון ≥82%.</div>
+  </div>
+  <div id="enClusters"><p class="empty">אין וריאציות אנגלית</p></div>
+
+  <!-- ── Section 2: Hebrew fuzzy clusters ── -->
+  <div class="section">
+    <h2>וריאציות איות בעברית <span class="badge-count">14</span></h2>
+    <div class="desc">קבוצות שמות עברית עם דמיון ≥82% — אישור מאחד אותן ללקוח אחד.</div>
+  </div>
+  <div id="heClusters"><div class="cluster" id="he_0">
+  <div class="names"><span class="name-pill">K cohen <span class="count">1</span></span><span class="name-pill">frida cohen <span class="count">1</span></span><span class="name-pill">maor cohen <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_0', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_0', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_0', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_0', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_1">
-  <div class="names"><span class="name-pill"><span class="count">5</span>אופיר אלגריסי</span><span class="name-pill"><span class="count">2</span>אופיר אלגרסי</span></div>
+  <div class="names"><span class="name-pill">אופיר אלגריסי <span class="count">5</span></span><span class="name-pill">אופיר אלגרסי <span class="count">2</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_1', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_1', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_1', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_1', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_2">
-  <div class="names"><span class="name-pill"><span class="count">5</span>אור לורדו</span><span class="name-pill"><span class="count">1</span>אור לרדו</span></div>
+  <div class="names"><span class="name-pill">אור לורדו <span class="count">5</span></span><span class="name-pill">אור לרדו <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_2', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_2', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_2', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_2', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_3">
-  <div class="names"><span class="name-pill"><span class="count">1</span>בינה ששון ליז</span><span class="name-pill"><span class="count">7</span>ליז</span></div>
+  <div class="names"><span class="name-pill">בינה ששון ליז <span class="count">1</span></span><span class="name-pill">ליז <span class="count">7</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_3', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_3', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_3', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_3', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_4">
-  <div class="names"><span class="name-pill"><span class="count">10</span>דביר</span><span class="name-pill"><span class="count">17</span>דביר ששון</span></div>
+  <div class="names"><span class="name-pill">דביר <span class="count">10</span></span><span class="name-pill">דביר ששון <span class="count">17</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_4', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_4', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_4', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_4', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_5">
-  <div class="names"><span class="name-pill"><span class="count">3</span>דודו יצחקי</span><span class="name-pill"><span class="count">1</span>ורד יצחקי</span></div>
+  <div class="names"><span class="name-pill">דודו יצחקי <span class="count">3</span></span><span class="name-pill">ורד יצחקי <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_5', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_5', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_5', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_5', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_6">
-  <div class="names"><span class="name-pill"><span class="count">1</span>דיאנה</span><span class="name-pill"><span class="count">2</span>דיאנה תמר ליבוביץ</span></div>
+  <div class="names"><span class="name-pill">דיאנה <span class="count">1</span></span><span class="name-pill">דיאנה תמר ליבוביץ <span class="count">2</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_6', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_6', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_6', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_6', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_7">
-  <div class="names"><span class="name-pill"><span class="count">2</span>יעל</span><span class="name-pill"><span class="count">2</span>יעל הנדרי</span><span class="name-pill"><span class="count">1</span>יעל פרינץ</span><span class="name-pill"><span class="count">4</span>יעל צרפתי</span></div>
+  <div class="names"><span class="name-pill">יעל <span class="count">2</span></span><span class="name-pill">יעל הנדרי <span class="count">2</span></span><span class="name-pill">יעל פרינץ <span class="count">1</span></span><span class="name-pill">יעל צרפתי <span class="count">4</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_7', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_7', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_7', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_7', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_8">
-  <div class="names"><span class="name-pill"><span class="count">3</span>מלי איסקוב</span><span class="name-pill"><span class="count">1</span>מלי יסאקוב</span></div>
+  <div class="names"><span class="name-pill">מלי איסקוב <span class="count">3</span></span><span class="name-pill">מלי יסאקוב <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_8', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_8', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_8', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_8', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_9">
-  <div class="names"><span class="name-pill"><span class="count">2</span>סוזי</span><span class="name-pill"><span class="count">4</span>סוזי והבה</span><span class="name-pill"><span class="count">3</span>סוזי ליה והבה</span></div>
+  <div class="names"><span class="name-pill">סוזי <span class="count">2</span></span><span class="name-pill">סוזי והבה <span class="count">4</span></span><span class="name-pill">סוזי ליה והבה <span class="count">3</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_9', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_9', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_9', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_9', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_10">
-  <div class="names"><span class="name-pill"><span class="count">6</span>סיוון סובעי</span><span class="name-pill"><span class="count">1</span>סיון סובעי</span></div>
+  <div class="names"><span class="name-pill">סיוון סובעי <span class="count">6</span></span><span class="name-pill">סיון סובעי <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_10', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_10', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_10', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_10', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_11">
-  <div class="names"><span class="name-pill"><span class="count">1</span>עמיחי בן אביר</span><span class="name-pill"><span class="count">1</span>עמיחי וקוני בן אביר</span></div>
+  <div class="names"><span class="name-pill">עמיחי בן אביר <span class="count">1</span></span><span class="name-pill">עמיחי וקוני בן אביר <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_11', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_11', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_11', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_11', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_12">
-  <div class="names"><span class="name-pill"><span class="count">10</span>רוני לביא</span><span class="name-pill"><span class="count">1</span>רוני לוי</span></div>
+  <div class="names"><span class="name-pill">רוני לביא <span class="count">10</span></span><span class="name-pill">רוני לוי <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_12', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_12', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_12', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_12', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="he_13">
-  <div class="names"><span class="name-pill"><span class="count">1</span>שירן גאוטה</span><span class="name-pill"><span class="count">1</span>שירן גואטה</span></div>
+  <div class="names"><span class="name-pill">שירן גאוטה <span class="count">1</span></span><span class="name-pill">שירן גואטה <span class="count">1</span></span></div>
   <div class="actions">
-    <button class="merge" onclick="decide('he_13', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('he_13', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('he_13', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('he_13', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div></div>
 
-<h2>3. מפיצים שמזמינים עבור אחרים (1 קונה → מספר נמענים)</h2>
-<p class="meta">קונה אחד עם 3+ נמענים שונים — סביר שזה מפיץ. <strong>זו לא כפילות</strong> אלא מידע על מי הזמין עבור מי. נמענים עם ⚠ סומנו ככפילות חשודה (הופיעו גם בקטע 2 או 4).</p>
-<div id="distributors"><div class="cluster" id="dist_0">
-  <div><strong>LIZ MEIROVICH</strong> — 47 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Herbalife International of America, Inc. California, USA</li><li>LIZ MEIROVICH</li><li>SHAHF WAITZMAN</li><li>liz</li><li>אביטל מטטוב פורטנוי</li><li>אודיה דוידוב</li><li>אור לרדו <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אורלי ברודו</li><li>אושרה פינחסי</li><li>אושרי שלי</li><li>אילה אילה</li><li>אלה מיטשניקחיים</li><li>אלכסנדרה אהרון</li><li>אתי רובין</li><li>בינה ששון ליז <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>בת אל יטיאו</li><li>בתאל שריקי</li><li>גל ברקת</li><li>דביר <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דביר ששון <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דריה זיגונוב</li><li>הילה אברגיל</li><li>חן זיתוני</li><li>יעל פרינץ <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>לי וגנר</li><li>ליהיא בנימין</li><li>ליז <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>ליז מאירוביץ</li><li>ליז עוז</li><li>לין ממן</li><li>מיכל מלמוד</li><li>מרגי נוקריאן</li><li>נטלי אילרוב</li><li>סגא קאסם</li><li>סונדוס אסד</li><li>עמית אפשטיין</li><li>צליל דדון</li><li>קרן טל קישנר</li><li>רויטל רויטל</li><li>רוני לוי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>רועי סלם</li><li>רותם עמרן</li><li>רחלי נומברג</li><li>רינת בדחה</li><li>שהם קנקין</li><li>שובל אסרף</li><li>תמרה רצאבי</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_1">
-  <div><strong>RONI LAVIE BITTON</strong> — 11 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>roni lavie bitton</li><li>אביטל גונן</li><li>איילת בר</li><li>אילת מוזס</li><li>מאור כהן</li><li>נאוה לביא</li><li>סבינה סטלמוצ׳נקו</li><li>רוני לביא <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>רעיה סימקין</li><li>שרון דלל</li><li>תמר אבצן</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_2">
-  <div><strong>RENATA LEVI</strong> — 5 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>אילנה אנדרייב</li><li>דנה קור</li><li>סיגל לוי</li><li>קארינה פרנקו</li><li>רנטה לוי</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_3">
-  <div><strong>SHELLY VIVANTE</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Shelly vivante</li><li>דביר <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>ליז מאירוביץ</li><li>שלי ויונטה</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_4">
-  <div><strong>YAEL ZARFATI</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>YAEL ZARFATI</li><li>Yael Zarfati</li><li>יעל <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>יעל צרפתי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_5">
-  <div><strong>SUZIE LIA VAHABA</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Suzie Lia Vahaba</li><li>סוזי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>סוזי והבה <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>סוזי ליה והבה <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_6">
-  <div><strong>DANA SOTO</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Dana Soto</li><li>Daniel Dali</li><li>דנה סוטו</li><li>עמיחי בן אביר <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_7">
-  <div><strong>DAVID ITZHAKI</strong> — 4 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>DAVID ITZHAKI</li><li>david itzhaki</li><li>דודו יצחקי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>ורד יצחקי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_8">
-  <div><strong>ELDAR BAN ATAR</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>דביר <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דביר ששון <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>שרון בן עטר</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_9">
-  <div><strong>MALI KUNTZ</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Mali Kuntz</li><li>דביר ששון <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>מלי קונץ</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_10">
-  <div><strong>SIVAN SUBAI</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>sivan subai</li><li>סיוון סובעי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>סיון סובעי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_11">
-  <div><strong>MEYTAR MORNO</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>MEYTAR MORNO</li><li>Meytar Morno</li><li>מיתר זיקרי מורנו</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_12">
-  <div><strong>DIANA TAMAR LEIBOVICH</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Diana Tamar leibovich</li><li>דיאנה <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דיאנה תמר ליבוביץ <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_13">
-  <div><strong>MARINA YAGUDAYEV</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Marina Yagudayev</li><li>מלי יסאקוב <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>מרינה יגודייב</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_14">
-  <div><strong>TAL GOLENBO</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Tal golenbo</li><li>גליה שיפיצין שוורץ</li><li>טל גולמבו</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_15">
-  <div><strong>SHAKED BERTI</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>חן כהן</li><li>ליאור סהר</li><li>שקד ברטי</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_16">
-  <div><strong>LIRAZ GOLAN</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>LIRAZ GOLAN</li><li>Liraz Golan</li><li>לירז דאלי</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_17">
-  <div><strong>SHIRAN DAHARY</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Shiran Dahary</li><li>שירן גאוטה <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>שירן גואטה <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_18">
-  <div><strong>OFIR ALGREESIE</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>OFIR ALGREESIE</li><li>אופיר אלגריסי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אופיר אלגרסי <span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_19">
-  <div><strong>MEYTAL COHEN</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>Meytal Cohen</li><li>ליז (מיטל)</li><li>מיטל כהן</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div><div class="cluster" id="dist_20">
-  <div><strong>GABRIEL GITMAN</strong> — 3 נמענים שונים</div>
-  <details><summary>הצג נמענים</summary><ul><li>GABRIEL GITMAN</li><li>Gabriel Gitman</li><li>גבריאל גיטמן</li></ul></details>
-  <div class="meta">מפיץ שמזמין עבור לקוחות אחרים — לא כפילות, פשוט סוג של buyer-on-behalf.</div>
-</div></div>
+  <!-- ── Section 3: Distributors (NOT duplicates) ── -->
+  <div class="section">
+    <h2>מפיצים שמזמינים עבור אחרים <span class="badge-count">21</span></h2>
+    <div class="desc">קונה אחד עם 3+ נמענים שונים — סביר שזה מפיץ.</div>
+  </div>
+  <div class="meta-info">
+    <b>זה לא כפילות</b> — זה מידע על מי הזמין עבור מי. נמענים שמסומנים ב-⚠ הופיעו גם בקבוצת כפילות חשודה (מעלה).
+  </div>
+  <div id="distributors"><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">LIZ MEIROVICH</span>
+      <span class="recipient-count">47 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Herbalife International of America, Inc. California, USA<span></span></li><li>LIZ MEIROVICH<span></span></li><li>SHAHF WAITZMAN<span></span></li><li>liz<span></span></li><li>אביטל מטטוב פורטנוי<span></span></li><li>אודיה דוידוב<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אור לרדו<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אורלי ברודו<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אושרה פינחסי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אושרי שלי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אילה אילה<span></span></li><li>אלה מיטשניקחיים<span></span></li><li>אלכסנדרה אהרון<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אתי רובין<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>בינה ששון ליז<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>בת אל יטיאו<span></span></li><li>בתאל שריקי<span></span></li><li>גל ברקת<span></span></li><li>דביר<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דביר ששון<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דריה זיגונוב<span></span></li><li>הילה אברגיל<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>חן זיתוני<span></span></li><li>יעל פרינץ<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>לי וגנר<span></span></li><li>ליהיא בנימין<span></span></li><li>ליז<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>ליז מאירוביץ<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>ליז עוז<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>לין ממן<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>מיכל מלמוד<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>מרגי נוקריאן<span></span></li><li>נטלי אילרוב<span></span></li><li>סגא קאסם<span></span></li><li>סונדוס אסד<span></span></li><li>עמית אפשטיין<span></span></li><li>צליל דדון<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>קרן טל קישנר<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>רויטל רויטל<span></span></li><li>רוני לוי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>רועי סלם<span></span></li><li>רותם עמרן<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>רחלי נומברג<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>רינת בדחה<span></span></li><li>שהם קנקין<span></span></li><li>שובל אסרף<span></span></li><li>תמרה רצאבי<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">RONI LAVIE BITTON</span>
+      <span class="recipient-count">11 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>roni lavie bitton<span></span></li><li>אביטל גונן<span></span></li><li>איילת בר<span></span></li><li>אילת מוזס<span></span></li><li>מאור כהן<span></span></li><li>נאוה לביא<span></span></li><li>סבינה סטלמוצ׳נקו<span></span></li><li>רוני לביא<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>רעיה סימקין<span></span></li><li>שרון דלל<span></span></li><li>תמר אבצן<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">RENATA LEVI</span>
+      <span class="recipient-count">5 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>אילנה אנדרייב<span></span></li><li>דנה קור<span></span></li><li>סיגל לוי<span></span></li><li>קארינה פרנקו<span></span></li><li>רנטה לוי<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">SHELLY VIVANTE</span>
+      <span class="recipient-count">4 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Shelly vivante<span></span></li><li>דביר<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>ליז מאירוביץ<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>שלי ויונטה<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">YAEL ZARFATI</span>
+      <span class="recipient-count">4 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>YAEL ZARFATI<span></span></li><li>Yael Zarfati<span></span></li><li>יעל<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>יעל צרפתי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">SUZIE LIA VAHABA</span>
+      <span class="recipient-count">4 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Suzie Lia Vahaba<span></span></li><li>סוזי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>סוזי והבה<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>סוזי ליה והבה<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">DANA SOTO</span>
+      <span class="recipient-count">4 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Dana Soto<span></span></li><li>Daniel Dali<span></span></li><li>דנה סוטו<span></span></li><li>עמיחי בן אביר<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">DAVID ITZHAKI</span>
+      <span class="recipient-count">4 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>DAVID ITZHAKI<span></span></li><li>david itzhaki<span></span></li><li>דודו יצחקי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>ורד יצחקי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">ELDAR BAN ATAR</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>דביר<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דביר ששון<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>שרון בן עטר<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">MALI KUNTZ</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Mali Kuntz<span></span></li><li>דביר ששון<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>מלי קונץ<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">SIVAN SUBAI</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>sivan subai<span></span></li><li>סיוון סובעי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>סיון סובעי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">MEYTAR MORNO</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>MEYTAR MORNO<span></span></li><li>Meytar Morno<span></span></li><li>מיתר זיקרי מורנו<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">DIANA TAMAR LEIBOVICH</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Diana Tamar leibovich<span></span></li><li>דיאנה<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>דיאנה תמר ליבוביץ<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">MARINA YAGUDAYEV</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Marina Yagudayev<span></span></li><li>מלי יסאקוב<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>מרינה יגודייב<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">TAL GOLENBO</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Tal golenbo<span></span></li><li>גליה שיפיצין שוורץ<span></span></li><li>טל גולמבו<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">SHAKED BERTI</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>חן כהן<span></span></li><li>ליאור סהר<span></span></li><li>שקד ברטי<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">LIRAZ GOLAN</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>LIRAZ GOLAN<span></span></li><li>Liraz Golan<span></span></li><li>לירז דאלי<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">SHIRAN DAHARY</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Shiran Dahary<span></span></li><li>שירן גאוטה<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>שירן גואטה<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">OFIR ALGREESIE</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>OFIR ALGREESIE<span></span></li><li>אופיר אלגריסי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li><li>אופיר אלגרסי<span class="warn-badge">⚠ כפילות חשודה — בדוק קטע "כפילויות עברית"</span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">MEYTAL COHEN</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>Meytal Cohen<span></span></li><li>ליז (מיטל)<span></span></li><li>מיטל כהן<span></span></li></ul>
+</details><details>
+  <summary>
+    <span class="right">
+      <span class="name-en">GABRIEL GITMAN</span>
+      <span class="recipient-count">3 נמענים</span>
+    </span>
+  </summary>
+  <ul><li>GABRIEL GITMAN<span></span></li><li>Gabriel Gitman<span></span></li><li>גבריאל גיטמן<span></span></li></ul>
+</details></div>
 
-<h2>4. שמות עברית עם איותי אנגלית מרובים</h2>
-<p class="meta">אותו נמען בעברית, מספר איותים שונים באנגלית — אותו אדם.</p>
-<div id="heMultiEn"><div class="cluster" id="hemulti_0">
-  <div><strong>דביר ששון</strong> = 4 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">FRIDA COHEN</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MALI KUNTZ</span></div>
+  <!-- ── Section 4: HE with multi EN ── -->
+  <div class="section">
+    <h2>אותו שם עברית · איותי אנגלית מרובים <span class="badge-count">17</span></h2>
+    <div class="desc">נמען עברי אחד עם מספר איותי אנגלית — סביר שזה אותו אדם עם איותים שונים.</div>
+  </div>
+  <div id="heMultiEn"><div class="cluster" id="hemulti_0">
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">דביר ששון</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">FRIDA COHEN</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MALI KUNTZ</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_0', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_0', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_0', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_0', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_1">
-  <div><strong>דביר</strong> = 3 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">דביר</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">ELDAR BAN ATAR</span><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_1', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_1', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_1', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_1', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_2">
-  <div><strong>אתי רובין</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ATI ROBIN</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">אתי רובין</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">ATI ROBIN</span><span class="name-pill">LIZ MEIROVICH</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_2', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_2', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_2', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_2', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_3">
-  <div><strong>לין ממן</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIN MAMAN</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">לין ממן</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIN MAMAN</span><span class="name-pill">LIZ MEIROVICH</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_3', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_3', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_3', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_3', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_4">
-  <div><strong>אושרי שלי</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRY SHELLY</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">אושרי שלי</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRY SHELLY</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_4', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_4', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_4', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_4', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_5">
-  <div><strong>אושרה פינחסי</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRA PINCHASI</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">אושרה פינחסי</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">OSHRA PINCHASI</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_5', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_5', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_5', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_5', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_6">
-  <div><strong>אודיה דוידוב</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ODAYA DAVIDOV</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">אודיה דוידוב</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ODAYA DAVIDOV</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_6', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_6', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_6', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_6', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_7">
-  <div><strong>קרן טל קישנר</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">KEREN TAL KISHNER</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">קרן טל קישנר</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">KEREN TAL KISHNER</span><span class="name-pill">LIZ MEIROVICH</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_7', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_7', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_7', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_7', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_8">
-  <div><strong>ליז מאירוביץ</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">ליז מאירוביץ</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">SHELLY VIVANTE</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_8', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_8', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_8', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_8', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_9">
-  <div><strong>רחלי נומברג</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">RACHELI MELZER</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">רחלי נומברג</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">RACHELI MELZER</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_9', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_9', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_9', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_9', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_10">
-  <div><strong>אורלי ברודו</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ORLY BRUDO</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">אורלי ברודו</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ORLY BRUDO</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_10', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_10', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_10', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_10', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_11">
-  <div><strong>מיכל מלמוד</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MICHAL MELAMUD</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">מיכל מלמוד</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">MICHAL MELAMUD</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_11', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_11', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_11', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_11', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_12">
-  <div><strong>הילה אברגיל</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">HILA ABARGIL</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">הילה אברגיל</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">HILA ABARGIL</span><span class="name-pill">LIZ MEIROVICH</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_12', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_12', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_12', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_12', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_13">
-  <div><strong>רותם עמרן</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ROTEM AMRAN</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">רותם עמרן</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">ROTEM AMRAN</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_13', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_13', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_13', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_13', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_14">
-  <div><strong>אלכסנדרה אהרון</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">ALEXANDRA AHARON</span><span class="name-pill">LIZ MEIROVICH</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">אלכסנדרה אהרון</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">ALEXANDRA AHARON</span><span class="name-pill">LIZ MEIROVICH</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_14', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_14', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_14', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_14', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_15">
-  <div><strong>ליז עוז</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">LIZ OZ</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">ליז עוז</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">LIZ OZ</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_15', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_15', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_15', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_15', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div><div class="cluster" id="hemulti_16">
-  <div><strong>צליל דדון</strong> = 2 איותי אנגלית:</div>
-  <div class="names"><span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">TSLIL DADON</span></div>
+  <div class="names">
+    <span class="name-pill" style="background:rgba(229,9,20,0.15);color:#fff;font-weight:600;">צליל דדון</span>
+    <span style="color:var(--muted);font-size:13px;align-self:center;">⇐</span>
+    <span class="name-pill">LIZ MEIROVICH</span><span class="name-pill">TSLIL DADON</span>
+  </div>
   <div class="actions">
-    <button class="merge" onclick="decide('hemulti_16', 'merge')">✓ אותו אדם</button>
-    <button class="keep" onclick="decide('hemulti_16', 'keep')">✕ אנשים נפרדים</button>
+    <button class="btn btn-merge" onclick="decide('hemulti_16', 'merge')">✓ אותו אדם — אחד</button>
+    <button class="btn btn-keep" onclick="decide('hemulti_16', 'keep')">✕ אנשים נפרדים</button>
   </div>
 </div></div>
+</main>
+
+<div class="floating-bar">
+  <span class="info"><b id="mergedCount">0</b> אוחדו · <b id="keptCount">0</b> נשמרו</span>
+  <button class="btn btn-export" onclick="exportDecisions()">📥 ייצא JSON עם החלטות</button>
+</div>
 
 <script>
-const decisions = JSON.parse(localStorage.getItem('dedupe_decisions') || '{}');
+const decisions = JSON.parse(localStorage.getItem('dedupe_decisions_v3') || '{}');
 
 function decide(clusterId, action) {
   decisions[clusterId] = action;
-  localStorage.setItem('dedupe_decisions', JSON.stringify(decisions));
-  const el = document.getElementById(clusterId);
+  localStorage.setItem('dedupe_decisions_v3', JSON.stringify(decisions));
+  refreshUI(clusterId);
+}
+
+function refreshUI(id) {
+  const el = document.getElementById(id);
   if (el) {
     el.classList.remove('merged', 'kept');
-    if (action === 'merge') el.classList.add('merged');
-    else if (action === 'keep') el.classList.add('kept');
+    if (decisions[id] === 'merge') el.classList.add('merged');
+    else if (decisions[id] === 'keep') el.classList.add('kept');
   }
   updateProgress();
 }
 
 function updateProgress() {
-  const n = Object.keys(decisions).length;
-  document.getElementById('progressLabel').textContent = `${n} החלטות נשמרו`;
+  const all = Object.values(decisions);
+  const merged = all.filter(a => a === 'merge').length;
+  const kept = all.filter(a => a === 'keep').length;
+  document.getElementById('progressLabel').textContent = `${merged + kept} החלטות`;
+  document.getElementById('mergedCount').textContent = merged;
+  document.getElementById('keptCount').textContent = kept;
 }
 
 function exportDecisions() {
-  const blob = new Blob([JSON.stringify(decisions, null, 2)], { type: 'application/json' });
+  // Build merged_customers.json with the unified mapping
+  const clusters = window.__clustersData;
+  const mapping = {};  // alias_name → canonical_name
+  const merged = [];
+
+  // Hebrew fuzzy clusters
+  clusters.he_fuzzy_clusters.forEach((c, i) => {
+    const id = 'he_' + i;
+    if (decisions[id] === 'merge') {
+      const canonical = c.names[0];  // first name as canonical
+      c.names.forEach(n => { if (n !== canonical) mapping[n] = canonical; });
+      merged.push({ canonical, aliases: c.names.slice(1), source: 'he_fuzzy' });
+    }
+  });
+  // English fuzzy clusters
+  clusters.en_fuzzy_clusters.forEach((c, i) => {
+    const id = 'en_' + i;
+    if (decisions[id] === 'merge') {
+      const canonical = c.names[0];
+      c.names.forEach(n => { if (n !== canonical) mapping[n] = canonical; });
+      merged.push({ canonical, aliases: c.names.slice(1), source: 'en_fuzzy' });
+    }
+  });
+  // HE → multi EN
+  clusters.he_multi_en.forEach((g, i) => {
+    const id = 'hemulti_' + i;
+    if (decisions[id] === 'merge') {
+      merged.push({ canonical_he: g.recipient_he, en_aliases: g.buyers_en, source: 'he_multi_en' });
+    }
+  });
+
+  const payload = {
+    generated_at: new Date().toISOString(),
+    decisions,
+    mapping,
+    merged_groups: merged,
+    summary: {
+      total_decisions: Object.keys(decisions).length,
+      merged_count: merged.length,
+      aliases_count: Object.keys(mapping).length,
+    },
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'dedupe_decisions.json';
-  a.click();
+  a.href = url; a.download = 'merged_customers.json'; a.click();
   URL.revokeObjectURL(url);
 }
 
-// Restore visual state from saved decisions
 window.addEventListener('DOMContentLoaded', () => {
-  Object.entries(decisions).forEach(([id, action]) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add(action === 'merge' ? 'merged' : 'kept');
-  });
+  Object.keys(decisions).forEach(id => refreshUI(id));
   updateProgress();
 });
+
+window.__clustersData = {"stats": {"total_orders": 734, "unique_buyers_en": 138, "unique_recipients_he": 273, "duplicates_found": 31, "distributors": 21}, "en_fuzzy_clusters": [], "he_fuzzy_clusters": [{"names": ["K cohen", "frida cohen", "maor cohen"], "counts": [1, 1, 1]}, {"names": ["אופיר אלגריסי", "אופיר אלגרסי"], "counts": [5, 2]}, {"names": ["אור לורדו", "אור לרדו"], "counts": [5, 1]}, {"names": ["בינה ששון ליז", "ליז"], "counts": [1, 7]}, {"names": ["דביר", "דביר ששון"], "counts": [10, 17]}, {"names": ["דודו יצחקי", "ורד יצחקי"], "counts": [3, 1]}, {"names": ["דיאנה", "דיאנה תמר ליבוביץ"], "counts": [1, 2]}, {"names": ["יעל", "יעל הנדרי", "יעל פרינץ", "יעל צרפתי"], "counts": [2, 2, 1, 4]}, {"names": ["מלי איסקוב", "מלי יסאקוב"], "counts": [3, 1]}, {"names": ["סוזי", "סוזי והבה", "סוזי ליה והבה"], "counts": [2, 4, 3]}, {"names": ["סיוון סובעי", "סיון סובעי"], "counts": [6, 1]}, {"names": ["עמיחי בן אביר", "עמיחי וקוני בן אביר"], "counts": [1, 1]}, {"names": ["רוני לביא", "רוני לוי"], "counts": [10, 1]}, {"names": ["שירן גאוטה", "שירן גואטה"], "counts": [1, 1]}], "distributor_groups": [{"buyer_en": "LIZ MEIROVICH", "recipients_he": ["Herbalife International of America, Inc. California, USA", "LIZ MEIROVICH", "SHAHF WAITZMAN", "liz", "אביטל מטטוב פורטנוי", "אודיה דוידוב", "אור לרדו", "אורלי ברודו", "אושרה פינחסי", "אושרי שלי", "אילה אילה", "אלה מיטשניקחיים", "אלכסנדרה אהרון", "אתי רובין", "בינה ששון ליז", "בת אל יטיאו", "בתאל שריקי", "גל ברקת", "דביר", "דביר ששון", "דריה זיגונוב", "הילה אברגיל", "חן זיתוני", "יעל פרינץ", "לי וגנר", "ליהיא בנימין", "ליז", "ליז מאירוביץ", "ליז עוז", "לין ממן", "מיכל מלמוד", "מרגי נוקריאן", "נטלי אילרוב", "סגא קאסם", "סונדוס אסד", "עמית אפשטיין", "צליל דדון", "קרן טל קישנר", "רויטל רויטל", "רוני לוי", "רועי סלם", "רותם עמרן", "רחלי נומברג", "רינת בדחה", "שהם קנקין", "שובל אסרף", "תמרה רצאבי"], "recipient_count": 47}, {"buyer_en": "RONI LAVIE BITTON", "recipients_he": ["roni lavie bitton", "אביטל גונן", "איילת בר", "אילת מוזס", "מאור כהן", "נאוה לביא", "סבינה סטלמוצ׳נקו", "רוני לביא", "רעיה סימקין", "שרון דלל", "תמר אבצן"], "recipient_count": 11}, {"buyer_en": "RENATA LEVI", "recipients_he": ["אילנה אנדרייב", "דנה קור", "סיגל לוי", "קארינה פרנקו", "רנטה לוי"], "recipient_count": 5}, {"buyer_en": "SHELLY VIVANTE", "recipients_he": ["Shelly vivante", "דביר", "ליז מאירוביץ", "שלי ויונטה"], "recipient_count": 4}, {"buyer_en": "YAEL ZARFATI", "recipients_he": ["YAEL ZARFATI", "Yael Zarfati", "יעל", "יעל צרפתי"], "recipient_count": 4}, {"buyer_en": "SUZIE LIA VAHABA", "recipients_he": ["Suzie Lia Vahaba", "סוזי", "סוזי והבה", "סוזי ליה והבה"], "recipient_count": 4}, {"buyer_en": "DANA SOTO", "recipients_he": ["Dana Soto", "Daniel Dali", "דנה סוטו", "עמיחי בן אביר"], "recipient_count": 4}, {"buyer_en": "DAVID ITZHAKI", "recipients_he": ["DAVID ITZHAKI", "david itzhaki", "דודו יצחקי", "ורד יצחקי"], "recipient_count": 4}, {"buyer_en": "ELDAR BAN ATAR", "recipients_he": ["דביר", "דביר ששון", "שרון בן עטר"], "recipient_count": 3}, {"buyer_en": "MALI KUNTZ", "recipients_he": ["Mali Kuntz", "דביר ששון", "מלי קונץ"], "recipient_count": 3}, {"buyer_en": "SIVAN SUBAI", "recipients_he": ["sivan subai", "סיוון סובעי", "סיון סובעי"], "recipient_count": 3}, {"buyer_en": "MEYTAR MORNO", "recipients_he": ["MEYTAR MORNO", "Meytar Morno", "מיתר זיקרי מורנו"], "recipient_count": 3}, {"buyer_en": "DIANA TAMAR LEIBOVICH", "recipients_he": ["Diana Tamar leibovich", "דיאנה", "דיאנה תמר ליבוביץ"], "recipient_count": 3}, {"buyer_en": "MARINA YAGUDAYEV", "recipients_he": ["Marina Yagudayev", "מלי יסאקוב", "מרינה יגודייב"], "recipient_count": 3}, {"buyer_en": "TAL GOLENBO", "recipients_he": ["Tal golenbo", "גליה שיפיצין שוורץ", "טל גולמבו"], "recipient_count": 3}, {"buyer_en": "SHAKED BERTI", "recipients_he": ["חן כהן", "ליאור סהר", "שקד ברטי"], "recipient_count": 3}, {"buyer_en": "LIRAZ GOLAN", "recipients_he": ["LIRAZ GOLAN", "Liraz Golan", "לירז דאלי"], "recipient_count": 3}, {"buyer_en": "SHIRAN DAHARY", "recipients_he": ["Shiran Dahary", "שירן גאוטה", "שירן גואטה"], "recipient_count": 3}, {"buyer_en": "OFIR ALGREESIE", "recipients_he": ["OFIR ALGREESIE", "אופיר אלגריסי", "אופיר אלגרסי"], "recipient_count": 3}, {"buyer_en": "MEYTAL COHEN", "recipients_he": ["Meytal Cohen", "ליז (מיטל)", "מיטל כהן"], "recipient_count": 3}, {"buyer_en": "GABRIEL GITMAN", "recipients_he": ["GABRIEL GITMAN", "Gabriel Gitman", "גבריאל גיטמן"], "recipient_count": 3}], "he_multi_en": [{"recipient_he": "דביר ששון", "buyers_en": ["ELDAR BAN ATAR", "FRIDA COHEN", "LIZ MEIROVICH", "MALI KUNTZ"], "buyer_count": 4}, {"recipient_he": "דביר", "buyers_en": ["ELDAR BAN ATAR", "LIZ MEIROVICH", "SHELLY VIVANTE"], "buyer_count": 3}, {"recipient_he": "אתי רובין", "buyers_en": ["ATI ROBIN", "LIZ MEIROVICH"], "buyer_count": 2}, {"recipient_he": "לין ממן", "buyers_en": ["LIN MAMAN", "LIZ MEIROVICH"], "buyer_count": 2}, {"recipient_he": "אושרי שלי", "buyers_en": ["LIZ MEIROVICH", "OSHRY SHELLY"], "buyer_count": 2}, {"recipient_he": "אושרה פינחסי", "buyers_en": ["LIZ MEIROVICH", "OSHRA PINCHASI"], "buyer_count": 2}, {"recipient_he": "אודיה דוידוב", "buyers_en": ["LIZ MEIROVICH", "ODAYA DAVIDOV"], "buyer_count": 2}, {"recipient_he": "קרן טל קישנר", "buyers_en": ["KEREN TAL KISHNER", "LIZ MEIROVICH"], "buyer_count": 2}, {"recipient_he": "ליז מאירוביץ", "buyers_en": ["LIZ MEIROVICH", "SHELLY VIVANTE"], "buyer_count": 2}, {"recipient_he": "רחלי נומברג", "buyers_en": ["LIZ MEIROVICH", "RACHELI MELZER"], "buyer_count": 2}, {"recipient_he": "אורלי ברודו", "buyers_en": ["LIZ MEIROVICH", "ORLY BRUDO"], "buyer_count": 2}, {"recipient_he": "מיכל מלמוד", "buyers_en": ["LIZ MEIROVICH", "MICHAL MELAMUD"], "buyer_count": 2}, {"recipient_he": "הילה אברגיל", "buyers_en": ["HILA ABARGIL", "LIZ MEIROVICH"], "buyer_count": 2}, {"recipient_he": "רותם עמרן", "buyers_en": ["LIZ MEIROVICH", "ROTEM AMRAN"], "buyer_count": 2}, {"recipient_he": "אלכסנדרה אהרון", "buyers_en": ["ALEXANDRA AHARON", "LIZ MEIROVICH"], "buyer_count": 2}, {"recipient_he": "ליז עוז", "buyers_en": ["LIZ MEIROVICH", "LIZ OZ"], "buyer_count": 2}, {"recipient_he": "צליל דדון", "buyers_en": ["LIZ MEIROVICH", "TSLIL DADON"], "buyer_count": 2}]};
 </script>
 </body>
 </html>

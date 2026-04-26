@@ -1,11 +1,10 @@
 {
   "stats": {
     "total_orders": 734,
-    "unique_en_buyers": 138,
-    "unique_he_recipients": 273,
-    "en_fuzzy_clusters": 0,
-    "he_fuzzy_clusters": 14,
-    "distributor_groups": 21
+    "unique_buyers_en": 138,
+    "unique_recipients_he": 273,
+    "duplicates_found": 31,
+    "distributors": 21
   },
   "en_fuzzy_clusters": [],
   "he_fuzzy_clusters": [
