@@ -139,10 +139,11 @@ def build_clusters(df):
     en_buyers = sorted(set(df["buyer_en_norm"].dropna().tolist()))
     he_translit = {he: he_to_latin(he) for he in he_recipients if he}
 
-    self_buyers = []
+    self_buyers_review = []     # need user review (70-99%)
+    self_buyers_auto = []        # auto-confirmed (100%)
     for he in he_recipients:
         if not he or not is_hebrew(he):
-            continue  # skip recipients that are already in Latin script
+            continue
         he_lat = he_translit[he]
         if not he_lat:
             continue
@@ -154,14 +155,21 @@ def build_clusters(df):
             score = fuzz.token_set_ratio(he_lat, buyer)
             if score >= TRANSLIT_THRESHOLD:
                 matches.append({"buyer_en": buyer, "score": int(score)})
-        if matches:
-            matches.sort(key=lambda m: -m["score"])
-            self_buyers.append({
-                "recipient_he": he,
-                "transliteration": he_lat,
-                "matched_buyers": matches,
-            })
-    self_buyers.sort(key=lambda x: -max(m["score"] for m in x["matched_buyers"]))
+        if not matches:
+            continue
+        matches.sort(key=lambda m: -m["score"])
+        top_score = matches[0]["score"]
+        record = {
+            "recipient_he": he,
+            "transliteration": he_lat,
+            "matched_buyers": matches,
+        }
+        if top_score >= 100:
+            self_buyers_auto.append(record)
+        else:
+            self_buyers_review.append(record)
+    self_buyers_review.sort(key=lambda x: -max(m["score"] for m in x["matched_buyers"]))
+    self_buyers_auto.sort(key=lambda x: x["recipient_he"])
 
     en_counts = df["buyer_en_norm"].value_counts().to_dict()
     he_counts = df["recipient_he_norm"].value_counts().to_dict()
@@ -171,7 +179,7 @@ def build_clusters(df):
             "total_orders": int(len(df)),
             "unique_buyers_en": len(en_names),
             "unique_recipients_he": len(he_names),
-            "duplicates_found": len(en_clusters) + len(he_clusters) + len(self_buyers),
+            "duplicates_found": len(en_clusters) + len(he_clusters) + len(self_buyers_review) + len(self_buyers_auto),
             "distributors": len(distributor_groups),
         },
         "en_fuzzy_clusters": [
@@ -183,7 +191,8 @@ def build_clusters(df):
             for c in he_clusters
         ],
         "distributor_groups": distributor_groups[:30],
-        "self_buyers": self_buyers[:50],
+        "self_buyers_review": self_buyers_review[:50],
+        "self_buyers_auto": self_buyers_auto,
     }
 
 
@@ -358,8 +367,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
   <!-- ── Section 1: English fuzzy clusters ── -->
   <div class="section">
-    <h2>וריאציות איות באנגלית <span class="badge-count">__EN_COUNT__</span></h2>
-    <div class="desc">קבוצות שמות אנגלית עם דמיון ≥82%.</div>
+    <h2>שגיאות איות באנגלית <span class="badge-count">__EN_COUNT__</span></h2>
+    <div class="desc">שני שמות אנגלית שונים שכנראה אותו אדם עם שגיאת איות.<br>
+    <span style="color:var(--muted);font-size:11px;">לדוגמה: "ROTEM LIANI" ↔ "ROTEM LYANI"</span></div>
   </div>
   <div id="enClusters">__EN_CLUSTERS_HTML__</div>
 
@@ -382,8 +392,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
   <!-- ── Section 4: Self-buyers (HE recipient = transliteration of EN buyer) ── -->
   <div class="section">
-    <h2>קונה לעצמו · עברית = תעתיק אנגלית <span class="badge-count">__HEMULTI_COUNT__</span></h2>
-    <div class="desc">נמען עברי שגם הופיע כקונה אנגלית עם תעתיק תואם. הציון מציין דמיון בין השם בעברית לתעתיק האנגלי.</div>
+    <h2>אותו אדם בשתי שפות — דורש סקירה <span class="badge-count">__HEMULTI_COUNT__</span></h2>
+    <div class="desc">שם בעברית של הנמען נשמע כמו השם האנגלי של הקונה — סביר שזה אותו אדם.<br>
+    <span style="color:var(--muted);font-size:11px;">לדוגמה: "אתי רובין" (עברית) ↔ "ATI ROBIN" (אנגלית). 100% מאושרים אוטומטית.</span></div>
   </div>
   <div id="heMultiEn">__HE_MULTI_EN_HTML__</div>
 </main>
@@ -445,14 +456,20 @@ function exportDecisions() {
       merged.push({ canonical, aliases: c.names.slice(1), source: 'en_fuzzy' });
     }
   });
-  // Self-buyers (HE recipient = transliteration of EN buyer)
-  clusters.self_buyers.forEach((g, i) => {
+  // Self-buyers manually reviewed
+  clusters.self_buyers_review.forEach((g, i) => {
     const id = 'selfbuy_' + i;
     if (decisions[id] === 'merge') {
       const en_aliases = g.matched_buyers.map(m => m.buyer_en);
       en_aliases.forEach(en => mapping[en] = g.recipient_he);
-      merged.push({ canonical_he: g.recipient_he, en_aliases, source: 'self_buyer' });
+      merged.push({ canonical_he: g.recipient_he, en_aliases, source: 'self_buyer_review' });
     }
+  });
+  // Self-buyers 100% — auto-merged silently
+  clusters.self_buyers_auto.forEach(g => {
+    const en_aliases = g.matched_buyers.map(m => m.buyer_en);
+    en_aliases.forEach(en => mapping[en] = g.recipient_he);
+    merged.push({ canonical_he: g.recipient_he, en_aliases, source: 'self_buyer_auto_100pct' });
   });
 
   const payload = {
@@ -568,7 +585,9 @@ def main():
     for c in data["he_fuzzy_clusters"]:
         for name in c["names"]:
             dup_names.add(name)
-    for g in data["self_buyers"]:
+    for g in data["self_buyers_review"]:
+        dup_names.add(g["recipient_he"])
+    for g in data["self_buyers_auto"]:
         dup_names.add(g["recipient_he"])
 
     dist_html = "".join(
@@ -576,16 +595,27 @@ def main():
         for i, g in enumerate(data["distributor_groups"])
     ) or '<p class="empty">אין מפיצים</p>'
 
-    hemulti_html = "".join(
-        render_self_buyer(i, g) for i, g in enumerate(data["self_buyers"])
-    ) or '<p class="empty">לא נמצאו תעתיקים תואמים</p>'
+    auto_count = len(data["self_buyers_auto"])
+    review_count = len(data["self_buyers_review"])
+    auto_notice = ""
+    if auto_count:
+        sample = ", ".join(g["recipient_he"] for g in data["self_buyers_auto"][:5])
+        more = f" ועוד {auto_count - 5}" if auto_count > 5 else ""
+        auto_notice = f'''<div class="meta-info" style="background:rgba(70,211,105,0.08);border-color:var(--good);">
+  <b>✓ {auto_count} כפילויות 100% אושרו אוטומטית</b> — תעתיק זהה לחלוטין לקונה האנגלית, אין ספק.
+  <br><span style="color:var(--muted);font-size:12px;">דוגמאות: {sample}{more}</span>
+</div>'''
+
+    hemulti_html = auto_notice + ("".join(
+        render_self_buyer(i, g) for i, g in enumerate(data["self_buyers_review"])
+    ) or '<p class="empty">לא נמצאו תעתיקים שדורשים סקירה</p>')
 
     html = (HTML_TEMPLATE
             .replace("__STATS_HTML__", stats_html)
             .replace("__EN_COUNT__", str(len(data["en_fuzzy_clusters"])))
             .replace("__HE_COUNT__", str(len(data["he_fuzzy_clusters"])))
             .replace("__DIST_COUNT__", str(len(data["distributor_groups"])))
-            .replace("__HEMULTI_COUNT__", str(len(data["self_buyers"])))
+            .replace("__HEMULTI_COUNT__", str(len(data["self_buyers_review"])))
             .replace("__EN_CLUSTERS_HTML__", en_html)
             .replace("__HE_CLUSTERS_HTML__", he_html)
             .replace("__DISTRIBUTORS_HTML__", dist_html)

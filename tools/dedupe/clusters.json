@@ -407,37 +407,7 @@
       "recipient_count": 3
     }
   ],
-  "self_buyers": [
-    {
-      "recipient_he": "אתי רובין",
-      "transliteration": "ATI ROBIN",
-      "matched_buyers": [
-        {
-          "buyer_en": "ATI ROBIN",
-          "score": 100
-        }
-      ]
-    },
-    {
-      "recipient_he": "ליז",
-      "transliteration": "LIZ",
-      "matched_buyers": [
-        {
-          "buyer_en": "LIZ MEIROVICH",
-          "score": 100
-        }
-      ]
-    },
-    {
-      "recipient_he": "נירית סוטו",
-      "transliteration": "NIRIT SOTO",
-      "matched_buyers": [
-        {
-          "buyer_en": "NIRIT SOTO",
-          "score": 100
-        }
-      ]
-    },
+  "self_buyers_review": [
     {
       "recipient_he": "פיני מחלוף",
       "transliteration": "PINI MCHLOF",
@@ -905,6 +875,68 @@
         {
           "buyer_en": "LINOR HABURA",
           "score": 75
+        }
+      ]
+    },
+    {
+      "recipient_he": "עדי יונה",
+      "transliteration": "ADI IONH",
+      "matched_buyers": [
+        {
+          "buyer_en": "ADI YONA",
+          "score": 75
+        }
+      ]
+    },
+    {
+      "recipient_he": "אופיר אלגריסי",
+      "transliteration": "AOPIR ALGRISI",
+      "matched_buyers": [
+        {
+          "buyer_en": "OFIR ALGREESIE",
+          "score": 74
+        }
+      ]
+    },
+    {
+      "recipient_he": "תמר לבשטיין",
+      "transliteration": "TMR LBSHTIIN",
+      "matched_buyers": [
+        {
+          "buyer_en": "TAMAR LEVSHTEIN",
+          "score": 74
+        }
+      ]
+    }
+  ],
+  "self_buyers_auto": [
+    {
+      "recipient_he": "אתי רובין",
+      "transliteration": "ATI ROBIN",
+      "matched_buyers": [
+        {
+          "buyer_en": "ATI ROBIN",
+          "score": 100
+        }
+      ]
+    },
+    {
+      "recipient_he": "ליז",
+      "transliteration": "LIZ",
+      "matched_buyers": [
+        {
+          "buyer_en": "LIZ MEIROVICH",
+          "score": 100
+        }
+      ]
+    },
+    {
+      "recipient_he": "נירית סוטו",
+      "transliteration": "NIRIT SOTO",
+      "matched_buyers": [
+        {
+          "buyer_en": "NIRIT SOTO",
+          "score": 100
         }
       ]
     }
