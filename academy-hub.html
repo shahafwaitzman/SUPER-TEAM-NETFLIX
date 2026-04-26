@@ -2413,6 +2413,26 @@ if (userEmail) {
    PHASE 2B · localStorage foundation (per-user scoped)
    ═══════════════════════════════════════════ */
 const ST_NS = userEmail ? `sta_${userEmail}` : 'sta_guest';
+
+/* One-time wipe of legacy global keys + stale per-user data (run once per browser).
+   Bumped to v3 on 2026-04-26 to enforce per-user isolation after Firebase reset. */
+(function stWipeLegacyV3(){
+  try {
+    if (localStorage.getItem('sta_reset_v3') === '1') return;
+    const toRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      // Wipe ALL sta_* keys (per-user and global) — fresh start
+      if (k.startsWith('sta_') || k.startsWith('sta-')) toRemove.push(k);
+    }
+    toRemove.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+    localStorage.setItem('sta_reset_v3', '1');
+    console.info('[Academy] One-time data reset complete. Cleared', toRemove.length, 'legacy keys.');
+  } catch (e) { console.warn('[Academy] Reset wipe failed:', e); }
+})();
+
+console.info('[Academy] Active user:', userEmail || '(guest)', '· Namespace:', ST_NS);
 const ST_KEYS = {
   PROGRESS:          `${ST_NS}_progress`,          // { [videoId]: 0..100 }
   WATCHLIST:         `${ST_NS}_watchlist`,         // [videoId, ...]
@@ -2534,13 +2554,9 @@ function trackVideoOpen(videoId, title) {
   const lw = stGet(ST_KEYS.LAST_WATCHED, {});
   lw[videoId] = { ts: Date.now(), title: title || '' };
   stSet(ST_KEYS.LAST_WATCHED, lw);
-
-  // Seed a small progress so card shows the bar immediately
-  const pr = stGet(ST_KEYS.PROGRESS, {});
-  if (!pr[videoId] || pr[videoId] < 5) {
-    pr[videoId] = 5;
-    stSet(ST_KEYS.PROGRESS, pr);
-  }
+  // Note: progress is only recorded when the user actually watches the video,
+  // not just opens the card. Auto-seed removed 2026-04-26 — was causing
+  // "Continue Watching" to fill with videos the user never actually viewed.
 }
 
 // Delegated listener — captures any future card click (in addition to existing handlers)
@@ -2560,7 +2576,7 @@ function buildContinueWatchingRow() {
   const progress = stGet(ST_KEYS.PROGRESS, {});
   const entries = Object.entries(lw)
     .map(([id, meta]) => ({ id, title: (meta && meta.title) || '', ts: (meta && meta.ts) || 0, pct: progress[id] || 0 }))
-    .filter(e => e.id && e.ts > 0)
+    .filter(e => e.id && e.ts > 0 && e.pct > 0)
     .sort((a, b) => b.ts - a.ts)
     .slice(0, 10);
 
